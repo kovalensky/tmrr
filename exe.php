@@ -78,7 +78,7 @@ if(!isset($decoded["info"])){
 if(!isset($decoded["meta version"]) && !isset($decoded["piece layers"])){
 	die("It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade");
 }
-$hey = $decoded["info"]["file tree"]; 
+$make = $decoded["info"]["file tree"]; 
 
 function printArrayNames($array, $parent = "") {
     foreach($array as $key => $value) {
@@ -91,4 +91,4 @@ function printArrayNames($array, $parent = "") {
 		}
     }
 }
-printArrayNames($hey);
+printArrayNames($make);
