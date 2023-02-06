@@ -6,6 +6,5 @@ Usage:
 ```
 TorrentMerkleReader.exe example.torrent
 ```
-Supports ASCII(english) file names only.
 
 Can be useful to search for the same copies of files on different trackers.
