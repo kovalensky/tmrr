@@ -1,5 +1,5 @@
 <?php
-
+// Bencode library
 function bencode_decode($input) {
     if ($input === '') {
         return null;
@@ -64,6 +64,7 @@ function bencode_decode_r($input, $len, &$pos) {
             return $output;
     }
 }
+// Check for arguments
 
 if (isset($argv[1]) && isset($argv[2]) OR !isset($argv[1])) {
 die("\r\nPlease use the correct syntax, as TorrentMerkleReader.exe <torrent-file-name> \r\n\r\n---\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\n\r\nGreetings from the Russian Federation!");
@@ -80,6 +81,7 @@ if(!isset($decoded["meta version"]) && !isset($decoded["piece layers"])){
 }
 $make = $decoded["info"]["file tree"]; 
 
+// Loop through all arrays saving locations and showing result
 function printArrayNames($array, $parent = "") {
     foreach($array as $key => $value) {
         $current = $parent . "/" . $key;
