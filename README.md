@@ -7,4 +7,4 @@ Usage:
 TorrentMerkleReader.exe example.torrent
 ```
 
-Can be useful to search for the same copies of files on different trackers.
+Can be useful to search for the same copies of files on different trackers thus reviving dead torrents.
