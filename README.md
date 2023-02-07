@@ -4,7 +4,7 @@ Standalone windows tool to read contents of BitTorrent v2 compatible .torrent fi
 
 Usage:
 ```
-TorrentMerkleReader.exe example.torrent
+tmrr.exe example.torrent
 ```
 
 Can be useful to search for the same copies of files on different trackers thus reviving dead torrents.
