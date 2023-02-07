@@ -67,7 +67,7 @@ function bencode_decode_r($input, $len, &$pos) {
 // Check for arguments
 
 if (isset($argv[1]) && isset($argv[2]) OR !isset($argv[1])) {
-die("\r\nPlease use the correct syntax, as TorrentMerkleReader.exe <torrent-file-name> \r\n\r\n---\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\n\r\nGreetings from the Russian Federation!");
+die("\r\nPlease use the correct syntax, as tmrr.exe <torrent-file-name> \r\n\r\n---\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\n\r\nGreetings from the Russian Federation!");
 	}
 
 $torrent_file = @file_get_contents($argv[1]);
