@@ -64,22 +64,24 @@ function bencode_decode_r($input, $len, &$pos) {
             return $output;
     }
 }
+
 // Check for arguments
 
 if (isset($argv[1]) && isset($argv[2]) OR !isset($argv[1])) {
 die("\r\nPlease use the correct syntax, as tmrr.exe <torrent-file-name> \r\n\r\n---\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\n\r\nGreetings from the Russian Federation!");
 	}
 
-$torrent_file = @file_get_contents($argv[1]);
-$decoded = @bencode_decode($torrent_file);
-if(!isset($decoded["info"])){
-	die("It looks like this is an invalid torrent file, are you sure comrade?");
-}
+	$torrent_file = @file_get_contents($argv[1]);
+	$decoded = @bencode_decode($torrent_file);
+		if(!isset($decoded["info"])){
+			die("It looks like this is an invalid torrent file, are you sure comrade?");
+		}
 
-if(!isset($decoded["meta version"]) && !isset($decoded["piece layers"])){
-	die("It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade");
-}
-$make = $decoded["info"]["file tree"]; 
+		if(!isset($decoded["meta version"]) && !isset($decoded["piece layers"])){
+			die("It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade");
+		}
+
+$make = $decoded["info"]["file tree"]; // Pass all files dictionary
 
 // Loop through all arrays saving locations and showing result
 function printArrayNames($array, $parent = "") {
@@ -88,9 +90,11 @@ function printArrayNames($array, $parent = "") {
         if(is_array($value) && strlen($key) !== 0) {
             printArrayNames($value, $current);
         } else {
-            echo $construct = $current . "\r\nRoot hash: " . bin2hex($value["pieces root"]) . " Size: " . $value["length"] . "\r\n\r\n";
+		
+            echo substr($current, 0, -1) . "\r\n\Root hash: " . bin2hex($value["pieces root"]) . " Size: " . $value["length"] . "\r\n\r\n";
 			
 		}
     }
 }
+
 printArrayNames($make);
