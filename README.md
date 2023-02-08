@@ -11,6 +11,12 @@ Standalone windows tool to read contents of BitTorrent v2 compatible .torrent fi
 Usage:
 ```
 tmrr.exe example.torrent
+
+```
+To save output to a file:
+```
+tmrr.exe example.torrent > file.txt
+
 ```
 
 Useful to search for the same copies of files on different trackers supporting BitTorrent v2, thus reviving dead torrents.
