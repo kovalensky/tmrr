@@ -15,3 +15,5 @@ tmrr.exe example.torrent > output.txt
 ```
 
 Useful for finding the sources of the same copies of files on different trackers that support BitTorrent v2, thus reviving dead torrents.
+
+WTFPL License.
