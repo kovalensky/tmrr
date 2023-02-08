@@ -15,7 +15,7 @@ tmrr.exe example.torrent
 ```
 To save output:
 ```
-tmrr.exe example.torrent > file.txt
+tmrr.exe example.torrent > output.txt
 
 ```
 
