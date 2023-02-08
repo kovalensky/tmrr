@@ -91,7 +91,7 @@ function printArrayNames($array, $parent = "") {
             printArrayNames($value, $current);
         } else {
 		
-            echo substr($current, 0, -1) . "\r\n\Root hash: " . bin2hex($value["pieces root"]) . " Size: " . $value["length"] . "\r\n\r\n";
+            echo substr($current, 1, -1) . "\r\n\Root hash: " . bin2hex($value["pieces root"]) . " Size: " . $value["length"] . "\r\n\r\n";
 			
 		}
     }
