@@ -17,4 +17,4 @@ To save output:
 tmrr.exe example.torrent > output.txt
 ```
 
-Useful to search for the same copies of files on different trackers supporting BitTorrent v2, thus reviving dead torrents.
+Useful for finding the sources of the same copies of files on different trackers that support BitTorrent v2, thus reviving dead torrents.
