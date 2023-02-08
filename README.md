@@ -13,7 +13,7 @@ Usage:
 tmrr.exe example.torrent
 
 ```
-To save output to a file:
+To save output:
 ```
 tmrr.exe example.torrent > file.txt
 
