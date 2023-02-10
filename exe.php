@@ -75,7 +75,7 @@ die("\r\nPlease use the correct syntax, as tmrr.exe <torrent-file-name> \r\n\r\n
 	}
 if ($argv[1] == "r" && isset($argv[2])) {
 // Do magic
-$file = $argv[2];
+	$file = $argv[2];
 	if(is_file($file)){
 	$root = new HasherV2($file, BLOCK_SIZE);
 	die( "Root hash of $file: " . bin2hex($root->root) );
@@ -87,7 +87,7 @@ $file = $argv[2];
 	
 	}
 if($argv[1] == "r" && !isset($argv[2]) ){
-		die("Please provide raw file location comrade");
+		die("Please specify the location of the raw file comrade");
 	}
 
 // Since no "r" argument key provided this has to be a torrent file, let's extract hashes
