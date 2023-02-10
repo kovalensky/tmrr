@@ -1,7 +1,7 @@
 # TMRR — Torrent Merkle Root Reader
 <h1 align="center">
   <a href="#">
-    <img src="https://media.giphy.com/media/kTi46X3FSLI3Q0Zn7j/giphy.gif" alt="TMRR">
+    <img src="https://media.giphy.com/media/X1ia2q41vzZQImSPdr/giphy.gif" alt="TMRR">
   </a>
 </h1>
 
