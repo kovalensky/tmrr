@@ -10,7 +10,7 @@ Extract root hashes from a .torrent file:
 ```
 tmrr.exe example.torrent
 ```
-Calcute root hashes for files:
+Calcute root hashes for raw files:
 ```
 tmrr.exe r your_file
 ```
