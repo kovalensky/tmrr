@@ -71,11 +71,11 @@ function bencode_decode_r($input, $len, &$pos) {
 // Check for arguments
 
 if (!isset($argv[1])) {
-die("\r\nPlease use the correct syntax, as tmrr.exe <torrent-file-name> \r\n\r\n---\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\n\r\nGreetings from the Russian Federation!");
+die("\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from a .torrent file*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of a raw file*\r\n\r\n---\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\n\r\nGreetings from the Russian Federation!\r\n");
 	}
 if ($argv[1] == "r" && isset($argv[2])) {
 // Do magic
-	$file = $argv[2];
+$file = $argv[2];
 	if(is_file($file)){
 	$root = new HasherV2($file, BLOCK_SIZE);
 	die( "Root hash of $file: " . @bin2hex($root->root) );
