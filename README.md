@@ -5,13 +5,18 @@
   </a>
 </h1>
 
-Usage:
+
+Extract root hashes from a .torrent file:
 ```
 tmrr.exe example.torrent
 ```
+Calcute root hashes for files:
+```
+tmrr.exe r your_file
+```
 To save output:
 ```
-tmrr.exe example.torrent > output.txt
+tmrr.exe your_command > output.txt
 ```
 
 Useful for finding the sources of the same copies of files on different trackers that support BitTorrent v2, thus reviving dead torrents.
