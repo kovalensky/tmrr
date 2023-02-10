@@ -78,7 +78,7 @@ if ($argv[1] == "r" && isset($argv[2])) {
 	$file = $argv[2];
 	if(is_file($file)){
 	$root = new HasherV2($file, BLOCK_SIZE);
-	die( "Root hash of $file: " . bin2hex($root->root) );
+	die( "Root hash of $file: " . @bin2hex($root->root) );
 	}
 	else{
 		
