@@ -76,13 +76,13 @@ die("\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Ext
 if ($argv[1] == "r" && isset($argv[2])) {
 // Do magic
 $file = $argv[2];
-	if(is_file($file)){
+	if(is_file($file) && filesize($file) !== 0){
 	$root = new HasherV2($file, BLOCK_SIZE);
 	die( "Root hash of $file: " . @bin2hex($root->root) );
 	}
 	else{
 		
-		die("This is not a raw file comrade");
+		die("This is not a raw file comrade, maybe it's empty");
 	}
 	
 	}
