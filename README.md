@@ -20,7 +20,7 @@ To save output:
 tmrr.exe your_command > output.txt
 ```
 
-For the Linux environment on which PHP is installed, clone this repository, then:
+For the Linux environment on which PHP is installed:
 ```
 php exe.php your_command
 ```
