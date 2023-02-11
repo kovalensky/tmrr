@@ -5,6 +5,7 @@
   </a>
 </h1>
 
+Useful for finding the sources of the same copies of files on different trackers that support BitTorrent v2, thus reviving dead torrents.
 
 Extract root hashes from a .torrent file:
 ```
@@ -19,4 +20,7 @@ To save output:
 tmrr.exe your_command > output.txt
 ```
 
-Useful for finding the sources of the same copies of files on different trackers that support BitTorrent v2, thus reviving dead torrents.
+For Linux on which PHP is installed clone this repository, then:
+```
+php exe.php your_command
+```
