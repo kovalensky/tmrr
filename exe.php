@@ -2,6 +2,12 @@
 // Constants for merkle calculation
 const BLOCK_SIZE = 16384;
 const HASH_SIZE = 32;
+
+//Timer variables
+$interactive_pos = 0;
+$sync = microtime(true);
+$clear = "\r\x1b[K"; // Clear output
+
 // Bencode library
 function bencode_decode($input) {
     if ($input === '') {
@@ -73,26 +79,23 @@ function bencode_decode_r($input, $len, &$pos) {
 if (!isset($argv[1])) {
 die("\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from a .torrent file*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of a raw file*\r\n\r\n---\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\n\r\nGreetings from the Russian Federation!\r\n");
 	}
-if ($argv[1] == "r" && isset($argv[2])) {
-// Do magic
-$file = $argv[2];
+	
+	if ($argv[1] == "r") {
+	// Calculate Merkle Root Hash
+	$file = @$argv[2];
 	if(is_file($file) && filesize($file) !== 0){
 	$root = new HasherV2($file, BLOCK_SIZE);
-	die( "Root hash of $file: " . @bin2hex($root->root) );
+	die( $clear . "\r\n$file \r\nRoot hash: " . @bin2hex($root->root) . "\r\n" );
 	}
 	else{
 		
-		die("This is not a raw file comrade, maybe it's empty");
+		die("This is not a raw file comrade, is it empty?");
 	}
 	
 	}
-if($argv[1] == "r" && !isset($argv[2]) ){
-		die("Please specify the location of the raw file comrade");
-	}
 
 // Since no "r" argument key provided this has to be a torrent file, let's extract hashes
-	$torrent_file = @file_get_contents($argv[1]);
-	$decoded = @bencode_decode($torrent_file);
+		$decoded = @bencode_decode(@file_get_contents($argv[1]));
 		if(!isset($decoded["info"])){
 			die("It looks like this is an invalid torrent file, are you sure comrade?");
 		}
@@ -101,7 +104,6 @@ if($argv[1] == "r" && !isset($argv[2]) ){
 			die("It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade");
 		}
 
-$make = $decoded["info"]["file tree"]; // Pass all files dictionary
 
 // Loop through all arrays saving locations and showing result
 function printArrayNames($array, $parent = "") {
@@ -111,13 +113,13 @@ function printArrayNames($array, $parent = "") {
             printArrayNames($value, $current);
         } else {
 		
-            echo substr($current, 1, -1) . "\r\nRoot hash: " . @bin2hex($value["pieces root"]) . " Size: " . $value["length"] . "\r\n\r\n";
+            echo "\r\n" . substr($current, 1, -1) . "\r\nHash: " . @bin2hex($value["pieces root"]) . " Size: " . $value["length"] . "\r\n";
 			
 		}
     }
 }
 
-printArrayNames($make);
+printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 
 // Individual files Merkle computations
 function next_power_2($value) {
@@ -172,6 +174,8 @@ class HasherV2 {
             if (!$leaf) {
                 break;
             }
+			$size = fstat($fd)["size"];
+			timer(ftell($fd), $size);
             $blocks[] = hash('sha256', $leaf, true);
             if (count($blocks) != $this->num_blocks) {
                 $remaining = $this->num_blocks - count($blocks);
@@ -204,4 +208,19 @@ class HasherV2 {
   }
   $this->root = merkle_root($this->layer_hashes);
 }
+}
+//Timer function
+function timer($dose, $max){
+    global $interactive_pos, $sync, $clear;
+    $symbols = ['|', '/', '—', '\\'];
+	
+    if((microtime(true) - $sync) >= 0.1 ){
+        if($interactive_pos > 3){
+            $interactive_pos = 0;
+        }
+        $percent = round(($dose / $max) * 100);
+        echo $clear . "	" . $symbols[$interactive_pos % 4] ." Calculating $percent%";
+        $interactive_pos++;
+        $sync = microtime(true);
+    }
 }
