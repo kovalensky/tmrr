@@ -215,9 +215,7 @@ function timer($dose, $max){
     $symbols = ['|', '/', '—', '\\'];
 	
     if((microtime(true) - $sync) >= 0.1 ){
-        if($interactive_pos > 3){
-            $interactive_pos = 0;
-        }
+
         $percent = round(($dose / $max) * 100);
         echo $clear . "	" . $symbols[$interactive_pos % 4] ." Calculating $percent%";
         $interactive_pos++;
