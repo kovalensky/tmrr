@@ -1,12 +1,52 @@
 <?php
+
+//Initialization
+
 // Constants for merkle calculation
 const BLOCK_SIZE = 16384;
 const HASH_SIZE = 32;
-
-//Timer variables
+// Timer variables
 $interactive_pos = 0;
 $sync = microtime(true);
-$clear = "\r\x1b[K"; // Clear output
+$clear = "\r\x1b[K"; // Escape symbols for clearing output
+// Language
+$msg = lang();
+
+//Main
+// Check for arguments
+if (!isset($argv[1])) {
+die($msg["main"]);
+	}
+	
+	if ($argv[1] == "r") {
+	// Calculate Merkle Root Hash
+	$file = @$argv[2];
+	if(is_file($file) && filesize($file) !== 0){
+	$root = new HasherV2($file, BLOCK_SIZE);
+	die( $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n ");
+	}
+	else{
+		
+		die($msg["noraw"]);
+	}
+	
+	}
+
+// Since no "r" argument key provided this has to be a torrent file, let's extract hashes
+		$decoded = @bencode_decode(@file_get_contents($argv[1]));
+		if(!isset($decoded["info"])){
+			die($msg["invalid_torrent"]);
+		}
+
+		if(!isset($decoded["meta version"]) && !isset($decoded["piece layers"])){
+			die($msg["no_v2"]);
+		}
+
+printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
+
+
+
+//Functions
 
 // Bencode library
 function bencode_decode($input) {
@@ -74,52 +114,21 @@ function bencode_decode_r($input, $len, &$pos) {
     }
 }
 
-// Check for arguments
-
-if (!isset($argv[1])) {
-die("\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from a .torrent file*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of a raw file*\r\n\r\n---\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\n\r\nGreetings from the Russian Federation!\r\n");
-	}
-	
-	if ($argv[1] == "r") {
-	// Calculate Merkle Root Hash
-	$file = @$argv[2];
-	if(is_file($file) && filesize($file) !== 0){
-	$root = new HasherV2($file, BLOCK_SIZE);
-	die( $clear . "\r\n$file \r\nRoot hash: " . @bin2hex($root->root) . "\r\n" );
-	}
-	else{
-		
-		die("This is not a raw file comrade, is it empty?");
-	}
-	
-	}
-
-// Since no "r" argument key provided this has to be a torrent file, let's extract hashes
-		$decoded = @bencode_decode(@file_get_contents($argv[1]));
-		if(!isset($decoded["info"])){
-			die("It looks like this is an invalid torrent file, are you sure comrade?");
-		}
-
-		if(!isset($decoded["meta version"]) && !isset($decoded["piece layers"])){
-			die("It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade");
-		}
-
 
 // Loop through all arrays saving locations and showing result
 function printArrayNames($array, $parent = "") {
+	global $msg;
     foreach($array as $key => $value) {
         $current = $parent . "/" . $key;
         if(is_array($value) && strlen($key) !== 0) {
             printArrayNames($value, $current);
         } else {
 		
-            echo "\r\n" . substr($current, 1, -1) . "\r\nHash: " . @bin2hex($value["pieces root"]) . " Size: " . $value["length"] . "\r\n";
+            echo "\r\n" . substr($current, 1, -1) . "\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . " {$msg["size"]}: " . $value["length"] . "\r\n";
 			
 		}
     }
 }
-
-printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 
 // Individual files Merkle computations
 function next_power_2($value) {
@@ -211,14 +220,65 @@ class HasherV2 {
 }
 //Timer function
 function timer($dose, $max){
+	global $msg;
     global $interactive_pos, $sync, $clear;
     $symbols = ['|', '/', '—', '\\'];
 	
     if((microtime(true) - $sync) >= 0.1 ){
 
         $percent = round(($dose / $max) * 100);
-        echo $clear . "	" . $symbols[$interactive_pos % 4] ." Calculating $percent%";
+        echo $clear . "	" . $symbols[$interactive_pos % 4] ." {$msg["calculation"]} $percent%";
         $interactive_pos++;
         $sync = microtime(true);
     }
 }
+
+//Language option
+function lang(){
+
+$strings = array(
+	"rus"=>
+	[
+	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe <файл.torrent>		*Извлекает хеши файлов из торрента*\r\n\r\ntmrr.exe r <ваш_файл>		*Вычисляет корневой Merkle хеш файла*\r\n\r\n---\r\n\r\nВерсия: 1.1.3b Болгарка\r\nРазработчик: Tykov на трекере NNMClub\r\nTelegram: @vatruski\r\n\r\n",
+	"noraw" => "Укажите расположение файла, он не должен быть пустым.",
+	"invalid_torrent" => ".torrent файл содержит ошибки.",
+	"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид. Торренты v1 формата не поддерживают вычисление Merkle хешей файлов.",
+	"root_hash" => "Хеш",
+	"calculation" => "Вычисление",
+	"size" => "Размер"
+	],
+	
+	"eng" => [
+	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from a .torrent file*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of a raw file*\r\n\r\n---\r\n\r\nVersion: 1.1.3b\r\nDev by Tykov on NNMClub tracker\r\nTelegram: @vatruski\r\nhttps://github.com/kovalensky/tmrr\r\n\r\nGreetings from the Russian Federation!\r\n",
+	"noraw" => "This is not a raw file comrade, is it empty?",
+	"invalid_torrent" => "It looks like this is an invalid torrent file, are you sure comrade?",
+	"no_v2" => "It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade",
+	"root_hash" => "Root hash",
+	"calculation" => "Calculating",
+	"size"=> "Size"
+	]
+	);
+
+	if(PHP_OS !== "WINNT"){
+		return $strings["eng"];
+	}
+	$locale_file = __DIR__ . DIRECTORY_SEPARATOR . "locale";
+	if(!file_exists($locale_file)){
+	$get_lang = @shell_exec('reg query "hklm\system\controlset001\control\nls\language" /v Installlanguage');
+	if (@preg_match('/\bREG_SZ\s+(\w+)\b/', $get_lang, $matches)) {
+		@file_put_contents($locale_file, $matches[1]);
+	}
+	else{
+		@file_put_contents($locale_file, "0409");
+	}
+	}
+	
+	$lang = @file_get_contents($locale_file);
+		if($lang == "0419"){
+			return $strings["rus"];
+	}
+		else{
+			return $strings["eng"];
+	}
+	}
+	
