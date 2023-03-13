@@ -220,8 +220,8 @@ class HasherV2 {
 }
 //Timer function
 function timer($dose, $max){
-	global $msg;
-    global $interactive_pos, $sync, $clear;
+
+    global $interactive_pos, $sync, $clear, $msg;
     $symbols = ['|', '/', '—', '\\'];
 	
     if((microtime(true) - $sync) >= 0.1 ){
