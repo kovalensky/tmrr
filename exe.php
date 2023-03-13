@@ -260,7 +260,7 @@ $strings = array(
 	);
 
 	if(PHP_OS !== "WINNT"){
-		return $strings["eng"];
+		return $strings["eng"]; // Linux bypass
 	}
 	$locale_file = __DIR__ . DIRECTORY_SEPARATOR . "locale";
 	if(!file_exists($locale_file)){
