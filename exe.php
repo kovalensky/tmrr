@@ -38,7 +38,7 @@ die($msg["main"]);
 			die($msg["invalid_torrent"]);
 		}
 
-		if(!isset($decoded["meta version"]) && !isset($decoded["piece layers"])){
+		if(!isset($decoded["meta version"]) && !isset($decoded["info"]["meta version"]) && !isset($decoded["piece layers"])){
 			die($msg["no_v2"]);
 		}
 
@@ -235,11 +235,11 @@ function timer($dose, $max){
 
 //Language option
 function lang(){
-
+$version = "1.1.4g";
 $strings = array(
 	"rus"=>
 	[
-	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe <файл.torrent>		*Извлекает хеши файлов из торрента*\r\n\r\ntmrr.exe r <ваш_файл>		*Вычисляет корневой Merkle хеш файла*\r\n\r\n---\r\n\r\nВерсия: 1.1.3b Болгарка\r\nРазработчик: Tykov на трекере NNMClub\r\nTelegram: @vatruski\r\n\r\n",
+	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe <файл.torrent>		*Извлекает хеши файлов из торрента*\r\n\r\ntmrr.exe r <ваш_файл>		*Вычисляет корневой Merkle хеш файла*\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nРазработчик: Tykov на трекере NNMClub\r\nTelegram: @vatruski\r\n\r\n",
 	"noraw" => "Укажите расположение файла, он не должен быть пустым.",
 	"invalid_torrent" => ".torrent файл содержит ошибки.",
 	"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид. Торренты v1 формата не поддерживают вычисление Merkle хешей файлов.",
@@ -249,11 +249,11 @@ $strings = array(
 	],
 	
 	"eng" => [
-	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from a .torrent file*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of a raw file*\r\n\r\n---\r\n\r\nVersion: 1.1.3b\r\nDev by Tykov on Rutracker.org\r\nTelegram: @vatruski\r\nhttps://github.com/kovalensky/tmrr\r\n\r\nGreetings from the Russian Federation!\r\n",
+	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from a .torrent file*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of a raw file*\r\n\r\n---\r\n\r\nVersion: $version\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\nhttps://github.com/kovalensky/tmrr\r\n\r\nGreetings from the Russian Federation!\r\n",
 	"noraw" => "This is not a raw file comrade, is it empty?",
 	"invalid_torrent" => "It looks like this is an invalid torrent file, are you sure comrade?",
 	"no_v2" => "It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade",
-	"root_hash" => "Root hash",
+	"root_hash" => "Hash",
 	"calculation" => "Calculating",
 	"size"=> "Size"
 	]
