@@ -38,7 +38,7 @@ die($msg["main"]);
 			die($msg["invalid_torrent"]);
 		}
 
-		if(!isset($decoded["meta version"]) && !isset($decoded["info"]["meta version"]) && !isset($decoded["piece layers"])){
+		if(!isset($decoded["info"]["meta version"]) && !isset($decoded["piece layers"])){
 			die($msg["no_v2"]);
 		}
 
