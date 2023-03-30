@@ -124,7 +124,7 @@ function printArrayNames($array, $parent = "") {
             printArrayNames($value, $current);
         } else {
 		
-            echo "\r\n" . substr($current, 1, -1) . "\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . " {$msg["size"]}: " . $value["length"] . "\r\n";
+            echo "\r\n" . substr($current, 1, -1) . "\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . " {$msg["size"]}: " . formatBytes($value["length"]) . "\r\n";
 			
 		}
     }
@@ -218,7 +218,7 @@ class HasherV2 {
   $this->root = merkle_root($this->layer_hashes);
 }
 }
-//Timer function
+// Timer function
 function timer($dose, $max){
 
     global $interactive_pos, $sync, $clear, $msg;
@@ -233,7 +233,19 @@ function timer($dose, $max){
     }
 }
 
-//Language option
+// Represent bytes
+function formatBytes($bytes, $precision = 2) { 
+    $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
+
+    $bytes = max($bytes, 0); 
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
+    $pow = min($pow, count($units) - 1); 
+    $bytes /= pow(1024, $pow); 
+
+    return round($bytes, $precision) . ' ' . $units[$pow]; 
+}
+
+// Language option
 function lang(){
 $version = "1.1.4g";
 $strings = array(
