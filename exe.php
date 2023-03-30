@@ -247,7 +247,7 @@ function formatBytes($bytes, $precision = 2) {
 
 // Language option
 function lang(){
-$version = "1.1.4g";
+$version = "1.1.5g";
 $strings = array(
 	"rus"=>
 	[
