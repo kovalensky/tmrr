@@ -17,32 +17,55 @@ $msg = lang();
 if (!isset($argv[1])) {
 die($msg["main"]);
 	}
-	
 	if ($argv[1] == "r") {
+	$err_status = [];
 	// Calculate Merkle Root Hash
-	$file = @$argv[2];
+	foreach(array_slice($argv, 2) as $file){
 	if(is_file($file) && filesize($file) !== 0){
 	$root = new HasherV2($file, BLOCK_SIZE);
-	die( $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n ");
+	echo $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
+	
+	unset($root);
 	}
 	else{
 		
-		die($msg["noraw"]);
+		$err_status[$file] = $msg["noraw"];
 	}
-	
 	}
+	if(!empty($err_status)){
+	echo "\r\n\r\n--- {$msg["unfinished_files"]}: --\r\n";
+	foreach($err_status as $key => $value){
+		echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
+		}
+	}
+	die();
+}
 
 // Since no "r" argument key provided this has to be a torrent file, let's extract hashes
-		$decoded = @bencode_decode(@file_get_contents($argv[1]));
+		$err_status = [];
+		foreach(array_slice($argv , 1) as $file){
+		$decoded = @bencode_decode(@file_get_contents($file));
 		if(!isset($decoded["info"])){
-			die($msg["invalid_torrent"]);
+			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
+			continue;
 		}
 
 		if(!isset($decoded["info"]["meta version"])){
-			die($msg["no_v2"]);
+			$err_status[$file] = $msg["no_v2"] . "\r\n";
+			continue;
 		}
 
-printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
+		echo "\r\n\r\n### $file ###\r\n" . "### {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " ###\r\n";
+		printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
+		
+		unset($decoded);
+}
+if(!empty($err_status)){
+	echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
+	foreach($err_status as $key => $value){
+		echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value";
+	}
+}
 
 
 
@@ -251,23 +274,31 @@ $version = "1.1.5g";
 $strings = array(
 	"rus"=>
 	[
-	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe <файл.torrent>		*Извлекает хеши файлов из торрента*\r\n\r\ntmrr.exe r <ваш_файл>		*Вычисляет корневой Merkle хеш файла*\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nРазработчик: Tykov на трекере NNMClub\r\nTelegram: @vatruski\r\n\r\n",
+	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe <файл.torrent>		*Извлекает хеши файлов из торрента*\r\n\r\ntmrr.exe r <ваш_файл>		*Вычисляет корневой Merkle хеш файла*\r\n\r\nСинтаксис поддерживает передачу нескольких файлов <файл1> <файл2>.. <файл5>\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nРазработчик: Tykov на трекере NNMClub\r\nTelegram: @vatruski\r\n\r\n",
 	"noraw" => "Укажите расположение файла, он не должен быть пустым.",
 	"invalid_torrent" => ".torrent файл содержит ошибки.",
 	"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид. Торренты v1 формата не поддерживают вычисление Merkle хешей файлов.",
 	"root_hash" => "Хеш",
 	"calculation" => "Вычисление",
-	"size" => "Размер"
+	"size" => "Размер",
+	"torrent_title" => "Название раздачи",
+	"file_location" => "Файл",
+	"unfinished_files" => "Необработанные файлы",
+	"error_type" => "Ошибка"
 	],
 	
 	"eng" => [
-	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from a .torrent file*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of a raw file*\r\n\r\n---\r\n\r\nVersion: $version\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\nhttps://github.com/kovalensky/tmrr\r\n\r\nGreetings from the Russian Federation!\r\n",
+	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from a .torrent file*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of a raw file*\r\n\r\nSyntax is supported for multiple files, as <file1> <file2>.. <file5>\r\n\r\n---\r\n\r\nVersion: $version\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\nhttps://github.com/kovalensky/tmrr\r\n\r\nGreetings from the Russian Federation!\r\n",
 	"noraw" => "This is not a raw file comrade, is it empty?",
 	"invalid_torrent" => "It looks like this is an invalid torrent file, are you sure comrade?",
-	"no_v2" => "It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade",
+	"no_v2" => "It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade.",
 	"root_hash" => "Hash",
 	"calculation" => "Calculating",
-	"size"=> "Size"
+	"size" => "Size",
+	"torrent_title" => "Title",
+	"file_location" => "File",
+	"unfinished_files" => "Unprocessed files",
+	"error_type" => "Error type"
 	]
 	);
 
