@@ -11,14 +11,14 @@ $sync = microtime(true);
 $clear = "\r\x1b[K"; // Escape symbols for clearing output
 // Language
 $msg = lang();
-
+// Error catcher
+$err_status =[];
 //Main
 // Check for arguments
 if (!isset($argv[1])) {
 die($msg["main"]);
 	}
 	if ($argv[1] == "r") {
-	$err_status = [];
 	// Calculate Merkle Root Hash
 	foreach(array_slice($argv, 2) as $file){
 	if(is_file($file) && filesize($file) !== 0){
@@ -33,7 +33,7 @@ die($msg["main"]);
 	}
 	}
 	if(!empty($err_status)){
-	echo "\r\n\r\n--- {$msg["unfinished_files"]}: --\r\n";
+	echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
 	foreach($err_status as $key => $value){
 		echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
 		}
@@ -42,7 +42,6 @@ die($msg["main"]);
 }
 
 // Since no "r" argument key provided this has to be a torrent file, let's extract hashes
-		$err_status = [];
 		foreach(array_slice($argv , 1) as $file){
 		$decoded = @bencode_decode(@file_get_contents($file));
 		if(!isset($decoded["info"])){
