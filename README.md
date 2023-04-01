@@ -11,7 +11,7 @@
 
 Useful for finding the sources of the same copies of files on different trackers that support BitTorrent v2, thus reviving dead torrents.
 
-Extract root hashes from a .torrent file:
+Extract root hashes from .torrent files:
 ```
 tmrr.exe example.torrent
 ```
@@ -19,7 +19,11 @@ Calculate root hashes for raw files:
 ```
 tmrr.exe r your_file
 ```
-To save output:
+Compare .torrent files for duplicates:
+```
+tmrr.exe c <example.torrent> <example2.torrent>.. <example5.torrent>
+```
+To save big output:
 ```
 tmrr.exe your_command > output.txt
 ```
