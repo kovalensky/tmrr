@@ -13,6 +13,7 @@ $clear = "\r\x1b[K"; // Escape symbols for clearing output
 $msg = lang();
 // Error catcher
 $err_status =[];
+
 //Main
 // Check for arguments
 if (!isset($argv[1])) {
@@ -32,16 +33,37 @@ die($msg["main"]);
 		$err_status[$file] = $msg["noraw"];
 	}
 	}
-	if(!empty($err_status)){
-	echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
-	foreach($err_status as $key => $value){
-		echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
-		}
-	}
+	error_status($err_status);
 	die();
 }
 
-// Since no "r" argument key provided this has to be a torrent file, let's extract hashes
+
+	if ($argv[1] == "c" && count($argv) > 2) {
+	$file_tree_array = [];
+	foreach(array_slice($argv, 2) as $file){
+	
+		$decoded = @bencode_decode(@file_get_contents($file));
+		if(!isset($decoded["info"])){
+			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
+			continue;
+		}
+
+		if(!isset($decoded["info"]["meta version"])){
+			$err_status[$file] = $msg["no_v2"] . "\r\n";
+			continue;
+		}
+		$file_tree_array["### " .$file. " ###: \r\n"] = $decoded["info"]["file tree"];
+	}
+	$compared= [];
+	combine_keys($file_tree_array, $compared);
+	compare($compared);
+	error_status($err_status);
+	die();
+	
+}
+
+
+// Since no "r" or "c" argument key provided this has to be a torrent file, let's extract hashes
 		foreach(array_slice($argv , 1) as $file){
 		$decoded = @bencode_decode(@file_get_contents($file));
 		if(!isset($decoded["info"])){
@@ -59,12 +81,7 @@ die($msg["main"]);
 		
 		unset($decoded);
 }
-if(!empty($err_status)){
-	echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
-	foreach($err_status as $key => $value){
-		echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value";
-	}
-}
+error_status($err_status);
 
 
 
@@ -151,6 +168,8 @@ function printArrayNames($array, $parent = "") {
 		}
     }
 }
+	
+
 
 // Individual files Merkle computations
 function next_power_2($value) {
@@ -205,8 +224,8 @@ class HasherV2 {
             if (!$leaf) {
                 break;
             }
-			$size = fstat($fd)["size"];
-			timer(ftell($fd), $size);
+            $size = fstat($fd)["size"];
+            timer(ftell($fd), $size);
             $blocks[] = hash('sha256', $leaf, true);
             if (count($blocks) != $this->num_blocks) {
                 $remaining = $this->num_blocks - count($blocks);
@@ -240,19 +259,79 @@ class HasherV2 {
   $this->root = merkle_root($this->layer_hashes);
 }
 }
+
+// Comparator functions
+
+//Extract and combine functions in one array
+function combine_keys($array, &$compared, $parent_key = "") {
+    foreach($array as $key => $value) {
+        $current_key = $parent_key . "/" . $key;
+        if(is_array($value) && strlen($key) !== 0) {
+            combine_keys($value, $compared, $current_key);
+        } else {
+  
+            $compared[substr($current_key, 1, -1)] = @bin2hex($value["pieces root"]);
+        }
+    }
+}
+
+// Do comparation
+function compare($array) {
+    global $msg, $clear, $argv;	
+	
+    $duplicates = [];
+    $count = count($array);
+    $array_iterator = 0;
+	$total_iterations = $count * ($count - 1) / 2;
+    for ($i = 0; $i < $count; $i++) {
+        $key1 = array_keys($array)[$i];
+        $value1 = $array[$key1];
+        for ($j = $i + 1; $j < $count; $j++) {
+			timer($array_iterator, $total_iterations); $array_iterator++;
+            $key2 = array_keys($array)[$j];
+            $value2 = $array[$key2];
+            
+            if ($value1 === $value2) {
+                if (!array_key_exists($value1, $duplicates)) {
+                    $duplicates[$value1] = [$key1, $key2];
+                } else {
+                    $duplicates[$value1][] = $key2;
+                }
+                
+                break;
+            }
+        }
+    }
+    if(!empty($duplicates)){
+        foreach ($duplicates as $value => $keys) {
+        echo $clear .  "\r\n{$msg["root_hash"]} $value {$msg["dup_found"]}:\r\n";
+            foreach ($keys as $key) {
+                echo $key. "\r\n\r\n";
+            }
+        }
+    }
+    else{
+        echo $clear. "\r\n" . $msg["no_duplicates"] . "\r\n";
+    }
+}
+
+
+
+
 // Timer function
 function timer($dose, $max){
 
     global $interactive_pos, $sync, $clear, $msg;
-    $symbols = ['|', '/', '—', '\\'];
-	
+    
     if((microtime(true) - $sync) >= 0.09 ){
-
+		$symbols = ['|', '/', '—', '\\'];
+		
         $percent = round(($dose / $max) * 100);
         echo $clear . "	" . $symbols[$interactive_pos % 4] ." {$msg["calculation"]} $percent%";
         $interactive_pos++;
         $sync = microtime(true);
     }
+	else{	return false;	}
 }
 
 // Represent bytes
@@ -267,13 +346,24 @@ function formatBytes($bytes, $precision = 2) {
     return round($bytes, $precision) . ' ' . $units[$pow]; 
 }
 
+// Error handler
+function error_status($err_status){
+	global $msg;
+	if(!empty($err_status)){
+	echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
+	foreach($err_status as $key => $value){
+		echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
+		}
+	}
+}
+
 // Language option
 function lang(){
-$version = "1.1.5g";
+$version = "1.1.7g";
 $strings = array(
 	"rus"=>
 	[
-	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe <файл.torrent>		*Извлекает хеши файлов из торрента*\r\n\r\ntmrr.exe r <ваш_файл>		*Вычисляет корневой Merkle хеш файла*\r\n\r\nСинтаксис поддерживает передачу нескольких файлов <файл1> <файл2>.. <файл5>\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nРазработчик: Tykov на трекере NNMClub\r\nTelegram: @vatruski\r\n\r\n",
+	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe <торрент-файл>		*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe c <торрент-файл>	*Находит дубликаты файлов в торрентах*\r\n\r\ntmrr.exe r <ваш-файл>		*Вычисляет корневой Merkle хеш файла*\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файл5> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nРазработчик: Tykov на трекере NNMClub\r\nTelegram: @vatruski\r\nhttps://github.com/kovalensky/tmrr\r\n\r\n",
 	"noraw" => "Укажите расположение файла, он не должен быть пустым.",
 	"invalid_torrent" => ".torrent файл содержит ошибки.",
 	"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид. Торренты v1 формата не поддерживают вычисление Merkle хешей файлов.",
@@ -283,11 +373,13 @@ $strings = array(
 	"torrent_title" => "Название раздачи",
 	"file_location" => "Файл",
 	"unfinished_files" => "Необработанные файлы",
-	"error_type" => "Ошибка"
+	"error_type" => "Ошибка",
+	"no_duplicates" => "Дубликаты не найдены.",
+	"dup_found" => "найден в"
 	],
 	
 	"eng" => [
-	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from a .torrent file*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of a raw file*\r\n\r\nSyntax is supported for multiple files, as <file1> <file2>.. <file5>\r\n\r\n---\r\n\r\nVersion: $version\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\nhttps://github.com/kovalensky/tmrr\r\n\r\nGreetings from the Russian Federation!\r\n",
+	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe <torrent-file>		*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe c <torrent-file>	*Compares duplicate files within .torrent files*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of raw files*\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <file5> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nDev by Tikva on Rutracker.org\r\nTelegram: @vatruski\r\nhttps://github.com/kovalensky/tmrr\r\n\r\nGreetings from the Russian Federation!\r\n",
 	"noraw" => "This is not a raw file comrade, is it empty?",
 	"invalid_torrent" => "It looks like this is an invalid torrent file, are you sure comrade?",
 	"no_v2" => "It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade.",
@@ -297,7 +389,9 @@ $strings = array(
 	"torrent_title" => "Title",
 	"file_location" => "File",
 	"unfinished_files" => "Unprocessed files",
-	"error_type" => "Error type"
+	"error_type" => "Error type",
+	"no_duplicates" => "No duplicates were found.",
+	"dup_found" => "found in"
 	]
 	);
 
