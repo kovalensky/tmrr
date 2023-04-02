@@ -30,6 +30,8 @@ tmrr.exe your_command > output.txt
 Web Server use:
 ```
 tmrr.php?method=[your_method]&tmrr_file1=<file1_location>&tmrr_file2=<file2_location>..
+Example:
+tmrr.php?method=c&tmrr_file1=example.torrent&tmrr_file2=/folder/example2.torrent..
 ```
 For the Linux environment on which PHP is installed:
 ```
