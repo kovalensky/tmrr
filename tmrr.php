@@ -24,7 +24,7 @@ $server = false;
 		$argv[0] = "Server is up";
 		$argv[1] = @$_GET["method"] ?? "1";
 		if(!isset($_GET["method"])){
-			$err_status["0"] = "Please set 'method' GET parameter, it can be empty or 'r' and 'c', please see https://github.com/kovalensky/tmrr.";
+			$err_status["0"] = "Please set 'method' GET parameter, it can be empty or contain 'r' and 'c' parameters, please see https://github.com/kovalensky/tmrr.";
 		}
 		$i = 2;
 		
