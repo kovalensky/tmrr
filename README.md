@@ -29,11 +29,11 @@ tmrr.exe your_command > output.txt
 ```
 Web Server use:
 ```
-https://server/exe.php?method=[your_method]&tmrr_file=<file_location>&tmrr_file2=<file_location>..
+https://server/tmrr.php?method=[your_method]&tmrr_file=<file_location>&tmrr_file2=<file_location>..
 ```
 For the Linux environment on which PHP is installed:
 ```
-php exe.php your_command
+php tmrr.php your_command
 ```
 
 If this tool has somehow helped you in finding important files, you can express your gratitude by starring this repository or making a donation🍀.
