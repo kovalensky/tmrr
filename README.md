@@ -29,7 +29,7 @@ tmrr.exe your_command > output.txt
 ```
 Web Server use:
 ```
-tmrr.php?method=(c, r or empty)&tmrr_file1=example.torrent&tmrr_file2=/folder/example2.torrent..
+tmrr.php?method=(c, r or empty)&tmrr_file1=example.torrent&tmrr_file2=./folder/example2.torrent..
 ```
 For the Linux environment on which PHP is installed:
 ```
