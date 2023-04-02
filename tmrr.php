@@ -86,6 +86,12 @@ die($msg["main"]);
 	if(isset($argv[1])){
 		if($server) {	echo $clear; 	unset($argv[1]);	}
 		foreach(array_slice($argv , 1) as $file){
+		if($server){
+		if(!file_exists($file)){
+		$err_status[$key] = "Please provide correct file locations inside tmrr[i]_files GET parameters.";
+		continue;
+		}
+		}
 		$decoded = @bencode_decode(@file_get_contents($file));
 		if(!isset($decoded["info"])){
 			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
