@@ -359,6 +359,7 @@ function error_status($err_status){
 
 // Language option
 function lang(){
+global $argv;
 $version = "1.1.7g";
 $strings = array(
 	"rus"=>
@@ -407,6 +408,16 @@ $strings = array(
 	else{
 		@file_put_contents($locale_file, "0409");
 	}
+	}
+		if(@$argv[1] == "locale"){
+		switch(@$argv[2]){
+			case "en":
+			file_put_contents($locale_file, "0409");
+			die("Language changed to English.");
+			case "ru":
+			file_put_contents($locale_file, "0419");
+			die("Язык был изменён на русский.");
+		}
 	}
 	
 	$lang = @file_get_contents($locale_file);
