@@ -23,6 +23,9 @@ $server = false;
 		$argv = [];
 		$argv[0] = "Server is up";
 		$argv[1] = @$_GET["method"] ?? "1";
+		if(!isset($_GET["method"])){
+			$err_status["0"] = "Please set 'method' GET parameter, it can be empty or 'r' and 'c', please see https://github.com/kovalensky/tmrr.";
+		}
 		$i = 2;
 		
 		foreach(array_slice($_GET, 1) as $key => $value){
@@ -88,7 +91,7 @@ die($msg["main"]);
 		foreach(array_slice($argv , 1) as $key => $file){
 		if($server){
 		if(!file_exists($file)){
-		$err_status[$key] = "Please provide correct file locations inside tmrr[i]_files GET parameters. Method can be empty, see https://github.com/kovalensky/tmrr";
+		$err_status[$key] = "Please provide correct file locations inside tmrr[i]_files GET parameters, see https://github.com/kovalensky/tmrr.";
 		continue;
 		}
 		}
