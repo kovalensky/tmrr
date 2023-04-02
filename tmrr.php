@@ -91,7 +91,7 @@ die($msg["main"]);
 		foreach(array_slice($argv , 1) as $key => $file){
 		if($server){
 		if(!file_exists($file)){
-		$err_status[$key] = "Please provide correct file locations inside tmrr[i]_files GET parameters, see https://github.com/kovalensky/tmrr.";
+		$err_status[$key] = "Please provide correct file locations inside tmrr(i)_files GET parameters, see https://github.com/kovalensky/tmrr.";
 		continue;
 		}
 		}
