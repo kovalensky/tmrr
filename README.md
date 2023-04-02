@@ -29,7 +29,7 @@ tmrr.exe your_command > output.txt
 ```
 Web Server use:
 ```
-https://server/tmrr.php?method=[your_method]&tmrr_file1=<file1_location>&tmrr_file2=<file2_location>..
+tmrr.php?method=[your_method]&tmrr_file1=<file1_location>&tmrr_file2=<file2_location>..
 ```
 For the Linux environment on which PHP is installed:
 ```
