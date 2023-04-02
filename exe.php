@@ -13,7 +13,25 @@ $clear = "\r\x1b[K"; // Escape symbols for clearing output
 $msg = lang();
 // Error catcher
 $err_status =[];
-
+if(PHP_MAJOR_VERSION < 8 ){ die("PHP < 8 is not supported."); }
+// Server checks
+$server = false;
+	if(php_sapi_name() !== "cli"){
+		$server = true;
+		timer(null, null, true);
+		$clear = "<pre>";
+		$argv = [];
+		$argv[0] = "Server is up";
+		$argv[1] = @$_GET["method"] ?? "1";
+		$i = 2;
+		
+		foreach(array_slice($_GET, 1) as $key => $value){
+			if(str_starts_with($key, "tmrr")){
+			$argv[$i] = $value;
+			$i++;
+			}
+		}
+	}
 //Main
 // Check for arguments
 if (!isset($argv[1])) {
@@ -64,6 +82,8 @@ die($msg["main"]);
 
 
 // Since no "r" or "c" argument key provided this has to be a torrent file, let's extract hashes
+	if(isset($argv[1])){
+		if($server) {	echo $clear; 	unset($argv[1]);	}
 		foreach(array_slice($argv , 1) as $file){
 		$decoded = @bencode_decode(@file_get_contents($file));
 		if(!isset($decoded["info"])){
@@ -82,6 +102,8 @@ die($msg["main"]);
 		unset($decoded);
 }
 error_status($err_status);
+	}
+
 
 
 
@@ -156,13 +178,13 @@ function bencode_decode_r($input, $len, &$pos) {
 
 // Loop through all arrays saving locations and showing result
 function printArrayNames($array, $parent = "") {
-	global $msg;
+	global $msg, $clear;
     foreach($array as $key => $value) {
         $current = $parent . "/" . $key;
         if(is_array($value) && strlen($key) !== 0) {
             printArrayNames($value, $current);
         } else {
-		
+			
             echo "\r\n" . substr($current, 1, -1) . "\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . " {$msg["size"]}: " . formatBytes($value["length"]) . "\r\n";
 			
 		}
@@ -318,12 +340,17 @@ function compare($array) {
 
 
 
-// Timer function
-function timer($dose, $max){
 
+
+// Timer function
+function timer($dose, $max, $disable=false){
     global $interactive_pos, $sync, $clear, $msg;
+	if ($disable == true)
+	{ 		
+		$interactive_pos = false;
+	}
     
-    if((microtime(true) - $sync) >= 0.09 ){
+    if((microtime(true) - $sync) >= 0.09 && $interactive_pos !== false ){
 		$symbols = ['|', '/', '—', '\\'];
 		
         $percent = round(($dose / $max) * 100);
