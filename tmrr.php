@@ -85,7 +85,7 @@ die($msg["main"]);
 // Since no "r" or "c" argument key provided this has to be a torrent file, let's extract hashes
 	if(isset($argv[1])){
 		if($server) {	echo $clear; 	unset($argv[1]);	}
-		foreach(array_slice($argv , 1) as $file){
+		foreach(array_slice($argv , 1) as $key => $file){
 		if($server){
 		if(!file_exists($file)){
 		$err_status[$key] = "Please provide correct file locations inside tmrr[i]_files GET parameters. Method can be empty, see https://github.com/kovalensky/tmrr";
