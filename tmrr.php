@@ -18,7 +18,7 @@ if(PHP_MAJOR_VERSION < 8 ){ die("PHP < 8 is not supported."); }
 $server = false;
 	if(php_sapi_name() !== "cli"){
 		$server = true;
-		timer(null, null, true);
+		timer(null, null, true); // Disable timer
 		$clear = "<pre>";
 		$argv = [];
 		$argv[0] = "Server is up";
@@ -32,6 +32,7 @@ $server = false;
 			}
 		}
 	}
+
 //Main
 // Check for arguments
 if (!isset($argv[1])) {
