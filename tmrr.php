@@ -14,7 +14,7 @@ $clear = "\r\x1b[K"; // Escape symbols for clearing output
 $msg = lang();
 // Error catcher
 $err_status =[];
-if(PHP_MAJOR_VERSION < 7 ){ die("PHP < 7 is not supported."); }
+if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 // Server checks
 	if(php_sapi_name() !== "cli"){
 		ob_start();
