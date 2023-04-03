@@ -5,6 +5,7 @@
 // Constants for merkle calculation
 const BLOCK_SIZE = 16384;
 const HASH_SIZE = 32;
+
 // Timer variables
 $interactive_pos = 0;
 $sync = microtime(true);
@@ -15,37 +16,42 @@ $msg = lang();
 $err_status =[];
 if(PHP_MAJOR_VERSION < 8 ){ die("PHP < 8 is not supported."); }
 // Server checks
-$server = false;
 	if(php_sapi_name() !== "cli"){
+		ob_start();
 		$server = true;
 		timer(null, null, true); // Disable timer
-		$clear = "<pre>";
+		if(count($tmrr_process) < 2){
+			die("Please provide parameters inside \$tmrr_process variable, see https://github.com/kovalensky/tmrr/wiki/Web-usage");
+		}
+		$clear = "";
+		$tmrr_result = [];
+		$tmrr_error = [];
 		$argv = [];
 		$argv[0] = "Server is up";
-		$argv[1] = @$_GET["method"] ?? "1";
-		if(!isset($_GET["method"])){
-			$err_status["0"] = "Please set 'method' GET parameter, it can be empty (default) or contain 'r' and 'c' parameters, please see https://github.com/kovalensky/tmrr.";
-		}
+		$argv[1] = $tmrr_process[0];
 		$i = 2;
 		
-		foreach(array_slice($_GET, 1) as $key => $value){
-			if(str_starts_with($key, "tmrr")){
+		foreach(array_slice($tmrr_process, 1) as $value){
 			$argv[$i] = $value;
-			$i++;
-			}
-		}
-	}
+			$i++;	
+	}}
+	
+
+
 
 //Main
 // Check for arguments
 if (!isset($argv[1])) {
 die($msg["main"]);
 	}
-	if ($argv[1] == "r") {
+	if ($argv[1] == "r" && count($argv) > 2) {
 	// Calculate Merkle Root Hash
 	foreach(array_slice($argv, 2) as $file){
 	if(is_file($file) && filesize($file) !== 0){
 	$root = new HasherV2($file, BLOCK_SIZE);
+	if(@$server)	{
+		$file = basename($file);	// Hide paths for web usage
+	}
 	echo $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
 	
 	unset($root);
@@ -56,7 +62,6 @@ die($msg["main"]);
 	}
 	}
 	error_status($err_status);
-	die();
 }
 
 
@@ -80,21 +85,13 @@ die($msg["main"]);
 	combine_keys($file_tree_array, $compared);
 	compare($compared);
 	error_status($err_status);
-	die();
 	
 }
 
 
 // Since no "r" or "c" argument key provided this has to be a torrent file, let's extract hashes
-	if(isset($argv[1])){
-		if($server) {	echo $clear; 	unset($argv[1]);	}
-		foreach(array_slice($argv , 1) as $key => $file){
-		if($server){
-		if(!file_exists($file)){
-		$err_status[$key] = "Please provide correct file locations inside tmrr(i)_files GET parameters, see https://github.com/kovalensky/tmrr.";
-		continue;
-		}
-		}
+		if($argv[1] == "e" && count($argv) > 2){
+		foreach(array_slice($argv , 2) as $file){
 		$decoded = @bencode_decode(@file_get_contents($file));
 		if(!isset($decoded["info"])){
 			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
@@ -111,7 +108,9 @@ die($msg["main"]);
 		
 		unset($decoded);
 }
-error_status($err_status);
+
+	error_status($err_status);
+	
 	}
 
 
@@ -188,13 +187,13 @@ function bencode_decode_r($input, $len, &$pos) {
 
 // Loop through all arrays saving locations and showing result
 function printArrayNames($array, $parent = "") {
-	global $msg, $clear;
+	global $msg;
     foreach($array as $key => $value) {
         $current = $parent . "/" . $key;
         if(is_array($value) && strlen($key) !== 0) {
             printArrayNames($value, $current);
         } else {
-			
+		
             echo "\r\n" . substr($current, 1, -1) . "\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . " {$msg["size"]}: " . formatBytes($value["length"]) . "\r\n";
 			
 		}
@@ -350,10 +349,8 @@ function compare($array) {
 
 
 
-
-
 // Timer function
-function timer($dose, $max, $disable=false){
+	function timer($dose, $max, $disable=false){
     global $interactive_pos, $sync, $clear, $msg;
 	if ($disable == true)
 	{ 		
@@ -385,13 +382,19 @@ function formatBytes($bytes, $precision = 2) {
 
 // Error handler
 function error_status($err_status){
-	global $msg;
+	global $msg, $server, $tmrr_result, $tmrr_error, $argv;
+		if(isset($server)){
+		$tmrr_error = $err_status;
+		$tmrr_result[0] = ob_get_clean();
+		return;
+		}
 	if(!empty($err_status)){
 	echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
 	foreach($err_status as $key => $value){
 		echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
 		}
 	}
+	die();
 }
 
 // Language option
