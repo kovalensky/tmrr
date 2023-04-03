@@ -79,7 +79,7 @@ die($msg["main"]);
 			$err_status[$file] = $msg["no_v2"] . "\r\n";
 			continue;
 		}
-		$file_tree_array["### " .$file. " ###: \r\n"] = $decoded["info"]["file tree"];
+		$file_tree_array["### " .file_base($file). " ###: \r\n"] = $decoded["info"]["file tree"];
 	}
 	$compared= [];
 	combine_keys($file_tree_array, $compared);
@@ -103,7 +103,7 @@ die($msg["main"]);
 			continue;
 		}
 
-		echo "\r\n\r\n### $file ###\r\n" . "### {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " ###\r\n";
+		echo "\r\n\r\n### " . file_base($file) . " ###\r\n" . "### {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " ###\r\n";
 		printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 		
 		unset($decoded);
@@ -395,6 +395,15 @@ function error_status($err_status){
 		}
 	}
 	die();
+}
+
+// Base name calculation for web usage
+function file_base($string){
+	global $server;
+	if(@$server){
+		return basename($string);
+	}
+	return $string;
 }
 
 // Language option
