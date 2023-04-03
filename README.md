@@ -28,9 +28,9 @@ To save big output:
 tmrr.exe your_command > output.txt
 ```
 Web Server use:
-```
-tmrr.php?method=(c, r or empty)&tmrr_file1=example.torrent&tmrr_file2=./folder/example2.torrent..
-```
+
+[Documentation](https://github.com/kovalensky/tmrr/wiki/Web-usage)
+
 For the Linux environment on which PHP is installed:
 ```
 php tmrr.php your_command
