@@ -9,11 +9,13 @@
   </a>
 </h1>
 
+[Documentation for web usage](https://github.com/kovalensky/tmrr/wiki/Web-usage)
+
 Useful for finding the sources of the same copies of files on different trackers that support BitTorrent v2, thus reviving dead torrents.
 
 Extract root hashes from .torrent files:
 ```
-tmrr.exe example.torrent
+tmrr.exe e example.torrent
 ```
 Calculate root hashes for raw files:
 ```
@@ -27,10 +29,6 @@ To save big output:
 ```
 tmrr.exe your_command > output.txt
 ```
-Web Server use:
-
-[Documentation](https://github.com/kovalensky/tmrr/wiki/Web-usage)
-
 For the Linux environment on which PHP is installed:
 ```
 php tmrr.php your_command
