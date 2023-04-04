@@ -25,7 +25,7 @@ Compare .torrent files for duplicates:
 ```
 tmrr.exe c <example.torrent> <example2.torrent>.. <example5.torrent>
 ```
-To save big output:
+To save large output:
 ```
 tmrr.exe your_command > output.txt
 ```
