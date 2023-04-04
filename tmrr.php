@@ -413,7 +413,7 @@ $version = "1.1.7g";
 $strings = array(
 	"rus"=>
 	[
-	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe c <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe r <ваш-файл>		*Вычисляет корневой Merkle хеш файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файл5> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
+	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe c <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe r <ваш-файл>		*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файл5> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
 	"noraw" => "Укажите расположение файла, он не должен быть пустым.",
 	"invalid_torrent" => ".torrent файл содержит ошибки.",
 	"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид. Торренты v1 формата не поддерживают вычисление Merkle хешей файлов.",
@@ -429,7 +429,7 @@ $strings = array(
 	],
 	
 	"eng" => [
-	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe c <torrent-file>	*Compares duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe r <your-file>		*Calculates Merkle root hash of raw files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <file5> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe c <torrent-file>	*Compares duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe r <your-file>		*Calculates the hash of existing raw files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <file5> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 	"noraw" => "This is not a raw file comrade, is it empty?",
 	"invalid_torrent" => "It looks like this is an invalid torrent file, are you sure comrade?",
 	"no_v2" => "It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade.",
