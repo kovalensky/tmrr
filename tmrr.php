@@ -429,7 +429,7 @@ $strings = array(
 	],
 	
 	"eng" => [
-	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe c <torrent-file>	*Compares duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe r <your-file>		*Calculates the hash of existing raw files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <file5> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe c <torrent-file>	*Compares duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe r <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <file5> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 	"noraw" => "This is not a raw file comrade, is it empty?",
 	"invalid_torrent" => "It looks like this is an invalid torrent file, are you sure comrade?",
 	"no_v2" => "It looks like this is an invalid hybrid/v2 file, probably a v1 torrent format that does not support root Merkle hashes, sorry comrade.",
