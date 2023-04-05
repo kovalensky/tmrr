@@ -68,7 +68,7 @@ die($msg["main"]);
 }
 
 
-	if ($argv[1] == "c" && count($argv) > 2) {
+	if ($argv[1] == "d" && count($argv) > 2) {
 	$file_tree_array = [];
 	foreach(array_slice($argv, 2) as $file){
 	
@@ -407,7 +407,7 @@ $version = "1.1.7g";
 $strings = array(
 	"rus"=>
 	[
-	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe c <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe r <ваш-файл>		*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файл5> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
+	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe r <ваш-файл>		*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файл5> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
 	"noraw" => "Укажите расположение файла, он не должен быть пустым.",
 	"invalid_torrent" => ".torrent файл содержит ошибки.",
 	"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид.\r\nv1 торренты не поддерживают показ хешей файлов.",
@@ -424,7 +424,7 @@ $strings = array(
 	],
 	
 	"eng" => [
-	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe c <torrent-file>	*Compares duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe r <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <file5> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Compares duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe r <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <file5> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 	"noraw" => "This is not a valid file, is it empty?",
 	"invalid_torrent" => "Invalid torrent file.",
 	"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
