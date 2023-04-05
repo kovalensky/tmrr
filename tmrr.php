@@ -12,8 +12,11 @@ $sync = microtime(true);
 $clear = "\r\x1b[K"; // Escape symbols for clearing output
 // Language
 $msg = lang();
+// File counter
+$filec = 0;
 // Error catcher
 $err_status =[];
+// Environment check
 if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 // Server checks
 	if(php_sapi_name() !== "cli"){
@@ -108,6 +111,7 @@ die($msg["main"]);
 
 		echo "\r\n\r\n### " . file_base($file) . " ###\r\n" . "### {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " ###\r\n";
 		printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
+		echo "\r\n\r\n{$msg["total_files"]}: $filec\r\n";
 		
 		unset($decoded);
 }
@@ -190,7 +194,7 @@ function bencode_decode_r($input, $len, &$pos) {
 
 // Loop through all arrays saving locations and showing result
 function printArrayNames($array, $parent = "") {
-	global $msg;
+	global $msg, $filec;
     foreach($array as $key => $value) {
         $current = $parent . "/" . $key;
         if(is_array($value) && strlen($key) !== 0) {
@@ -199,6 +203,7 @@ function printArrayNames($array, $parent = "") {
 		
             echo "\r\n" . substr($current, 1, -1) . "\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . " {$msg["size"]}: " . formatBytes($value["length"]) . "\r\n";
 			
+			$filec++;
 		}
     }
 }
@@ -414,7 +419,8 @@ $strings = array(
 	"unfinished_files" => "Необработанные файлы",
 	"error_type" => "Ошибка",
 	"no_duplicates" => "Дубликаты не найдены.",
-	"dup_found" => "найден в"
+	"dup_found" => "найден в",
+	"total_files" => "Всего файлов"
 	],
 	
 	"eng" => [
@@ -430,7 +436,8 @@ $strings = array(
 	"unfinished_files" => "Unprocessed files",
 	"error_type" => "Error type",
 	"no_duplicates" => "No duplicates were found.",
-	"dup_found" => "found in"
+	"dup_found" => "found in",
+	"total_files" => "Total files"
 	]
 	);
 
