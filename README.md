@@ -13,7 +13,7 @@
 
 Useful for finding the sources of the same copies of files on different trackers that support BitTorrent v2, thus reviving dead torrents.
 
-Extract root hashes from .torrent files:
+Extract file hashes from .torrent files:
 ```
 tmrr.exe e example.torrent
 ```
