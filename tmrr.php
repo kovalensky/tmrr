@@ -420,7 +420,7 @@ $strings = array(
 	"error_type" => "Ошибка",
 	"no_duplicates" => "Дубликаты не найдены.",
 	"dup_found" => "найден в",
-	"total_files" => "Всего файлов"
+	"total_files" => "Количество файлов"
 	],
 	
 	"eng" => [
