@@ -21,7 +21,7 @@ Calculate hashes for raw files:
 ```
 tmrr.exe r your_file
 ```
-Compare .torrent files for duplicates:
+Compare .torrent file(s) for duplicates:
 ```
 tmrr.exe d <example.torrent> <example2.torrent>.. <example5.torrent>
 ```
