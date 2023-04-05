@@ -81,11 +81,14 @@ die($msg["main"]);
 		}
 		$file_tree_array["### " .file_base($file). " ###: \r\nFile: "] = $decoded["info"]["file tree"];
 	}
-	$compared= [];
-	combine_keys($file_tree_array, $compared);
-	compare($compared);
-	error_status($err_status);
+	if(!empty($file_tree_array)){
+		
+	$hashes = [];
+	combine_keys($file_tree_array, $hashes);
+	compare($hashes);
 	
+	}
+	error_status($err_status);
 }
 
 
@@ -308,42 +311,28 @@ function combine_keys($array, &$compared, $parent_key = "") {
 
 // Do comparation
 function compare($array) {
-    global $msg, $clear, $argv;	
+    global $msg;
+		$count = count($array);
+    	foreach ($array as $key => $value) {
+		if (isset($keys[$value])) {
+			$keys[$value][] = $key;
+		} else {
+			$keys[$value] = array($key);
+		}
+	}
 	
-    $duplicates = [];
-    $count = count($array);
-    $array_iterator = 0;
-	$total_iterations = $count * ($count - 1) / 2;
-    for ($i = 0; $i < $count; $i++) {
-        $key1 = array_keys($array)[$i];
-        $value1 = $array[$key1];
-        for ($j = $i + 1; $j < $count; $j++) {
-			timer($array_iterator, $total_iterations); $array_iterator++;
-            $key2 = array_keys($array)[$j];
-            $value2 = $array[$key2];
-            
-            if ($value1 === $value2) {
-                if (!array_key_exists($value1, $duplicates)) {
-                    $duplicates[$value1] = [$key1, $key2];
-                } else {
-                    $duplicates[$value1][] = $key2;
-                }
-                
-                break;
-            }
-        }
-    }
-    if(!empty($duplicates)){
-        foreach ($duplicates as $value => $keys) {
-        echo $clear .  "\r\n{$msg["root_hash"]} $value {$msg["dup_found"]}:\r\n";
-            foreach ($keys as $key) {
-                echo $key. "\r\n\r\n";
-            }
-        }
-    }
-    else{
-        echo $clear. "\r\n" . $msg["no_duplicates"] . "\r\n";
-    }
+	$dups = false;
+	foreach ($keys as $key => $value) {
+		if (count($value) > 1) {
+			echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
+			$dups = true;
+		}
+	}
+
+if(!$dups){
+	echo "\r\n" . $msg["no_duplicates"] . "\r\n";
+}
+           
 }
 
 
