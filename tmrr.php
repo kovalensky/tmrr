@@ -79,7 +79,7 @@ die($msg["main"]);
 			$err_status[$file] = $msg["no_v2"] . "\r\n";
 			continue;
 		}
-		$file_tree_array["### " .file_base($file). " ###: \r\n"] = $decoded["info"]["file tree"];
+		$file_tree_array["### " .file_base($file). " ###: \r\nFile: "] = $decoded["info"]["file tree"];
 	}
 	$compared= [];
 	combine_keys($file_tree_array, $compared);
