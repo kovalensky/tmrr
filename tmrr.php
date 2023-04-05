@@ -111,7 +111,7 @@ die($msg["main"]);
 
 		echo "\r\n\r\n### " . file_base($file) . " ###\r\n" . "### {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " ###\r\n";
 		printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
-		echo "\r\n\r\n{$msg["total_files"]}: $filec\r\n"; // Show total files count
+		echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
 		
 		unset($decoded);
 }
