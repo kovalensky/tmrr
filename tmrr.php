@@ -340,7 +340,7 @@ if($filed == 0){
 	echo "\r\n" . $msg["no_duplicates"] . "\r\n";
 }
 else{
-	echo "{$msg["total_files"]}: $filec\r\n{$msg["total_dup_files"]}: " . $filed - $dup_hashes . "\r\n";
+	echo "{$msg["total_files"]}: $filec\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . "\r\n";
 }
            
 }
