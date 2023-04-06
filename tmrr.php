@@ -85,8 +85,9 @@ die($msg["main"]);
 	if(!empty($file_tree_array)){
 		
 	$hashes = [];
+	$filec = 0;
 	combine_keys($file_tree_array, $hashes);
-	compare($hashes);
+	compare($hashes, $filec);
 	
 	}
 	error_status($err_status);
@@ -301,6 +302,7 @@ class HasherV2 {
 
 //Extract and combine functions in one array
 function combine_keys($array, &$compared, $parent_key = "") {
+	global $filec;
     foreach($array as $key => $value) {
         $current_key = $parent_key . "/" . $key;
         if(is_array($value) && strlen($key) !== 0) {
@@ -308,12 +310,13 @@ function combine_keys($array, &$compared, $parent_key = "") {
         } else {
   
             $compared[substr($current_key, 1, -1)] = @bin2hex($value["pieces root"]);
-        }
+			$filec++;
+		}
     }
 }
 
 // Do comparation
-function compare($array) {
+function compare($array, $filec) {
     global $msg;
 		$count = count($array);
     	foreach ($array as $key => $value) {
@@ -337,7 +340,7 @@ if($filed == 0){
 	echo "\r\n" . $msg["no_duplicates"] . "\r\n";
 }
 else{
-	echo "{$msg["root_hashes"]}: $dup_hashes\r\n{$msg["total_dup_files"]}: $filed\r\n";
+	echo "{$msg["total_files"]}: $filec\r\n{$msg["total_dup_files"]}: " . $filed - $dup_hashes . "\r\n";
 }
            
 }
@@ -378,7 +381,7 @@ function formatBytes($bytes, $precision = 2) {
 
 // Error handler
 function error_status($err_status){
-	global $msg, $server, $tmrr_result, $tmrr_error, $argv;
+	global $msg, $server, $tmrr_result, $tmrr_error;
 		if(isset($server)){
 		$tmrr_error = $err_status;
 		$tmrr_result[0] = ob_get_clean();
@@ -422,7 +425,7 @@ $strings = array(
 	"error_type" => "Ошибка",
 	"no_duplicates" => "Дубликаты не найдены.",
 	"dup_found" => "найден в",
-	"total_files" => "Количество файлов",
+	"total_files" => "Общее количество файлов",
 	"total_dup_files" => "Количество дубликатов",
 	"root_hashes" => "Хешей"
 	],
