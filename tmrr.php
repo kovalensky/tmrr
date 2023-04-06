@@ -12,8 +12,6 @@ $sync = microtime(true);
 $clear = "\r\x1b[K"; // Escape symbols for clearing output
 // Language
 $msg = lang();
-// File counter
-$filec = 0;
 // Error catcher
 $err_status =[];
 // Environment check
@@ -82,7 +80,7 @@ die($msg["main"]);
 			$err_status[$file] = $msg["no_v2"] . "\r\n";
 			continue;
 		}
-		$file_tree_array["### " .file_base($file). " ###: \r\nFile: "] = $decoded["info"]["file tree"];
+		$file_tree_array["### " .file_base($file). " ###: \r\n{$msg["file_location"]}: "] = $decoded["info"]["file tree"];
 	}
 	if(!empty($file_tree_array)){
 		
@@ -95,8 +93,8 @@ die($msg["main"]);
 }
 
 
-// Since no "r" or "c" argument key provided this has to be a torrent file, let's extract hashes
 		if($argv[1] == "e" && count($argv) > 2){
+		$filec = 0;
 		foreach(array_slice($argv , 2) as $file){
 		$decoded = @bencode_decode(@file_get_contents($file));
 		if(!isset($decoded["info"])){
@@ -325,17 +323,21 @@ function compare($array) {
 			$keys[$value] = array($key);
 		}
 	}
-	
-	$dups = false;
+	$dup_hashes = 0;
+	$filed = 0;
 	foreach ($keys as $key => $value) {
 		if (count($value) > 1) {
 			echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
-			$dups = true;
+			$filed += count($value);
+			$dup_hashes++;
 		}
 	}
 
-if(!$dups){
+if($filed == 0){
 	echo "\r\n" . $msg["no_duplicates"] . "\r\n";
+}
+else{
+	echo "{$msg["root_hashes"]}: $dup_hashes\r\n{$msg["total_dup_files"]}: $filed\r\n"; $filed = 0; $dup_hashes = 0;
 }
            
 }
@@ -420,7 +422,9 @@ $strings = array(
 	"error_type" => "Ошибка",
 	"no_duplicates" => "Дубликаты не найдены.",
 	"dup_found" => "найден в",
-	"total_files" => "Количество файлов"
+	"total_files" => "Количество файлов",
+	"total_dup_files" => "Количество дубликатов",
+	"root_hashes" => "Хешей"
 	],
 	
 	"eng" => [
@@ -437,7 +441,9 @@ $strings = array(
 	"error_type" => "Error type",
 	"no_duplicates" => "No duplicates were found.",
 	"dup_found" => "found in",
-	"total_files" => "Total files"
+	"total_files" => "Total files",
+	"total_dup_files" => "Duplicate count",
+	"root_hashes" => "Hashes"
 	]
 	);
 
