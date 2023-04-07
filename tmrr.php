@@ -39,61 +39,13 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 	
 
 
-
 //Main
 // Check for arguments
-if (!isset($argv[1])) {
-die($msg["main"]);
-	}
-	if ($argv[1] == "r" && count($argv) > 2) {
-	// Calculate Merkle Root Hash
-	foreach(array_slice($argv, 2) as $file){
-	if(is_file($file) && filesize($file) !== 0){
-	$root = new HasherV2($file, BLOCK_SIZE);
-	if(@$server)	{
-		$file = basename($file);	// Hide paths for web usage
-	}
-	echo $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
-	
-	unset($root);
-	}
-	else{
-		
-		$err_status[$file] = $msg["noraw"];
-	}
-	}
-	error_status($err_status);
-}
-
-
-	if ($argv[1] == "d" && count($argv) > 2) {
-	$file_tree_array = [];
-	foreach(array_slice($argv, 2) as $file){
-	
-		$decoded = @bencode_decode(@file_get_contents($file));
-		if(!isset($decoded["info"])){
-			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
-			continue;
+	if (!isset($argv[1]) || !in_array( $argv[1], ["e", "d", "c"])) {
+	die($msg["main"]);
 		}
 
-		if(!isset($decoded["info"]["meta version"])){
-			$err_status[$file] = $msg["no_v2"] . "\r\n";
-			continue;
-		}
-		$file_tree_array["### " .file_base($file). " ###: \r\n{$msg["file_location"]}: "] = $decoded["info"]["file tree"];
-	}
-	if(!empty($file_tree_array)){
-		
-	$hashes = [];
-	$filec = 0;
-	combine_keys($file_tree_array, $hashes);
-	compare($hashes, $filec);
-	
-	}
-	error_status($err_status);
-}
-
-
+		// Extract hashes
 		if($argv[1] == "e" && count($argv) > 2){
 		$filec = 0;
 		foreach(array_slice($argv , 2) as $file){
@@ -119,7 +71,55 @@ die($msg["main"]);
 	
 	}
 
+		// Find duplicates, be aware that duplicates inside single .torrent file are also shown
+		if ($argv[1] == "d" && count($argv) > 2) {
+		$file_tree_array = [];
+		foreach(array_slice($argv, 2) as $file){
+		
+			$decoded = @bencode_decode(@file_get_contents($file));
+			if(!isset($decoded["info"])){
+				$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
+				continue;
+			}
 
+			if(!isset($decoded["info"]["meta version"])){
+				$err_status[$file] = $msg["no_v2"] . "\r\n";
+				continue;
+			}
+			$file_tree_array["### " .file_base($file). " ###: \r\n{$msg["file_location"]}: "] = $decoded["info"]["file tree"];
+		}
+		if(!empty($file_tree_array)){
+			
+		$hashes = [];
+		$filec = 0;
+		combine_keys($file_tree_array, $hashes);
+		compare($hashes, $filec);
+		
+		}
+		error_status($err_status);
+	}
+
+
+	
+		// Calculate Merkle Root Hash
+		if ($argv[1] == "c" && count($argv) > 2) {
+		foreach(array_slice($argv, 2) as $file){
+		if(is_file($file) && filesize($file) !== 0){
+		$root = new HasherV2($file, BLOCK_SIZE);
+		if(@$server)	{
+			$file = basename($file);	// Hide paths for web usage
+		}
+		echo $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
+		
+		unset($root);
+		}
+		else{
+			
+			$err_status[$file] = $msg["noraw"];
+		}
+		}
+		error_status($err_status);
+	}
 
 
 //Functions
@@ -235,7 +235,7 @@ function merkle_root($blocks) {
     }
     return $blocks;
 }
-
+// File hasher
 class HasherV2 {
     private $path;
     public $root;
@@ -300,7 +300,7 @@ class HasherV2 {
 
 // Comparator functions
 
-//Extract and combine functions in one array
+//Extract and combine hashes in one array
 function combine_keys($array, &$compared, $parent_key = "") {
 	global $filec;
     foreach($array as $key => $value) {
@@ -412,7 +412,7 @@ $version = "1.1.7g";
 $strings = array(
 	"rus"=>
 	[
-	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe r <ваш-файл>		*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файл5> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
+	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe c <ваш-файл>		*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файл5> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
 	"noraw" => "Укажите расположение файла, он не должен быть пустым.",
 	"invalid_torrent" => ".torrent файл содержит ошибки.",
 	"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид.\r\nv1 торренты не поддерживают показ хешей файлов.",
@@ -431,7 +431,7 @@ $strings = array(
 	],
 	
 	"eng" => [
-	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Compares duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe r <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <file5> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe c <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <file5> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 	"noraw" => "This is not a valid file, is it empty?",
 	"invalid_torrent" => "Invalid torrent file.",
 	"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
