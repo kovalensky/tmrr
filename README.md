@@ -17,7 +17,7 @@ Extract file hashes from .torrent files:
 ```
 tmrr.exe e example.torrent
 ```
-Calculate hashes for raw files:
+Calculate hashes for existing files:
 ```
 tmrr.exe r your_file
 ```
