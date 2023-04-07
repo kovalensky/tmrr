@@ -14,8 +14,10 @@ $clear = "\r\x1b[K"; // Escape symbols for clearing output
 $msg = lang();
 // Error catcher
 $err_status =[];
+
 // Environment check
 if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
+
 // Server checks
 	if(php_sapi_name() !== "cli"){
 		ob_start();
@@ -38,15 +40,15 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 	}}
 	
 
-
 //Main
+
 // Check for arguments
-	if (!isset($argv[1]) || !in_array( $argv[1], ["e", "d", "c"])) {
+	if (!isset($argv[1]) || !in_array( $argv[1], ["e", "d", "c"] ) || count($argv) <= 2) {
 	die($msg["main"]);
 		}
 
 		// Extract hashes
-		if($argv[1] == "e" && count($argv) > 2){
+		if($argv[1] == "e"){
 		$filec = 0;
 		foreach(array_slice($argv , 2) as $file){
 		$decoded = @bencode_decode(@file_get_contents($file));
@@ -65,14 +67,14 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
 		
 		unset($decoded);
-}
+	}
 
 	error_status($err_status);
 	
 	}
 
 		// Find duplicates, be aware that duplicates inside single .torrent file are also shown
-		if ($argv[1] == "d" && count($argv) > 2) {
+		if ($argv[1] == "d") {
 		$file_tree_array = [];
 		foreach(array_slice($argv, 2) as $file){
 		
@@ -102,7 +104,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 
 	
 		// Calculate Merkle Root Hash
-		if ($argv[1] == "c" && count($argv) > 2) {
+		if ($argv[1] == "c") {
 		foreach(array_slice($argv, 2) as $file){
 		if(is_file($file) && filesize($file) !== 0){
 		$root = new HasherV2($file, BLOCK_SIZE);
