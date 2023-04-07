@@ -5,7 +5,7 @@
 [![Donate Ethereum](https://img.shields.io/badge/Ethereum-8c8c8c.svg)](https://ethereum/wallet/0x58dC9585BE36e855bA30609909f7D4Ef11313ee1)
 <h1 align="center">
   <a href="#">
-    <img src="https://i3.imageban.ru/out/2023/04/05/475b813d69ec85b507e961fa0fa8caae.gif" alt="TMRR">
+    <img src="https://i4.imageban.ru/out/2023/04/07/76d1dada6b25539f344512ca7bb3a839.gif" alt="TMRR">
   </a>
 </h1>
 
