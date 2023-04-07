@@ -19,7 +19,7 @@ tmrr.exe e example.torrent
 ```
 Calculate hashes for existing files:
 ```
-tmrr.exe r your_file
+tmrr.exe c your_file
 ```
 Compare .torrent file(s) for duplicates:
 ```
