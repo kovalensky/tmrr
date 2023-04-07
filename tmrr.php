@@ -23,7 +23,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		ob_start();
 		$server = true;
 		timer(null, null, true); // Disable timer
-		if(count($tmrr_process) < 2 || !in_array( $tmrr_process[0], ["e", "d", "c"] )){
+		if(count($tmrr_process) < 2){
 			die("Please provide parameters inside \$tmrr_process variable, see https://github.com/kovalensky/tmrr/wiki/Web-usage");
 		}
 		$clear = "";
@@ -303,15 +303,15 @@ class HasherV2 {
 // Comparator functions
 
 //Extract and combine hashes in one array
-function combine_keys($array, &$compared, $parent_key = "") {
+function combine_keys($array, &$hashes, $parent_key = "") {
 	global $filec;
     foreach($array as $key => $value) {
         $current_key = $parent_key . "/" . $key;
         if(is_array($value) && strlen($key) !== 0) {
-            combine_keys($value, $compared, $current_key);
+            combine_keys($value, $hashes, $current_key);
         } else {
   
-            $compared[substr($current_key, 1, -1)] = @bin2hex($value["pieces root"]);
+            $hashes[substr($current_key, 1, -1)] = @bin2hex($value["pieces root"]);
 			$filec++;
 		}
     }
