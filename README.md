@@ -21,7 +21,7 @@ Calculate hashes for existing files:
 ```
 tmrr.exe c your_file
 ```
-Find duplicate files within .torrent file(s):
+Find duplicates within .torrent file(s):
 ```
 tmrr.exe d <example.torrent> <example2.torrent>.. <example5.torrent>
 ```
