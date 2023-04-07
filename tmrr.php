@@ -23,7 +23,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		ob_start();
 		$server = true;
 		timer(null, null, true); // Disable timer
-		if(count($tmrr_process) < 2){
+		if(count($tmrr_process) < 2 || !in_array( $tmrr_process[0], ["e", "d", "c"] )){
 			die("Please provide parameters inside \$tmrr_process variable, see https://github.com/kovalensky/tmrr/wiki/Web-usage");
 		}
 		$clear = "";
