@@ -23,7 +23,7 @@ tmrr.exe c your_file
 ```
 Find duplicates within .torrent file(s):
 ```
-tmrr.exe d <example.torrent> <example2.torrent>.. <example5.torrent>
+tmrr.exe d <example.torrent> <example2.torrent>.. <exampleN.torrent>
 ```
 To save large output:
 ```
