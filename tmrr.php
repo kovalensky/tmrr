@@ -62,7 +62,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 			continue;
 		}
 
-		echo "\r\n\r\n### " . file_base($file) . " ###\r\n" . "### {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " ###\r\n";
+		echo "\r\n\r\n ### " . file_base($file) . " ###\r\n" . " ### {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " ###\r\n";
 		printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 		echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
 		
@@ -88,7 +88,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				$err_status[$file] = $msg["no_v2"] . "\r\n";
 				continue;
 			}
-			$file_tree_array["### " .file_base($file). " ###: \r\n{$msg["file_location"]}: "] = $decoded["info"]["file tree"];
+			$file_tree_array[file_base($file). ":\r\n  "] = $decoded["info"]["file tree"];
 		}
 		if(!empty($file_tree_array)){
 
@@ -201,7 +201,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				printArrayNames($value, $current);
 			} else {
 			
-				echo "\r\n" . substr($current, 1, -1) . "\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . " {$msg["size"]}: " . formatBytes($value["length"]) . "\r\n";
+				echo "\r\n " . substr($current, 1, -1) . ' (' . formatBytes($value["length"]) . ")\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . "\r\n";
 				
 				$filec++;
 			}
@@ -419,7 +419,6 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид.\r\nv1 торренты не поддерживают показ хешей файлов.",
 		"root_hash" => "Хеш",
 		"calculation" => "Вычисление",
-		"size" => "Размер",
 		"torrent_title" => "Название раздачи",
 		"file_location" => "Файл",
 		"unfinished_files" => "Необработанные файлы",
@@ -438,7 +437,6 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
 		"root_hash" => "Hash",
 		"calculation" => "Calculating",
-		"size" => "Size",
 		"torrent_title" => "Title",
 		"file_location" => "File",
 		"unfinished_files" => "Unprocessed files",
