@@ -91,34 +91,33 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 			$file_tree_array["### " .file_base($file). " ###: \r\n{$msg["file_location"]}: "] = $decoded["info"]["file tree"];
 		}
 		if(!empty($file_tree_array)){
-			
+
 		$hashes = [];
 		$filec = 0;
 		combine_keys($file_tree_array, $hashes);
+		unset($file_tree_array);
 		compare($hashes, $filec);
 		
 		}
 		error_status($err_status);
 	}
 
-
 	
 		// Calculate Merkle Root Hash
 		if ($argv[1] == "c") {
 		foreach(array_slice($argv, 2) as $file){
-		if(is_file($file) && filesize($file) !== 0){
-		$root = new HasherV2($file, BLOCK_SIZE);
-		if(@$server)	{
-			$file = basename($file);	// Hide paths for web usage
-		}
-		echo $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
-		
-		unset($root);
-		}
-		else{
+			if(is_file($file) && filesize($file) !== 0){
+			$root = new HasherV2($file, BLOCK_SIZE);
+			$file = basename($file); // Hide paths for web usage
 			
+			echo $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
+			
+			unset($root);
+			
+			}
+		else{
 			$err_status[$file] = $msg["noraw"];
-		}
+			}
 		}
 		error_status($err_status);
 	}
@@ -127,361 +126,361 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 //Functions
 
 // Bencode library
-function bencode_decode($input) {
-    if ($input === '') {
-        return null;
-    }
+	function bencode_decode($input) {
+		if ($input === '') {
+			return null;
+		}
 
-    $len = strlen($input);
-    $pos = 0;
-    $output = bencode_decode_r($input, $len, $pos);
-    return $output;
-}
+		$len = strlen($input);
+		$pos = 0;
+		$output = bencode_decode_r($input, $len, $pos);
+		return $output;
+	}
 
-function bencode_decode_r($input, $len, &$pos) {
-    switch ($input[$pos]) {
-        case 'd':
-            $output = array();
-            $pos++;
+	function bencode_decode_r($input, $len, &$pos) {
+		switch ($input[$pos]) {
+			case 'd':
+				$output = array();
+				$pos++;
 
-            while ($input[$pos] !== 'e') {
-                $key = bencode_decode_r($input, $len, $pos);
-                $output[$key] = bencode_decode_r($input, $len, $pos);
-            }
+				while ($input[$pos] !== 'e') {
+					$key = bencode_decode_r($input, $len, $pos);
+					$output[$key] = bencode_decode_r($input, $len, $pos);
+				}
 
-            $pos++;
-            return $output;
+				$pos++;
+				return $output;
 
-        case 'l':
-            $output = array();
-            $pos++;
+			case 'l':
+				$output = array();
+				$pos++;
 
-            while ($input[$pos] !== 'e') {
-                $output[] = bencode_decode_r($input, $len, $pos);
-            }
+				while ($input[$pos] !== 'e') {
+					$output[] = bencode_decode_r($input, $len, $pos);
+				}
 
-            $pos++;
-            return $output;
+				$pos++;
+				return $output;
 
-        case 'i':
-            $output = '';
-            $pos++;
+			case 'i':
+				$output = '';
+				$pos++;
 
-            while ($input[$pos] !== 'e') {
-                $output .= $input[$pos];
-                $pos++;
-            }
+				while ($input[$pos] !== 'e') {
+					$output .= $input[$pos];
+					$pos++;
+				}
 
-            $pos++;
-            return (int) $output;
+				$pos++;
+				return (int) $output;
 
-        default:
-            $len_str = '';
-            $pos_start = $pos;
+			default:
+				$len_str = '';
+				$pos_start = $pos;
 
-            while (is_numeric($input[$pos])) {
-                $len_str .= $input[$pos];
-                $pos++;
-            }
+				while (is_numeric($input[$pos])) {
+					$len_str .= $input[$pos];
+					$pos++;
+				}
 
-            $len = (int) $len_str;
-            $pos++;
-            $output = substr($input, $pos, $len);
-            $pos += $len;
-            return $output;
-    }
-}
+				$len = (int) $len_str;
+				$pos++;
+				$output = substr($input, $pos, $len);
+				$pos += $len;
+				return $output;
+		}
+	}
 
 
-// Loop through all arrays saving locations and showing result
-function printArrayNames($array, $parent = "") {
-	global $msg, $filec;
-    foreach($array as $key => $value) {
-        $current = $parent . "/" . $key;
-        if(is_array($value) && strlen($key) !== 0) {
-            printArrayNames($value, $current);
-        } else {
-		
-            echo "\r\n" . substr($current, 1, -1) . "\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . " {$msg["size"]}: " . formatBytes($value["length"]) . "\r\n";
+	// Loop through all arrays saving locations and showing result
+	function printArrayNames($array, $parent = "") {
+		global $msg, $filec;
+		foreach($array as $key => $value) {
+			$current = $parent . "/" . $key;
+			if(is_array($value) && strlen($key) !== 0) {
+				printArrayNames($value, $current);
+			} else {
 			
-			$filec++;
-		}
-    }
-}
-	
-
-
-// Individual files Merkle computations
-function next_power_2($value) {
-    if (!($value & ($value - 1)) && $value) {
-        return $value;
-    }
-    $start = 1;
-    while ($start < $value) {
-        $start <<= 1;
-    }
-    return $start;
-}
-
-function merkle_root($blocks) {
-    if (count($blocks) > 0) {
-        while (count($blocks) > 1) {
-            for ($i = 0; $i < count($blocks); $i += 2) {
-                $x = $blocks[$i];
-                $y = isset($blocks[$i + 1]) ? $blocks[$i + 1] : '';
-                $blocks[$i / 2] = hash('sha256', $x . $y, true);
-            }
-            $blocks = array_slice($blocks, 0, count($blocks) / 2);
-        }
-        return $blocks[0];
-    }
-    return $blocks;
-}
-// File hasher
-class HasherV2 {
-    private $path;
-    public $root;
-    private $piece_layer;
-    private $layer_hashes;
-    private $piece_length;
-    private $num_blocks;
-    public function __construct($path, $piece_length) {
-        $this->path = $path;
-        $this->root = null;
-        $this->piece_layer = null;
-        $this->layer_hashes = [];
-        $this->piece_length = $piece_length;
-        $this->num_blocks = $piece_length / BLOCK_SIZE;
-        $fd = fopen($this->path, 'rb');
-        $this->process_file($fd);
-        fclose($fd);
-    }
-
-    private function process_file($fd) {
-        while (!feof($fd)) {
-            $blocks = [];
-            $leaf = fread($fd, BLOCK_SIZE);
-            if (!$leaf) {
-                break;
-            }
-            $size = fstat($fd)["size"];
-            timer(ftell($fd), $size);
-            $blocks[] = hash('sha256', $leaf, true);
-            if (count($blocks) != $this->num_blocks) {
-                $remaining = $this->num_blocks - count($blocks);
-                if (count($this->layer_hashes) == 0) {
-                    $power2 = next_power_2(count($blocks));
-                    $remaining = $power2 - count($blocks);
-                }
-                $padding = array_fill(0, $remaining, str_repeat("\x00", HASH_SIZE));
-                $blocks = array_merge($blocks, $padding);
-            }
-            $layer_hash = merkle_root($blocks);
-            $this->layer_hashes[] = $layer_hash;
-        }
-        $this->_calculate_root();
-    }
-	private function _calculate_root() {
-  $this->piece_layer = "";
-  foreach ($this->layer_hashes as $hash) {
-    $this->piece_layer .= $hash;
-  }
-
-  $hashes = count($this->layer_hashes);
-  if ($hashes > 1) {
-    $pow2 = next_power_2($hashes);
-    $remainder = $pow2 - $hashes;
-    $pad_piece = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
-    for ($i = 0; $i < $remainder; $i++) {
-      $this->layer_hashes[] = merkle_root($pad_piece);
-    }
-  }
-  $this->root = merkle_root($this->layer_hashes);
-}
-}
-
-// Comparator functions
-
-//Extract and combine hashes in one array
-function combine_keys($array, &$hashes, $parent_key = "") {
-	global $filec;
-    foreach($array as $key => $value) {
-        $current_key = $parent_key . "/" . $key;
-        if(is_array($value) && strlen($key) !== 0) {
-            combine_keys($value, $hashes, $current_key);
-        } else {
-  
-            $hashes[substr($current_key, 1, -1)] = @bin2hex($value["pieces root"]);
-			$filec++;
-		}
-    }
-}
-
-// Do comparation
-function compare($array, $filec) {
-    global $msg;
-		$count = count($array);
-    	foreach ($array as $key => $value) {
-		if (isset($keys[$value])) {
-			$keys[$value][] = $key;
-		} else {
-			$keys[$value] = array($key);
+				echo "\r\n" . substr($current, 1, -1) . "\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . " {$msg["size"]}: " . formatBytes($value["length"]) . "\r\n";
+				
+				$filec++;
+			}
 		}
 	}
-	$dup_hashes = 0;
-	$filed = 0;
-	foreach ($keys as $key => $value) {
-		if (count($value) > 1) {
-			echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
-			$filed += count($value);
-			$dup_hashes++;
-		}
-	}
-
-if($filed == 0){
-	echo "\r\n" . $msg["no_duplicates"] . "\r\n";
-}
-else{
-	echo "{$msg["total_files"]}: $filec\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . "\r\n";
-}
-           
-}
-
-
-
-
-// Timer function
-	function timer($dose, $max, $disable=false){
-    global $interactive_pos, $sync, $clear, $msg;
-	if ($disable == true)
-	{ 		
-		$interactive_pos = false;
-	}
-    
-    if((microtime(true) - $sync) >= 0.09 && $interactive_pos !== false ){
-		$symbols = ['|', '/', '—', '\\'];
 		
-        $percent = round(($dose / $max) * 100);
-        echo $clear . "	" . $symbols[$interactive_pos % 4] ." {$msg["calculation"]} $percent%";
-        $interactive_pos++;
-        $sync = microtime(true);
-    }
-	else{	return false;	}
-}
 
-// Represent bytes
-function formatBytes($bytes, $precision = 2) { 
-    $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
 
-    $bytes = max($bytes, 0); 
-    $pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
-    $pow = min($pow, count($units) - 1); 
-    $bytes /= pow(1024, $pow); 
-
-    return round($bytes, $precision) . ' ' . $units[$pow]; 
-}
-
-// Error handler
-function error_status($err_status){
-	global $msg, $server, $tmrr_result, $tmrr_error;
-		if(isset($server)){
-		$tmrr_error = $err_status;
-		$tmrr_result[0] = ob_get_clean();
-		return;
+	// Individual files Merkle computations
+	function next_power_2($value) {
+		if (!($value & ($value - 1)) && $value) {
+			return $value;
 		}
-	if(!empty($err_status)){
-	echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
-	foreach($err_status as $key => $value){
-		echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
+		$start = 1;
+		while ($start < $value) {
+			$start <<= 1;
+		}
+		return $start;
+	}
+
+	function merkle_root($blocks) {
+		if (count($blocks) > 0) {
+			while (count($blocks) > 1) {
+				for ($i = 0; $i < count($blocks); $i += 2) {
+					$x = $blocks[$i];
+					$y = isset($blocks[$i + 1]) ? $blocks[$i + 1] : '';
+					$blocks[$i / 2] = hash('sha256', $x . $y, true);
+				}
+				$blocks = array_slice($blocks, 0, count($blocks) / 2);
+			}
+			return $blocks[0];
+		}
+		return $blocks;
+	}
+	// File hasher
+	class HasherV2 {
+		private $path;
+		public $root;
+		private $piece_layer;
+		private $layer_hashes;
+		private $piece_length;
+		private $num_blocks;
+		public function __construct($path, $piece_length) {
+			$this->path = $path;
+			$this->root = null;
+			$this->piece_layer = null;
+			$this->layer_hashes = [];
+			$this->piece_length = $piece_length;
+			$this->num_blocks = $piece_length / BLOCK_SIZE;
+			$fd = fopen($this->path, 'rb');
+			$this->process_file($fd);
+			fclose($fd);
+		}
+
+		private function process_file($fd) {
+			while (!feof($fd)) {
+				$blocks = [];
+				$leaf = fread($fd, BLOCK_SIZE);
+				if (!$leaf) {
+					break;
+				}
+				$size = fstat($fd)["size"];
+				timer(ftell($fd), $size);
+				$blocks[] = hash('sha256', $leaf, true);
+				if (count($blocks) != $this->num_blocks) {
+					$remaining = $this->num_blocks - count($blocks);
+					if (count($this->layer_hashes) == 0) {
+						$power2 = next_power_2(count($blocks));
+						$remaining = $power2 - count($blocks);
+					}
+					$padding = array_fill(0, $remaining, str_repeat("\x00", HASH_SIZE));
+					$blocks = array_merge($blocks, $padding);
+				}
+				$layer_hash = merkle_root($blocks);
+				$this->layer_hashes[] = $layer_hash;
+			}
+			$this->_calculate_root();
+		}
+		private function _calculate_root() {
+	  $this->piece_layer = "";
+	  foreach ($this->layer_hashes as $hash) {
+		$this->piece_layer .= $hash;
+	  }
+
+	  $hashes = count($this->layer_hashes);
+	  if ($hashes > 1) {
+		$pow2 = next_power_2($hashes);
+		$remainder = $pow2 - $hashes;
+		$pad_piece = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
+		for ($i = 0; $i < $remainder; $i++) {
+		  $this->layer_hashes[] = merkle_root($pad_piece);
+		}
+	  }
+	  $this->root = merkle_root($this->layer_hashes);
+	}
+	}
+
+	// Comparator functions
+
+	//Extract and combine hashes in one array
+	function combine_keys($array, &$hashes, $parent_key = "") {
+		global $filec;
+		foreach($array as $key => $value) {
+			$current_key = $parent_key . "/" . $key;
+			if(is_array($value) && strlen($key) !== 0) {
+				combine_keys($value, $hashes, $current_key);
+			} else {
+	  
+				$hashes[substr($current_key, 1, -1)] = @bin2hex($value["pieces root"]);
+				$filec++;
+			}
 		}
 	}
-	die();
-}
 
-// Base name calculation for web usage
-function file_base($string){
-	global $server;
-	if(@$server){
-		return basename($string);
-	}
-	return $string;
-}
+	// Do comparation
+	function compare($array, $filec) {
+		global $msg;
+		
+			foreach ($array as $key => $value) {
+			if (isset($keys[$value])) {
+				$keys[$value][] = $key;
+			} else {
+				$keys[$value] = array($key);
+			}
+		}
+		$dup_hashes = 0;
+		$filed = 0;
+		foreach ($keys as $key => $value) {
+			if (count($value) > 1) {
+				echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
+				$filed += count($value);
+				$dup_hashes++;
+			}
+		}
 
-// Language option
-function lang(){
-global $argv;
-$version = "1.1.7g";
-$strings = array(
-	"rus"=>
-	[
-	"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe c <ваш-файл>		*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
-	"noraw" => "Укажите расположение файла, он не должен быть пустым.",
-	"invalid_torrent" => ".torrent файл содержит ошибки.",
-	"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид.\r\nv1 торренты не поддерживают показ хешей файлов.",
-	"root_hash" => "Хеш",
-	"calculation" => "Вычисление",
-	"size" => "Размер",
-	"torrent_title" => "Название раздачи",
-	"file_location" => "Файл",
-	"unfinished_files" => "Необработанные файлы",
-	"error_type" => "Ошибка",
-	"no_duplicates" => "Дубликаты не найдены.",
-	"dup_found" => "найден в",
-	"total_files" => "Общее количество файлов",
-	"total_dup_files" => "Количество дубликатов",
-	"root_hashes" => "Хешей"
-	],
-	
-	"eng" => [
-	"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe c <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
-	"noraw" => "This is not a valid file, is it empty?",
-	"invalid_torrent" => "Invalid torrent file.",
-	"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
-	"root_hash" => "Hash",
-	"calculation" => "Calculating",
-	"size" => "Size",
-	"torrent_title" => "Title",
-	"file_location" => "File",
-	"unfinished_files" => "Unprocessed files",
-	"error_type" => "Error type",
-	"no_duplicates" => "No duplicates were found.",
-	"dup_found" => "found in",
-	"total_files" => "Total files",
-	"total_dup_files" => "Duplicate count",
-	"root_hashes" => "Hashes"
-	]
-	);
-
-	if(PHP_OS !== "WINNT"){
-		return $strings["eng"]; // Linux bypass
-	}
-	$locale_file = __DIR__ . DIRECTORY_SEPARATOR . "locale";
-	if(!file_exists($locale_file)){
-	$get_lang = @shell_exec('reg query "hklm\system\controlset001\control\nls\language" /v Installlanguage');
-	if (@preg_match('/\bREG_SZ\s+(\w+)\b/', $get_lang, $matches)) {
-		@file_put_contents($locale_file, $matches[1]);
+	if($filed == 0){
+		echo "\r\n" . $msg["no_duplicates"] . "\r\n";
 	}
 	else{
-		@file_put_contents($locale_file, "0409");
+		echo "{$msg["total_files"]}: $filec\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . "\r\n";
 	}
+			   
 	}
-		if(@$argv[1] == "locale"){
-		switch(@$argv[2]){
-			case "en":
-			file_put_contents($locale_file, "0409");
-			die("Language changed to English.");
-			case "ru":
-			file_put_contents($locale_file, "0419");
-			die("Язык был изменён на русский.");
+
+
+
+
+	// Timer function
+		function timer($dose, $max, $disable=false){
+		global $interactive_pos, $sync, $clear, $msg;
+		if ($disable == true)
+		{ 		
+			$interactive_pos = false;
 		}
+		
+		if((microtime(true) - $sync) >= 0.09 && $interactive_pos !== false ){
+			$symbols = ['|', '/', '—', '\\'];
+			
+			$percent = round(($dose / $max) * 100);
+			echo $clear . "	" . $symbols[$interactive_pos % 4] ." {$msg["calculation"]} $percent%";
+			$interactive_pos++;
+			$sync = microtime(true);
+		}
+		else{	return false;	}
 	}
-	
-	$lang = @file_get_contents($locale_file);
-		if($lang == "0419"){
-			return $strings["rus"];
+
+	// Represent bytes
+	function formatBytes($bytes, $precision = 2) { 
+		$units = array('B', 'KB', 'MB', 'GB', 'TB'); 
+
+		$bytes = max($bytes, 0); 
+		$pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
+		$pow = min($pow, count($units) - 1); 
+		$bytes /= pow(1024, $pow); 
+
+		return round($bytes, $precision) . ' ' . $units[$pow]; 
 	}
+
+	// Error handler
+	function error_status($err_status){
+		global $msg, $server, $tmrr_result, $tmrr_error;
+			if(isset($server)){
+			$tmrr_error = $err_status;
+			$tmrr_result[0] = ob_get_clean();
+			return;
+			}
+		if(!empty($err_status)){
+		echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
+		foreach($err_status as $key => $value){
+			echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
+			}
+		}
+		die();
+	}
+
+	// Base name calculation for web usage
+	function file_base($string){
+		global $server;
+		if(@$server){
+			return basename($string);
+		}
+		return $string;
+	}
+
+	// Language option
+	function lang(){
+	global $argv;
+	$version = "1.1.7g";
+	$strings = array(
+		"rus"=>
+		[
+		"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe c <ваш-файл>		*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
+		"noraw" => "Укажите расположение файла, он не должен быть пустым.",
+		"invalid_torrent" => ".torrent файл содержит ошибки.",
+		"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид.\r\nv1 торренты не поддерживают показ хешей файлов.",
+		"root_hash" => "Хеш",
+		"calculation" => "Вычисление",
+		"size" => "Размер",
+		"torrent_title" => "Название раздачи",
+		"file_location" => "Файл",
+		"unfinished_files" => "Необработанные файлы",
+		"error_type" => "Ошибка",
+		"no_duplicates" => "Дубликаты не найдены.",
+		"dup_found" => "найден в",
+		"total_files" => "Общее количество файлов",
+		"total_dup_files" => "Количество дубликатов",
+		"root_hashes" => "Хешей"
+		],
+		
+		"eng" => [
+		"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe c <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+		"noraw" => "This is not a valid file, is it empty?",
+		"invalid_torrent" => "Invalid torrent file.",
+		"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
+		"root_hash" => "Hash",
+		"calculation" => "Calculating",
+		"size" => "Size",
+		"torrent_title" => "Title",
+		"file_location" => "File",
+		"unfinished_files" => "Unprocessed files",
+		"error_type" => "Error type",
+		"no_duplicates" => "No duplicates were found.",
+		"dup_found" => "found in",
+		"total_files" => "Total files",
+		"total_dup_files" => "Duplicate count",
+		"root_hashes" => "Hashes"
+		]
+		);
+
+		if(PHP_OS !== "WINNT"){
+			return $strings["eng"]; // Linux bypass
+		}
+		$locale_file = __DIR__ . DIRECTORY_SEPARATOR . "locale";
+		if(!file_exists($locale_file)){
+		$get_lang = @shell_exec('reg query "hklm\system\controlset001\control\nls\language" /v Installlanguage');
+		if (@preg_match('/\bREG_SZ\s+(\w+)\b/', $get_lang, $matches)) {
+			@file_put_contents($locale_file, $matches[1]);
+		}
 		else{
-			return $strings["eng"];
-	}
-	}
-	
+			@file_put_contents($locale_file, "0409");
+		}
+		}
+			if(@$argv[1] == "locale"){
+			switch(@$argv[2]){
+				case "en":
+				file_put_contents($locale_file, "0409");
+				die("Language changed to English.");
+				case "ru":
+				file_put_contents($locale_file, "0419");
+				die("Язык был изменён на русский.");
+			}
+		}
+		
+		$lang = @file_get_contents($locale_file);
+			if($lang == "0419"){
+				return $strings["rus"];
+		}
+			else{
+				return $strings["eng"];
+		}
+		}
+		
