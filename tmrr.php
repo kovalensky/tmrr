@@ -1,4 +1,5 @@
 <?php
+
 //Initialization
 
 // Constants for merkle calculation
@@ -91,7 +92,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				$err_status[$file] = $msg["no_v2"] . "\r\n";
 				continue;
 			}
-			$file_tree_array[file_base($file). ":\r\n  "] = $decoded["info"]["file tree"];
+			$file_tree_array[" " . file_base($file). ":\r\n  "] = $decoded["info"]["file tree"];
 		}
 		if(!empty($file_tree_array)){
 
