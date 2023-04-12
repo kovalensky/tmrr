@@ -1,5 +1,4 @@
 <?php
-
 //Initialization
 
 // Constants for merkle calculation
@@ -19,6 +18,7 @@ $err_status =[];
 if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 
 // Server checks
+	$server = false;
 	if(php_sapi_name() !== "cli"){
 		ob_start();
 		$server = true;
@@ -63,7 +63,9 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		}
 
 		echo "\r\n\r\n ### " . file_base($file) . " ###\r\n" . " ### {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " ###\r\n";
-		@cli_set_process_title("Extracting file hashes — $file");
+			if(!$server){
+				cli_set_process_title("Extracting file hashes — $file");
+			}
 		printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 		echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
 		
@@ -97,7 +99,9 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		$filec = 0;
 		combine_keys($file_tree_array, $hashes);
 		unset($file_tree_array);
-		@cli_set_process_title("Searching for duplicates");
+			if(!$server){
+			cli_set_process_title("Searching for duplicates");
+			}
 		compare($hashes, $filec);
 		
 		}
@@ -109,10 +113,12 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		if ($argv[1] == "c") {
 		foreach(array_slice($argv, 2) as $file){
 			if(is_file($file) && filesize($file) !== 0){
-			@cli_set_process_title("Calculating the hash of — $file");
+				if(!$server){
+					cli_set_process_title("Calculating the hash of — $file");
+					}
 			$root = new HasherV2($file, BLOCK_SIZE);
 			$file = basename($file); // Hide paths for web usage
-			echo $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
+			echo $clear . "\r\n $file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
 			
 			unset($root);
 			
@@ -385,7 +391,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 	// Error handler
 	function error_status($err_status){
 		global $msg, $server, $tmrr_result, $tmrr_error;
-			if(isset($server)){
+			if($server){
 			$tmrr_error = $err_status;
 			$tmrr_result[0] = ob_get_clean();
 			return;
@@ -402,7 +408,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 	// Base name calculation for web usage
 	function file_base($string){
 		global $server;
-		if(@$server){
+		if($server){
 			return basename($string);
 		}
 		return $string;
