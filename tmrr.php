@@ -418,7 +418,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 	// Language option
 	function lang(){
 	global $argv;
-	$version = "1.1.7g";
+	$version = "2.0g"; // Code name: Gribovskaya Pumpkin
 	$strings = array(
 		"rus"=>
 		[
