@@ -118,8 +118,8 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 					cli_set_process_title("Calculating the hash of — $file");
 					}
 			$root = new HasherV2($file, BLOCK_SIZE);
-			$file = basename($file); // Hide paths for web usage
-			echo $clear . "\r\n $file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
+			$file = file_base($file); // Hide paths for web usage
+			echo $clear . "\r\n $file: \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
 			
 			unset($root);
 			
