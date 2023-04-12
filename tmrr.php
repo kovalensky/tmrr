@@ -100,8 +100,8 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		combine_keys($file_tree_array, $hashes);
 		unset($file_tree_array);
 			if(!$server){
-			cli_set_process_title("Searching for duplicates");
-			}
+				cli_set_process_title("Searching for duplicates");
+				}
 		compare($hashes, $filec);
 		
 		}
