@@ -1,5 +1,5 @@
 # TMRR — Torrent Merkle Root Reader
-[![Branch](https://img.shields.io/badge/Version-1.1.7g-green.svg)](https://github.com/kovalensky/tmrr/releases)
+[![Branch](https://img.shields.io/badge/Version-2.0g_beta-green.svg)](https://github.com/kovalensky/tmrr/releases)
 [![Donate Monero](https://img.shields.io/badge/Donate-Monero-FF6600.svg)](https://monero/wallet/837ooBb4LrdGKd2qbzEsjt4SgdG9oCLJgjozRCyszB474pNrEzAftYdPL8EA75h7NqP4Zxmp2ikR3eggLeWcViCMVJxYpQ8)
 [![Donate Bitcoin](https://img.shields.io/badge/Bitcoin-f7931a.svg)](https://bitcoin/wallet/1GWxFbfqHcMR4FEKy2P1sayPkFByGKGwCK)
 [![Donate Ethereum](https://img.shields.io/badge/Ethereum-8c8c8c.svg)](https://ethereum/wallet/0x58dC9585BE36e855bA30609909f7D4Ef11313ee1)
