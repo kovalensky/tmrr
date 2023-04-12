@@ -63,6 +63,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		}
 
 		echo "\r\n\r\n ### " . file_base($file) . " ###\r\n" . " ### {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " ###\r\n";
+		@cli_set_process_title("Extracting file hashes — $file");
 		printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 		echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
 		
@@ -96,6 +97,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		$filec = 0;
 		combine_keys($file_tree_array, $hashes);
 		unset($file_tree_array);
+		@cli_set_process_title("Searching for duplicates");
 		compare($hashes, $filec);
 		
 		}
@@ -107,9 +109,9 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		if ($argv[1] == "c") {
 		foreach(array_slice($argv, 2) as $file){
 			if(is_file($file) && filesize($file) !== 0){
+			@cli_set_process_title("Calculating the hash of — $file");
 			$root = new HasherV2($file, BLOCK_SIZE);
 			$file = basename($file); // Hide paths for web usage
-			
 			echo $clear . "\r\n$file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
 			
 			unset($root);
@@ -431,7 +433,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		],
 		
 		"eng" => [
-		"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts root hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe c <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+		"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe c <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 		"noraw" => "This is not a valid file, is it empty?",
 		"invalid_torrent" => "Invalid torrent file.",
 		"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
