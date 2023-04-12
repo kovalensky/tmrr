@@ -428,8 +428,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		"no_duplicates" => "Дубликаты не найдены.",
 		"dup_found" => "найден в",
 		"total_files" => "Общее количество файлов",
-		"total_dup_files" => "Количество дубликатов",
-		"root_hashes" => "Хешей"
+		"total_dup_files" => "Количество дубликатов"
 		],
 		
 		"eng" => [
@@ -446,8 +445,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		"no_duplicates" => "No duplicates were found.",
 		"dup_found" => "found in",
 		"total_files" => "Total files",
-		"total_dup_files" => "Duplicate count",
-		"root_hashes" => "Hashes"
+		"total_dup_files" => "Duplicate count"
 		]
 		);
 
