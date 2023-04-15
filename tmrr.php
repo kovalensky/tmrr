@@ -266,11 +266,11 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		}
 
 		private function process_file($fd) {
+			$size = fstat($fd)["size"];
 			while (!feof($fd)) {
 				$blocks = [];
 				$leaf = fread($fd, BLOCK_SIZE);
 				
-				$size = fstat($fd)["size"];
 				timer(ftell($fd), $size);
 				
 				$blocks[] = hash('sha256', $leaf, true);
