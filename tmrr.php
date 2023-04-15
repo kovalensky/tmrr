@@ -119,7 +119,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 					}
 			$root = new HasherV2($file, BLOCK_SIZE);
 			$file = file_base($file); // Hide paths for web usage
-			echo $clear . "\r\n $file: \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
+			echo $clear . "\r\n $file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
 			
 			unset($root);
 			
@@ -269,11 +269,10 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 			while (!feof($fd)) {
 				$blocks = [];
 				$leaf = fread($fd, BLOCK_SIZE);
-				if (!$leaf) {
-					break;
-				}
+				
 				$size = fstat($fd)["size"];
 				timer(ftell($fd), $size);
+				
 				$blocks[] = hash('sha256', $leaf, true);
 				if (count($blocks) != $this->num_blocks) {
 					$remaining = $this->num_blocks - count($blocks);
@@ -455,7 +454,13 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		"total_dup_files" => "Duplicate count"
 		]
 		);
-
+		
+		// For GitHub repository this tool is only distributed in English.
+		
+		return $strings["eng"];
+		
+		// Checkout NNMClub or Rutracker.org for multilingual versions.
+		
 		if(PHP_OS !== "WINNT"){
 			return $strings["eng"]; // Linux bypass
 		}
