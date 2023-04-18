@@ -65,7 +65,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 
 		echo "\r\n\r\n — File: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
 			if(!$server){
-				cli_set_process_title("Extracting file hashes — $file");
+				cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
 			}
 		printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 		echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
@@ -101,7 +101,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		combine_keys($file_tree_array, $hashes);
 		unset($file_tree_array);
 			if(!$server){
-				cli_set_process_title("Searching for duplicates");
+				cli_set_process_title($msg["cli_dup_search"]);
 				}
 		compare($hashes, $filec);
 		
@@ -115,7 +115,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		foreach(array_slice($argv, 2) as $file){
 			if(is_file($file) && filesize($file) !== 0){
 				if(!$server){
-					cli_set_process_title("Calculating the hash of — $file");
+					cli_set_process_title($msg["cli_hash_calculation"] . " — $file");
 					}
 			$root = new HasherV2($file, BLOCK_SIZE);
 			$file = file_base($file); // Hide paths for web usage
@@ -346,7 +346,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		}
 
 	if($filed == 0){
-		echo "\r\n" . $msg["no_duplicates"] . "\r\n";
+		echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec\r\n";
 	}
 	else{
 		echo "{$msg["total_files"]}: $filec\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . "\r\n";
@@ -434,7 +434,10 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		"no_duplicates" => "Дубликаты не найдены.",
 		"dup_found" => "найден в",
 		"total_files" => "Общее количество файлов",
-		"total_dup_files" => "Количество дубликатов"
+		"total_dup_files" => "Количество дубликатов",
+		"cli_dup_search" => "Поиск дубликатов",
+		"cli_hash_extraction" => "Извлечение хешей",
+		"cli_hash_calculation" => "Вычисление хеша"
 		],
 		
 		"eng" => [
@@ -451,7 +454,10 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		"no_duplicates" => "No duplicates were found.",
 		"dup_found" => "found in",
 		"total_files" => "Total files",
-		"total_dup_files" => "Duplicate count"
+		"total_dup_files" => "Duplicate count",
+		"cli_dup_search" => "Searching for duplicates",
+		"cli_hash_extraction" => "Extracting file hashes",
+		"cli_hash_calculation" => "Calculating the hash of"
 		]
 		);
 		
