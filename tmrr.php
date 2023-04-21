@@ -318,7 +318,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				combine_keys($value, $hashes, $current_key);
 			} else {
 	  
-				$hashes[ substr($current_key, 1, -1) . " (" . formatBytes($value["length"]) . ")" ] = @bin2hex($value["pieces root"]);
+				$hashes[ substr($current_key, 1, -1) ] = @bin2hex($value["pieces root"]) . " (" . formatBytes($value["length"]) . ")";
 				$filec++;
 			}
 		}
