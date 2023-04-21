@@ -44,7 +44,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 //Main
 
 // Check for arguments
-	if (!isset($argv[1]) || !in_array( $argv[1], ["e", "d", "c"] ) || count($argv) <= 2) {
+	if (count($argv) <= 2 || !in_array( $argv[1], ["e", "d", "c"] )) {
 	die($msg["main"]);
 		}
 
