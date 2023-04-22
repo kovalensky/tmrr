@@ -5,11 +5,8 @@
 // Constants for merkle calculation
 const BLOCK_SIZE = 16384;
 const HASH_SIZE = 32;
-
 // Timer variables
-$interactive_pos = 0;
 $sync = microtime(true);
-$clear = "\r\x1b[K"; // Escape symbols for clearing output
 // Language
 $msg = lang();
 // Error catcher
@@ -23,7 +20,6 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 	if(php_sapi_name() !== "cli"){
 		ob_start();
 		$server = true;
-		timer(null, null, true); // Disable timer
 		if(count($tmrr_process) < 2 || !in_array( $tmrr_process[0], ["e", "d", "c"] )){
 			die("Please provide parameters inside \$tmrr_process variable, see https://github.com/kovalensky/tmrr/wiki/Web-usage");
 		}
@@ -116,12 +112,9 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		if ($argv[1] == "c") {
 		foreach(array_slice($argv, 2) as $file){
 			if(is_file($file) && filesize($file) !== 0){
-				if(!$server){
-					cli_set_process_title($msg["cli_hash_calculation"] . " — $file");
-					}
 			$root = new HasherV2($file, BLOCK_SIZE);
 			$file = file_base($file); // Hide paths for web usage
-			echo $clear . "\r\n $file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
+			echo "\r\n $file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
 			
 			unset($root);
 			
@@ -266,17 +259,17 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 			$this->piece_length = $piece_length;
 			$this->num_blocks = $piece_length / BLOCK_SIZE;
 			$fd = fopen($this->path, 'rb');
-			$this->process_file($fd);
+			$this->process_file($fd, $this->path);
 			fclose($fd);
 		}
 
-		private function process_file($fd) {
+		private function process_file($fd, $filename = "") {
 			$size = fstat($fd)["size"];
 			while (!feof($fd)) {
 				$blocks = [];
 				$leaf = fread($fd, BLOCK_SIZE);
 				
-				timer(ftell($fd), $size);
+				timer(ftell($fd), $size, $filename);
 				
 				$blocks[] = hash('sha256', $leaf, true);
 				if (count($blocks) != $this->num_blocks) {
@@ -363,22 +356,14 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 
 
 	// Timer function
-		function timer($dose, $max, $disable=false){
-		global $interactive_pos, $sync, $clear, $msg;
-		if ($disable == true)
-		{ 		
-			$interactive_pos = false;
-		}
+		function timer($dose, $max, $filename){
+		global $sync, $server, $msg;
 		
-		if((microtime(true) - $sync) >= 0.09 && $interactive_pos !== false ){
-			$symbols = ['|', '/', '—', '\\'];
-			
+		if((microtime(true) - $sync) >= 0.09 && !$server ){
 			$percent = round(($dose / $max) * 100);
-			echo $clear . "	" . $symbols[$interactive_pos % 4] ." {$msg["calculation"]} $percent%";
-			$interactive_pos++;
+			cli_set_process_title("{$msg["calculation"]} $percent% — $filename  ");
 			$sync = microtime(true);
 		}
-		else{	return false;	}
 	}
 
 	// Represent bytes
@@ -451,7 +436,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		"invalid_torrent" => "Invalid torrent file.",
 		"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
 		"root_hash" => "Hash",
-		"calculation" => "Calculating",
+		"calculation" => "Processing",
 		"torrent_title" => "Title",
 		"file_location" => "File",
 		"unfinished_files" => "Unprocessed files",
