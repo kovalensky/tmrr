@@ -149,12 +149,16 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 	}
 
 	function bencode_decode_r($input, $len, &$pos) {
+		if ($pos >= $len) {
+			return null;
+		}
+
 		switch ($input[$pos]) {
 			case 'd':
 				$output = array();
 				$pos++;
 
-				while ($input[$pos] !== 'e') {
+				while ($pos < $len && $input[$pos] !== 'e') {
 					$key = bencode_decode_r($input, $len, $pos);
 					$output[$key] = bencode_decode_r($input, $len, $pos);
 				}
@@ -166,7 +170,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				$output = array();
 				$pos++;
 
-				while ($input[$pos] !== 'e') {
+				while ($pos < $len && $input[$pos] !== 'e') {
 					$output[] = bencode_decode_r($input, $len, $pos);
 				}
 
@@ -177,7 +181,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				$output = '';
 				$pos++;
 
-				while ($input[$pos] !== 'e') {
+				while ($pos < $len && $input[$pos] !== 'e') {
 					$output .= $input[$pos];
 					$pos++;
 				}
@@ -189,7 +193,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				$len_str = '';
 				$pos_start = $pos;
 
-				while (is_numeric($input[$pos])) {
+				while ($pos < $len && is_numeric($input[$pos])) {
 					$len_str .= $input[$pos];
 					$pos++;
 				}
@@ -201,6 +205,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				return $output;
 		}
 	}
+
 
 
 	// Loop through all arrays saving locations and showing result
