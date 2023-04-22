@@ -137,7 +137,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 //Functions
 
 // Bencode library
-	function bencode_decode($input) {
+	function bencode_decode(string $input) {
 		if ($input === '') {
 			return null;
 		}
@@ -145,70 +145,64 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		$len = strlen($input);
 		$pos = 0;
 		try {
-		$output = bencode_decode_r($input, $len, $pos);
+			$output = bencode_decode_r($input, $len, $pos);
 		} catch (TypeError $e) {
-		$output = null;
+			$output = null;
 		}
 		return $output;
 	}
 
-	function bencode_decode_r($input, $len, &$pos) {
+	function bencode_decode_r(string $input, int $len, int &$pos) {
 		if ($pos >= $len) {
 			return null;
 		}
 
-		switch ($input[$pos]) {
-			case 'd':
-				$output = array();
-				$pos++;
+		$ch = $input[$pos];
 
-				while ($pos < $len && $input[$pos] !== 'e') {
-					$key = bencode_decode_r($input, $len, $pos);
-					$output[$key] = bencode_decode_r($input, $len, $pos);
-				}
+		if ($ch === 'd') {
+			$output = array();
+			$pos++;
 
-				$pos++;
-				return $output;
+			while ($pos < $len && $input[$pos] !== 'e') {
+				$key = bencode_decode_r($input, $len, $pos);
+				$output[$key] = bencode_decode_r($input, $len, $pos);
+			}
 
-			case 'l':
-				$output = array();
-				$pos++;
+			$pos++;
+			return $output;
+		} elseif ($ch === 'l') {
+			$output = array();
+			$pos++;
 
-				while ($pos < $len && $input[$pos] !== 'e') {
-					$output[] = bencode_decode_r($input, $len, $pos);
-				}
+			while ($pos < $len && $input[$pos] !== 'e') {
+				$output[] = bencode_decode_r($input, $len, $pos);
+			}
 
-				$pos++;
-				return $output;
+			$pos++;
+			return $output;
+		} elseif ($ch === 'i') {
+			$pos++;
+			$endpos = strpos($input, 'e', $pos);
+			$output = (int) substr($input, $pos, $endpos - $pos);
+			$pos = $endpos + 1;
+			return $output;
+		} else {
+			$len_str = '';
+			$pos_start = $pos;
 
-			case 'i':
-				$output = '';
-				$pos++;
+			while ($pos < $len && is_numeric($input[$pos])) {
+				$len_str .= $input[$pos++];
+			}
 
-				while ($pos < $len && $input[$pos] !== 'e') {
-					$output .= $input[$pos];
-					$pos++;
-				}
-
-				$pos++;
-				return (int) $output;
-
-			default:
-				$len_str = '';
-				$pos_start = $pos;
-
-				while ($pos < $len && is_numeric($input[$pos])) {
-					$len_str .= $input[$pos];
-					$pos++;
-				}
-
-				$len = (int) $len_str;
-				$pos++;
-				$output = substr($input, $pos, $len);
-				$pos += $len;
-				return $output;
+			$len = (int) $len_str;
+			$pos++;
+			$output = substr($input, $pos, $len);
+			$pos += $len;
+			return $output;
 		}
 	}
+
+
 
 
 
