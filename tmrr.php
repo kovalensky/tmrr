@@ -145,9 +145,9 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		$len = strlen($input);
 		$pos = 0;
 		try {
-        $output = bencode_decode_r($input, $len, $pos);
+		$output = bencode_decode_r($input, $len, $pos);
 		} catch (TypeError $e) {
-        $output = null;
+		$output = null;
 		}
 		return $output;
 	}
