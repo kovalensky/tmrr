@@ -129,7 +129,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 //Functions
 
 // Bencode library
-	function bencode_decode(string $input) {
+	function bencode_decode($input) {
 		if ($input === '') {
 			return null;
 		}
@@ -144,7 +144,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		return $output;
 	}
 
-	function bencode_decode_r(string $input, int $len, int &$pos) {
+	function bencode_decode_r($input, $len, &$pos) {
 		if ($pos >= $len) {
 			return null;
 		}
