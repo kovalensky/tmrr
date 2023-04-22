@@ -38,50 +38,22 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		foreach(array_slice($tmrr_process, 1) as $value){
 			$argv[$i] = $value;
 			$i++;	
-	}}
+	}
+		$argc = count($argv);
+	}
 	
 
 //Main
 
 // Check for arguments
-	if (count($argv) <= 2 || !in_array( $argv[1], ["e", "d", "c"] )) {
-	die($msg["main"]);
+	if ($argc <= 2 || !in_array( $argv[1], ["e", "d", "c"] )) {
+		die($msg["main"]);
 		}
 
 		// Extract hashes
 		if($argv[1] == "e"){
-		$filec = 0;
-		foreach(array_slice($argv , 2) as $file){
-		$decoded = @bencode_decode(@file_get_contents($file));
-		if(!isset($decoded["info"])){
-			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
-			continue;
-		}
-
-		if(!isset($decoded["info"]["meta version"])){
-			$err_status[$file] = $msg["no_v2"] . "\r\n";
-			continue;
-		}
-
-		echo "\r\n\r\n — File: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
-			if(!$server){
-				cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
-			}
-		printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
-		echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
-		
-		unset($decoded);
-	}
-
-	error_status($err_status);
-	
-	}
-
-		// Find duplicates, be aware that duplicates inside single .torrent file are also shown
-		if ($argv[1] == "d") {
-		$file_tree_array = [];
-		foreach(array_slice($argv, 2) as $file){
-		
+			$filec = 0;
+			foreach(array_slice($argv , 2) as $file){
 			$decoded = @bencode_decode(@file_get_contents($file));
 			if(!isset($decoded["info"])){
 				$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
@@ -92,21 +64,51 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				$err_status[$file] = $msg["no_v2"] . "\r\n";
 				continue;
 			}
-			$file_tree_array[" " . file_base($file). ":  "] = $decoded["info"]["file tree"];
-		}
-		if(!empty($file_tree_array)){
 
-		$hashes = [];
-		$filec = 0;
-		combine_keys($file_tree_array, $hashes);
-		unset($file_tree_array);
-			if(!$server){
-				cli_set_process_title($msg["cli_dup_search"]);
+			echo "\r\n\r\n — File: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
+				if(!$server){
+					cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
 				}
-		compare($hashes, $filec);
-		
+			printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
+			echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
+			
+			unset($decoded);
 		}
+
 		error_status($err_status);
+		
+	}
+
+		// Find duplicates, be aware that duplicates inside single .torrent file are also shown
+		if ($argv[1] == "d") {
+			$file_tree_array = [];
+			foreach(array_slice($argv, 2) as $file){
+			
+				$decoded = @bencode_decode(@file_get_contents($file));
+				if(!isset($decoded["info"])){
+					$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
+					continue;
+				}
+
+				if(!isset($decoded["info"]["meta version"])){
+					$err_status[$file] = $msg["no_v2"] . "\r\n";
+					continue;
+				}
+				$file_tree_array[" " . file_base($file). ":  "] = $decoded["info"]["file tree"];
+			}
+				if(!empty($file_tree_array)){
+
+					$hashes = [];
+					$filec = 0;
+					combine_keys($file_tree_array, $hashes);
+					unset($file_tree_array);
+						if(!$server){
+							cli_set_process_title($msg["cli_dup_search"]);
+							}
+					compare($hashes, $filec);
+					
+				}
+			error_status($err_status);
 	}
 
 	
