@@ -5,7 +5,7 @@
 [![Donate Ethereum](https://img.shields.io/badge/Ethereum-8c8c8c.svg)](https://ethereum/wallet/0x58dC9585BE36e855bA30609909f7D4Ef11313ee1)
 <h1 align="center">
   <a href="#">
-    <img src="https://i2.imageban.ru/out/2023/04/12/4f216f7d10c311d87bbf733d5347a3ff.gif" alt="TMRR">
+    <img src="https://i6.imageban.ru/out/2023/04/24/c6a229386a585cb943405cf6cabe6e5c.gif" alt="TMRR">
   </a>
 </h1>
 
@@ -34,4 +34,4 @@ For the Linux environment on which PHP is installed:
 php tmrr.php your_command
 ```
 
-If this tool has somehow helped you in finding important files, you can express your gratitude by starring this repository or making a donation🍀.
+If this tool has somehow helped you in finding important files, you can express your gratitude by starring this repository 🍀.
