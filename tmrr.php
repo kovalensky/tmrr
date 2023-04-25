@@ -60,7 +60,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 				continue;
 			}
 
-			echo "\r\n\r\n — File: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
+			echo "\r\n\r\n — {$msg["file_location"]}: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
 				if(!$server){
 					cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
 				}
@@ -450,11 +450,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		]
 		);
 		
-		// For GitHub repository this tool is only distributed in English.
-		
-		return $strings["eng"];
-		
-		// Checkout NNMClub or Rutracker.org for multilingual versions.
+		return $strings["rus"];
 		
 		if(PHP_OS !== "WINNT"){
 			return $strings["eng"]; // Linux bypass
