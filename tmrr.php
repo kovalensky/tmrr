@@ -450,7 +450,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		]
 		);
 		
-		return $strings["rus"];
+		return $strings["eng"];
 		
 		if(PHP_OS !== "WINNT"){
 			return $strings["eng"]; // Linux bypass
