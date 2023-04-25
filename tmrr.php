@@ -358,9 +358,9 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		function timer($dose, $max, $filename){
 		global $sync, $server, $msg;
 		
-		if((microtime(true) - $sync) >= 0.09 && !$server ){
+		if((microtime(true) - $sync) >= 1 && !$server ){
 			$percent = round(($dose / $max) * 100);
-			cli_set_process_title("{$msg["calculation"]} $percent% — $filename  ");
+			cli_set_process_title("{$msg["calculation"]} $percent% — $filename");
 			$sync = microtime(true);
 		}
 	}
