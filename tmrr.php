@@ -6,7 +6,7 @@
 const BLOCK_SIZE = 16384;
 const HASH_SIZE = 32;
 // Timer variables
-$sync = microtime(true);
+$sync = time();
 // Language
 $msg = lang();
 // Error catcher
@@ -358,7 +358,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		function timer($dose, $max, $filename){
 		global $sync, $server, $msg;
 		
-		if((microtime(true) - $sync) >= 1 && !$server ){
+		if((time() - $sync) >= 1 && !$server ){
 			$percent = round(($dose / $max) * 100);
 			cli_set_process_title("{$msg["calculation"]} $percent% — $filename");
 			$sync = microtime(true);
