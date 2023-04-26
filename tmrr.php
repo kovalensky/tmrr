@@ -450,7 +450,11 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		]
 		);
 		
+		// For GitHub repository this tool is only distributed in English.
+		
 		return $strings["eng"];
+		
+		// Checkout NNMClub.to / Rutracker.org trackers for multilingual versions.
 		
 		if(PHP_OS !== "WINNT"){
 			return $strings["eng"]; // Linux bypass
