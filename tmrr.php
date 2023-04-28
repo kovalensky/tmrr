@@ -361,7 +361,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		if((time() - $sync) >= 1 && !$server ){
 			$percent = round(($dose / $max) * 100);
 			cli_set_process_title("{$msg["calculation"]} $percent% — $filename");
-			$sync = microtime(true);
+			$sync = time();
 		}
 	}
 
