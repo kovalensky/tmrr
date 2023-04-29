@@ -2,7 +2,7 @@
 
 //Initialization
 
-// Constants for merkle calculation
+// Constants for file Merkle calculation
 const BLOCK_SIZE = 16384;
 const HASH_SIZE = 32;
 // Timer variables
@@ -11,9 +11,6 @@ $sync = time();
 $msg = lang();
 // Error catcher
 $err_status =[];
-
-// Environment check
-if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 
 // Server checks
 	$server = false;
@@ -49,25 +46,25 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		if($argv[1] == "e"){
 			$filec = 0;
 			foreach(array_slice($argv , 2) as $file){
-			$decoded = @bencode_decode(@file_get_contents($file));
-			if(!isset($decoded["info"])){
-				$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
-				continue;
-			}
-
-			if(!isset($decoded["info"]["meta version"])){
-				$err_status[$file] = $msg["no_v2"] . "\r\n";
-				continue;
-			}
-
-			echo "\r\n\r\n — {$msg["file_location"]}: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
-				if(!$server){
-					cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
+				$decoded = @bencode_decode(@file_get_contents($file));
+				if(!isset($decoded["info"])){
+					$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
+					continue;
 				}
-			printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
-			echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
-			
-			unset($decoded);
+
+				if(!isset($decoded["info"]["meta version"])){
+					$err_status[$file] = $msg["no_v2"] . "\r\n";
+					continue;
+				}
+
+				echo "\r\n\r\n — File: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
+					if(!$server){
+						cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
+					}
+				printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
+				echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
+				
+				unset($decoded);
 		}
 
 		error_status($err_status);
@@ -109,19 +106,19 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 	
 		// Calculate Merkle Root Hash
 		if ($argv[1] == "c") {
-		foreach(array_slice($argv, 2) as $file){
-			if(is_file($file) && filesize($file) !== 0){
-			$root = new HasherV2($file, BLOCK_SIZE);
-			$file = file_base($file); // Hide paths for web usage
-			echo "\r\n $file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
-			
-			unset($root);
-			
+			foreach(array_slice($argv, 2) as $file){
+				if(is_file($file) && filesize($file) !== 0){
+					$root = new HasherV2($file, BLOCK_SIZE);
+					$file = file_base($file); // Hide paths for web usage
+					echo "\r\n $file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
+					
+					unset($root);
+				
+				}
+			else{
+				$err_status[$file] = $msg["noraw"];
+				}
 			}
-		else{
-			$err_status[$file] = $msg["noraw"];
-			}
-		}
 		error_status($err_status);
 	}
 
@@ -129,7 +126,7 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 //Functions
 
 // Bencode library
-	function bencode_decode($input) {
+function bencode_decode($input) {
 		if ($input === '') {
 			return null;
 		}
@@ -193,6 +190,9 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 			return $output;
 		}
 	}
+
+
+
 
 
 
@@ -286,22 +286,22 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 			$this->_calculate_root();
 		}
 		private function _calculate_root() {
-	  $this->piece_layer = "";
-	  foreach ($this->layer_hashes as $hash) {
-		$this->piece_layer .= $hash;
-	  }
+		  $this->piece_layer = "";
+		  foreach ($this->layer_hashes as $hash) {
+			$this->piece_layer .= $hash;
+		  }
 
-	  $hashes = count($this->layer_hashes);
-	  if ($hashes > 1) {
-		$pow2 = next_power_2($hashes);
-		$remainder = $pow2 - $hashes;
-		$pad_piece = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
-		for ($i = 0; $i < $remainder; $i++) {
-		  $this->layer_hashes[] = merkle_root($pad_piece);
+		  $hashes = count($this->layer_hashes);
+		  if ($hashes > 1) {
+			$pow2 = next_power_2($hashes);
+			$remainder = $pow2 - $hashes;
+			$pad_piece = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
+			for ($i = 0; $i < $remainder; $i++) {
+			  $this->layer_hashes[] = merkle_root($pad_piece);
+			}
+		  }
+		  $this->root = merkle_root($this->layer_hashes);
 		}
-	  }
-	  $this->root = merkle_root($this->layer_hashes);
-	}
 	}
 
 	// Comparator functions
@@ -326,11 +326,11 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 		global $msg;
 		
 			foreach ($array as $key => $value) {
-			if (isset($keys[$value])) {
-				$keys[$value][] = $key;
-			} else {
-				$keys[$value] = array($key);
-			}
+				if (isset($keys[$value])) {
+					$keys[$value][] = $key;
+				} else {
+					$keys[$value] = array($key);
+				}
 		}
 		$dup_hashes = 0;
 		$filed = 0;
@@ -342,12 +342,12 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 			}
 		}
 
-	if($filed == 0){
-		echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec\r\n";
-	}
-	else{
-		echo "{$msg["total_files"]}: $filec\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . "\r\n";
-	}
+		if($filed == 0){
+			echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec\r\n";
+		}
+		else{
+			echo "{$msg["total_files"]}: $filec\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . "\r\n";
+		}
 			   
 	}
 
@@ -355,15 +355,15 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 
 
 	// Timer function
-		function timer($dose, $max, $filename){
+	function timer($dose, $max, $filename){
 		global $sync, $server, $msg;
-		
+	
 		if((time() - $sync) >= 1 && !$server ){
 			$percent = round(($dose / $max) * 100);
 			cli_set_process_title("{$msg["calculation"]} $percent% — $filename");
 			$sync = time();
+			}
 		}
-	}
 
 	// Represent bytes
 	function formatBytes($bytes, $precision = 2) { 
@@ -381,17 +381,17 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 	function error_status($err_status){
 		global $msg, $server, $tmrr_result, $tmrr_error;
 			if($server){
-			$tmrr_error = $err_status;
-			$tmrr_result[0] = ob_get_clean();
-			return;
+				$tmrr_error = $err_status;
+				$tmrr_result[0] = ob_get_clean();
+				return;
 			}
 		if(!empty($err_status)){
-		echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
-		foreach($err_status as $key => $value){
-			echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
+			echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
+			foreach($err_status as $key => $value){
+				echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
+				}
 			}
-		}
-		die();
+			die();
 	}
 
 	// Base name calculation for web usage
@@ -405,87 +405,93 @@ if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 
 	// Language option
 	function lang(){
-	global $argv;
-	$version = "2.0g"; // Code name: Gribovskaya Pumpkin
-	$strings = array(
-		"rus"=>
-		[
-		"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe c <ваш-файл>		*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
-		"noraw" => "Укажите расположение файла, он не должен быть пустым.",
-		"invalid_torrent" => ".torrent файл содержит ошибки.",
-		"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид.\r\nv1 торренты не поддерживают показ хешей файлов.",
-		"root_hash" => "Хеш",
-		"calculation" => "Вычисление",
-		"torrent_title" => "Название раздачи",
-		"file_location" => "Файл",
-		"unfinished_files" => "Необработанные файлы",
-		"error_type" => "Ошибка",
-		"no_duplicates" => "Дубликаты не найдены.",
-		"dup_found" => "найден в",
-		"total_files" => "Общее количество файлов",
-		"total_dup_files" => "Количество дубликатов",
-		"cli_dup_search" => "Поиск дубликатов",
-		"cli_hash_extraction" => "Извлечение хешей",
-		"cli_hash_calculation" => "Вычисление хеша"
-		],
-		
-		"eng" => [
-		"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe c <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
-		"noraw" => "This is not a valid file, is it empty?",
-		"invalid_torrent" => "Invalid torrent file.",
-		"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
-		"root_hash" => "Hash",
-		"calculation" => "Processing",
-		"torrent_title" => "Title",
-		"file_location" => "File",
-		"unfinished_files" => "Unprocessed files",
-		"error_type" => "Error type",
-		"no_duplicates" => "No duplicates were found.",
-		"dup_found" => "found in",
-		"total_files" => "Total files",
-		"total_dup_files" => "Duplicate count",
-		"cli_dup_search" => "Searching for duplicates",
-		"cli_hash_extraction" => "Extracting file hashes",
-		"cli_hash_calculation" => "Calculating the hash of"
-		]
-		);
-		
-		// For GitHub repository this tool is only distributed in English.
-		
-		return $strings["eng"];
-		
-		// Checkout NNMClub.to / Rutracker.org trackers for multilingual versions.
-		
-		if(PHP_OS !== "WINNT"){
-			return $strings["eng"]; // Linux bypass
-		}
-		$locale_file = __DIR__ . DIRECTORY_SEPARATOR . "locale";
-		if(!file_exists($locale_file)){
-		$get_lang = @shell_exec('reg query "hklm\system\controlset001\control\nls\language" /v Installlanguage');
-		if (@preg_match('/\bREG_SZ\s+(\w+)\b/', $get_lang, $matches)) {
-			@file_put_contents($locale_file, $matches[1]);
-		}
-		else{
-			@file_put_contents($locale_file, "0409");
-		}
-		}
-			if(@$argv[1] == "locale"){
-			switch(@$argv[2]){
-				case "en":
-				file_put_contents($locale_file, "0409");
-				die("Language changed to English.");
-				case "ru":
-				file_put_contents($locale_file, "0419");
-				die("Язык был изменён на русский.");
+		global $argv;
+		$version = "2.0g"; // Code name: Gribovskaya Pumpkin
+		$strings = array(
+			"rus"=>
+			[
+			"main" => "\r\nСинтаксис:\r\n\r\ntmrr.exe e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr.exe d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr.exe c <ваш-файл>		*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
+			"noraw" => "Укажите расположение файла, он не должен быть пустым.",
+			"invalid_torrent" => ".torrent файл содержит ошибки.",
+			"no_v2" => "Это торрент файл v1 формата, а не v2 или гибрид.\r\nv1 торренты не поддерживают показ хешей файлов.",
+			"root_hash" => "Хеш",
+			"calculation" => "Вычисление",
+			"torrent_title" => "Название раздачи",
+			"file_location" => "Файл",
+			"unfinished_files" => "Необработанные файлы",
+			"error_type" => "Ошибка",
+			"no_duplicates" => "Дубликаты не найдены.",
+			"dup_found" => "найден в",
+			"total_files" => "Общее количество файлов",
+			"total_dup_files" => "Количество дубликатов",
+			"cli_dup_search" => "Поиск дубликатов",
+			"cli_hash_extraction" => "Извлечение хешей",
+			"cli_hash_calculation" => "Вычисление хеша"
+			],
+			
+			"eng" => [
+			"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe c <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+			"noraw" => "This is not a valid file, is it empty?",
+			"invalid_torrent" => "Invalid torrent file.",
+			"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
+			"root_hash" => "Hash",
+			"calculation" => "Processing",
+			"torrent_title" => "Title",
+			"file_location" => "File",
+			"unfinished_files" => "Unprocessed files",
+			"error_type" => "Error type",
+			"no_duplicates" => "No duplicates were found.",
+			"dup_found" => "found in",
+			"total_files" => "Total files",
+			"total_dup_files" => "Duplicate count",
+			"cli_dup_search" => "Searching for duplicates",
+			"cli_hash_extraction" => "Extracting file hashes",
+			"cli_hash_calculation" => "Calculating the hash of"
+			]
+			);
+			
+			// For GitHub repository this tool is only distributed in English.
+			
+			return $strings["eng"];
+			
+			// Checkout NNMClub or Rutracker.org for multilingual versions.
+			
+			if(PHP_OS !== "WINNT"){
+				return $strings["eng"]; // Linux bypass
 			}
-		}
-		
-		$lang = @file_get_contents($locale_file);
-			if($lang == "0419"){
-				return $strings["rus"];
-		}
-			else{
-				return $strings["eng"];
-		}
+			
+			$locale_file = __DIR__ . DIRECTORY_SEPARATOR . "locale";
+			
+			if(!file_exists($locale_file)){
+				$get_lang = @shell_exec('reg query "hklm\system\controlset001\control\nls\language" /v Installlanguage');
+				if (@preg_match('/\bREG_SZ\s+(\w+)\b/', $get_lang, $matches)) {
+					
+					@file_put_contents($locale_file, $matches[1]);
+				
+				}
+				else{
+					
+					@file_put_contents($locale_file, "0409");
+				
+				}
+			}
+				if(@$argv[1] == "locale"){
+					switch(@$argv[2]){
+						case "en":
+						file_put_contents($locale_file, "0409");
+						die("Language changed to English.");
+						case "ru":
+						file_put_contents($locale_file, "0419");
+						die("Язык был изменён на русский.");
+					}
+			}
+			
+			$lang = @file_get_contents($locale_file);
+				if($lang == "0419"){
+					return $strings["rus"];
+			}
+				else{
+					return $strings["eng"];
+			}
 		}
 		
