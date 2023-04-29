@@ -342,7 +342,7 @@ $err_status =[];
 			}
 		}
 
-		if($filed == 0){
+		if($filed > 0){
 			echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec\r\n";
 		}
 		else{
