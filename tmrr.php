@@ -2,7 +2,7 @@
 
 //Initialization
 
-// Constants for merkle calculation
+// Constants for file Merkle calculation
 const BLOCK_SIZE = 16384;
 const HASH_SIZE = 32;
 // Timer variables
@@ -71,7 +71,7 @@ $err_status =[];
 		
 	}
 
-		// Find duplicates, be aware that duplicates inside single .torrent file are also shown
+		// Find duplicates; be aware that duplicates inside single .torrent file are also shown
 		if ($argv[1] == "d") {
 			$file_tree_array = [];
 			foreach(array_slice($argv, 2) as $file){
@@ -94,9 +94,9 @@ $err_status =[];
 					$filec = 0;
 					combine_keys($file_tree_array, $hashes);
 					unset($file_tree_array);
-						if(!$server){
-							cli_set_process_title($msg["cli_dup_search"]);
-							}
+					if(!$server){
+						cli_set_process_title($msg["cli_dup_search"]);
+						}
 					compare($hashes, $filec);
 					
 				}
@@ -125,21 +125,21 @@ $err_status =[];
 
 //Functions
 
-// Bencode library
-function bencode_decode($input) {
-		if ($input === '') {
-			return null;
-		}
+	// Bencode library
+	function bencode_decode($input) {
+			if ($input === '') {
+				return null;
+			}
 
-		$len = strlen($input);
-		$pos = 0;
-		try {
-			$output = bencode_decode_r($input, $len, $pos);
-		} catch (TypeError $e) {
-			$output = null;
+			$len = strlen($input);
+			$pos = 0;
+			try {
+				$output = bencode_decode_r($input, $len, $pos);
+			} catch (TypeError $e) {
+				$output = null;
+			}
+			return $output;
 		}
-		return $output;
-	}
 
 	function bencode_decode_r($input, $len, &$pos) {
 		if ($pos >= $len) {
