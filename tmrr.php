@@ -2,7 +2,7 @@
 
 //Initialization
 
-// Constants for file Merkle calculation
+// Constants for merkle calculation
 const BLOCK_SIZE = 16384;
 const HASH_SIZE = 32;
 // Timer variables
@@ -11,6 +11,9 @@ $sync = time();
 $msg = lang();
 // Error catcher
 $err_status =[];
+
+// Environment check
+if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
 
 // Server checks
 	$server = false;
@@ -430,7 +433,7 @@ function bencode_decode($input) {
 			],
 			
 			"eng" => [
-			"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr.exe e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\ntmrr.exe d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr.exe c <your-file>		*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+			"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\ntmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 			"noraw" => "This is not a valid file, is it empty?",
 			"invalid_torrent" => "Invalid torrent file.",
 			"no_v2" => "This is an invalid hybrid or v2 torrent.\r\nv1 torrents do not support displaying file hashes.",
