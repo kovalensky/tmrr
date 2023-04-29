@@ -12,9 +12,6 @@ $msg = lang();
 // Error catcher
 $err_status =[];
 
-// Environment check
-if(PHP_MAJOR_VERSION < 5 ){ die("PHP < 5.6 is not supported."); }
-
 // Server checks
 	$server = false;
 	if(php_sapi_name() !== "cli"){
