@@ -15,15 +15,15 @@ Useful for finding the sources of the same copies of files on different trackers
 
 Extract file hashes from .torrent files:
 ```
-tmrr.exe e example.torrent
+tmrr e example.torrent
 ```
 Calculate hashes for existing files:
 ```
-tmrr.exe c your_file
+tmrr c your_file
 ```
 Find duplicates within .torrent file(s):
 ```
-tmrr.exe d <example.torrent> <example2.torrent>.. <exampleN.torrent>
+tmrr d <example.torrent> <example2.torrent>.. <exampleN.torrent>
 ```
 To save large output:
 ```
