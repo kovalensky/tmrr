@@ -358,7 +358,7 @@ $err_status =[];
 	function timer($dose, $max, $filename){
 		global $sync, $server, $msg;
 	
-		if((time() - $sync) >= 1 && !$server ){
+		if(	(time() - $sync) >= 1 && !$server ){
 			$percent = round(($dose / $max) * 100);
 			cli_set_process_title("{$msg["calculation"]} $percent% — $filename");
 			$sync = time();
