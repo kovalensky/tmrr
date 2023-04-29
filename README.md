@@ -27,7 +27,7 @@ tmrr d <example.torrent> <example2.torrent>.. <exampleN.torrent>
 ```
 To save large output:
 ```
-tmrr.exe your_command > output.txt
+tmrr your_command > output.txt
 ```
 For the Linux environment on which PHP is installed:
 ```
