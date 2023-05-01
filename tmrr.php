@@ -47,16 +47,10 @@ $err_status =[];
 			$filec = 0;
 			foreach(array_slice($argv , 2) as $file){
 				$decoded = @bencode_decode(@file_get_contents($file));
-				if(!isset($decoded["info"])){
-					$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
+				if(!validity_tcheck($file)){
 					continue;
 				}
-
-				if(!isset($decoded["info"]["meta version"])){
-					$err_status[$file] = $msg["no_v2"] . "\r\n";
-					continue;
-				}
-
+				
 				echo "\r\n\r\n — {$msg["file_location"]}: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
 					if(!$server){
 						cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
@@ -77,13 +71,7 @@ $err_status =[];
 			foreach(array_slice($argv, 2) as $file){
 			
 				$decoded = @bencode_decode(@file_get_contents($file));
-				if(!isset($decoded["info"])){
-					$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
-					continue;
-				}
-
-				if(!isset($decoded["info"]["meta version"])){
-					$err_status[$file] = $msg["no_v2"] . "\r\n";
+				if(!validity_tcheck($file)){
 					continue;
 				}
 				$file_tree_array[" " . file_base($file). ":  "] = $decoded["info"]["file tree"];
@@ -364,6 +352,21 @@ $err_status =[];
 			$sync = time();
 			}
 		}
+
+	// Torrent validity checks
+	function validity_tcheck($file){
+		global $decoded, $msg, $err_status;
+		if(!isset($decoded["info"])){
+			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
+			return false;
+				}
+
+		if(!isset($decoded["info"]["meta version"])){
+			$err_status[$file] = $msg["no_v2"] . "\r\n";
+			return false;
+				}
+			return true;
+	}
 
 	// Represent bytes
 	function formatBytes($bytes, $precision = 2) { 
