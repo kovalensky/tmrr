@@ -57,7 +57,7 @@ $err_status =[];
 					continue;
 				}
 
-				echo "\r\n\r\n — File: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
+				echo "\r\n\r\n — {$msg["file_location"]}: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
 					if(!$server){
 						cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
 					}
