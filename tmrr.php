@@ -52,9 +52,9 @@ $err_status =[];
 				}
 				
 				echo "\r\n\r\n — {$msg["file_location"]}: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
-					if(!$server){
-						cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
-					}
+				if(!$server){
+					cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
+				}
 				printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 				echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
 				
@@ -103,9 +103,9 @@ $err_status =[];
 					unset($root);
 				
 				}
-			else{
-				$err_status[$file] = $msg["noraw"];
-				}
+				else{
+					$err_status[$file] = $msg["noraw"];
+					}
 			}
 		error_status($err_status);
 	}
@@ -365,7 +365,7 @@ $err_status =[];
 			$err_status[$file] = $msg["no_v2"] . "\r\n";
 			return false;
 				}
-			return true;
+		return true;
 	}
 
 	// Represent bytes
