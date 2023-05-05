@@ -195,7 +195,7 @@ $err_status =[];
 				printArrayNames($value, $current);
 			} else {
 			
-				echo "\r\n " . substr($current, 1, -1) . ' (' . formatBytes($value["length"]) . ")\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . "\r\n";
+				echo "\r\n " . substr($current, 1, -1) . ' (' . @formatBytes($value["length"]) . ")\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . "\r\n";
 				
 				$filec++;
 			}
