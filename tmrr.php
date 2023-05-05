@@ -303,7 +303,7 @@ $err_status =[];
 				combine_keys($value, $hashes, $current_key);
 			} else {
 	  
-				$hashes[ substr($current_key, 1, -1) ] = @bin2hex($value["pieces root"]) . " (" . formatBytes($value["length"]) . ")";
+				$hashes[ substr($current_key, 1, -1) ] = @bin2hex($value["pieces root"]) . " (" . @formatBytes($value["length"]) . ")";
 				$filec++;
 			}
 		}
