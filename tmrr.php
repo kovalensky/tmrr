@@ -453,48 +453,31 @@ $err_status =[];
 			]
 			);
 			
-			// For GitHub repository this tool is only distributed in English.
 			
-			return $strings["eng"];
+			$locale_file = __DIR__ . DIRECTORY_SEPARATOR . "ru";
 			
-			// Checkout NNMClub or Rutracker.org for multilingual versions.
-			
-			if(PHP_OS !== "WINNT"){
-				return $strings["eng"]; // Linux bypass
-			}
-			
-			$locale_file = __DIR__ . DIRECTORY_SEPARATOR . "locale";
-			
-			if(!file_exists($locale_file)){
-				$get_lang = @shell_exec('reg query "hklm\system\controlset001\control\nls\language" /v Installlanguage');
-				if (@preg_match('/\bREG_SZ\s+(\w+)\b/', $get_lang, $matches)) {
-					
-					@file_put_contents($locale_file, $matches[1]);
-				
-				}
-				else{
-					
-					@file_put_contents($locale_file, "0409");
-				
-				}
-			}
-				if(@$argv[1] == "locale"){
-					switch(@$argv[2]){
-						case "en":
-						file_put_contents($locale_file, "0409");
-						die("Language changed to English.");
-						case "ru":
-						file_put_contents($locale_file, "0419");
-						die("Язык был изменён на русский.");
+					if(@$argv[1] == "locale"){
+						switch(@$argv[2]){
+							case "en":
+							@unlink($locale_file);
+							die("Language changed to English.");
+							case "ru":
+							file_put_contents($locale_file, "");
+							die("Язык был изменён на русский.");
 					}
 			}
 			
-			$lang = @file_get_contents($locale_file);
-				if($lang == "0419"){
-					return $strings["rus"];
-			}
+			if(!file_exists($locale_file)){
+				
+				return $strings["eng"];
+				
+				}
 				else{
-					return $strings["eng"];
-			}
-		}
+					
+				return $strings["rus"];
+				
+				}
+	}
+			
+
 		
