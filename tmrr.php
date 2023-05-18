@@ -10,7 +10,7 @@ $sync = time();
 // Language
 $msg = lang();
 // Error catcher
-$err_status =[];
+$err_status = [];
 
 // Server checks
 	$server = false;
