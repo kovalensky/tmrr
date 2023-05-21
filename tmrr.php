@@ -434,7 +434,7 @@ $err_status = [];
 		global $argv;
 		$version = "2.3g"; // Code name: Gribovskaya (Mushroom Pumpkin)
 		$strings = array(
-			"rus"=>
+			"ru"=>
 			[
 			"main" => "\r\nСинтаксис:\r\n\r\ntmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
 			"noraw" => "Укажите расположение файла, он не должен быть пустым.",
@@ -455,7 +455,7 @@ $err_status = [];
 			"cli_hash_calculation" => "Вычисление хеша"
 			],
 			
-			"eng" => [
+			"en" => [
 			"main" => "\r\nPlease use the correct syntax, as:\r\n\r\ntmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\ntmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\ntmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 			"noraw" => "This is not a valid file, is it empty?",
 			"invalid_torrent" => "Invalid torrent file.",
@@ -492,12 +492,12 @@ $err_status = [];
 			
 			if(!file_exists($locale_file)){
 				
-				return $strings["eng"];
+				return $strings["en"];
 				
 				}
 				else{
 					
-				return $strings["rus"];
+				return $strings["ru"];
 				
 				}
 	}
