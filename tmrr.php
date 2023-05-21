@@ -180,8 +180,7 @@ $err_status = [];
 	function combine_keys($array, &$hashes, $parent_key = "") {
 		global $torrent_size, $filec;
 		foreach($array as $key => $value) {
-			$current_key = 
-			$parent_key . "/" . $key;
+			$current_key = $parent_key . "/" . $key;
 			if(is_array($value) && strlen($key) !== 0) {
 				combine_keys($value, $hashes, $current_key);
 			} else {
