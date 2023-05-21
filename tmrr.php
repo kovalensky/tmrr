@@ -53,8 +53,9 @@ $err_status = [];
 					cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
 				}
 				$filec = 0; // File count
+				$torrent_size = 0;
 				printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
-				echo "\r\n{$msg["total_files"]}: $filec\r\n";
+				echo "\r\n{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size) . ")\r\n";
 				
 			}
 
@@ -75,6 +76,7 @@ $err_status = [];
 				if(!empty($file_tree_array)){
 
 					$hashes = [];
+					$torrent_size = 0;
 					$filec = 0;
 					combine_keys($file_tree_array, $hashes);
 					unset($file_tree_array);
@@ -182,7 +184,7 @@ $err_status = [];
 
 	// Loop through all arrays saving locations and showing result
 	function printArrayNames($array, $parent = "") {
-		global $msg, $filec;
+		global $msg, $filec, $torrent_size;
 		foreach($array as $key => $value) {
 			$current = $parent . "/" . $key;
 			if(is_array($value) && strlen($key) !== 0) {
@@ -190,7 +192,7 @@ $err_status = [];
 			} else {
 			
 				echo "\r\n " . substr($current, 1, -1) . ' (' . @formatBytes($value["length"]) . ")\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . "\r\n";
-				
+				$torrent_size += (int)@$value["length"];
 				$filec++;
 			}
 		}
@@ -295,14 +297,18 @@ $err_status = [];
 
 	//Extract and combine hashes in one array
 	function combine_keys($array, &$hashes, $parent_key = "") {
-		global $filec;
+		global $torrent_size, $filec;
 		foreach($array as $key => $value) {
 			$current_key = $parent_key . "/" . $key;
 			if(is_array($value) && strlen($key) !== 0) {
 				combine_keys($value, $hashes, $current_key);
 			} else {
-	  
-				$hashes[ substr($current_key, 1, -1) ] = @bin2hex($value["pieces root"]) . " (" . @formatBytes($value["length"]) . ")";
+				
+				$hashes[substr($current_key, 1, -1)] = [
+                "hash" => @bin2hex($value["pieces root"]) . " (" . @formatBytes($value["length"]) . ")",
+                "size" => (int)@$value["length"]
+            ];
+				$torrent_size += (int)@$value["length"];
 				$filec++;
 			}
 		}
@@ -310,13 +316,16 @@ $err_status = [];
 
 	// Create an array and find duplicates
 	function compare($array) {
-		global $msg, $filec;
-
+		global $msg, $torrent_size, $filec;
+		$dups_size = 0;
+		
 		foreach ($array as $key => $value) {
-			if (isset($keys[$value])) {
-				$keys[$value][] = $key;
+			$hash = $value["hash"];
+			if (isset($keys[$hash])) {
+				$keys[$hash][] = $key;
+				$dups_size += $value["size"];
 				} else {
-				$keys[$value] = array($key);
+				$keys[$hash] = array($key);
 				}
 			}
 		$dup_hashes = 0;
@@ -333,10 +342,10 @@ $err_status = [];
 		}
 
 		if(empty($dup_hashes)){
-			echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec\r\n";
+			echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec (" . @formatBytes($torrent_size)  . ")\r\n";
 		}
 		else{
-			echo "{$msg["total_files"]}: $filec\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . "\r\n";
+			echo "{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size)  . ")\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . " (" . @formatBytes($dups_size) .  ")\r\n";
 		}
 			   
 	}
