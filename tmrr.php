@@ -9,29 +9,6 @@ $sync = time();
 // Error catcher
 $err_status = [];
 
-// Server checks
-	$server = false;
-	if(php_sapi_name() !== "cli"){
-		ob_start();
-		$server = true;
-		if(count($tmrr_process) < 2 || !in_array( $tmrr_process[0], ["e", "d", "c"] )){
-			die("Please provide parameters inside \$tmrr_process variable, see https://github.com/kovalensky/tmrr/wiki/Web-usage");
-		}
-		$tmrr_result = [];
-		$tmrr_error = [];
-		$argv = [];
-		$argv[0] = "Server is up";
-		$argv[1] = $tmrr_process[0];
-		$i = 2;
-		
-		foreach(array_slice($tmrr_process, 1) as $value){
-			$argv[$i] = $value;
-			$i++;	
-	}
-		$argc = count($argv);
-	}
-	
-
 //Main
 
 // Check for arguments
@@ -48,10 +25,10 @@ $err_status = [];
 					continue;
 				}
 				
-				echo "\r\n\r\n — {$msg["file_location"]}: " . file_base($file) . " —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
-				if(!$server){
-					cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
-				}
+				echo "\r\n\r\n — {$msg["file_location"]}: $file —\r\n" . " — {$msg["torrent_title"]}: " . @$decoded["info"]["name"] . " — \r\n\r\n";
+
+				cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
+
 				$filec = 0; // File count
 				$torrent_size = 0;
 				printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
@@ -71,7 +48,7 @@ $err_status = [];
 				if(!validity_tcheck($file)){
 					continue;
 				}
-				$file_tree_array[" " . file_base($file). ":  "] = $decoded["info"]["file tree"];
+				$file_tree_array["  $file:  "] = $decoded["info"]["file tree"];
 			}
 				if(!empty($file_tree_array)){
 
@@ -80,9 +57,7 @@ $err_status = [];
 					$filec = 0;
 					combine_keys($file_tree_array, $hashes);
 					unset($file_tree_array);
-					if(!$server){
-						cli_set_process_title($msg["cli_dup_search"]);
-						}
+					cli_set_process_title($msg["cli_dup_search"]);
 					compare($hashes);
 					
 			}
@@ -99,7 +74,7 @@ $err_status = [];
 				
 					$hash = new HasherV2($file, 2**14);
 					
-					echo "\r\n " . file_base($file)  ."\r\n{$msg["root_hash"]}: " . @bin2hex($hash->root) . "\r\n\r\n ";
+					echo "\r\n $file\r\n{$msg["root_hash"]}: " . @bin2hex($hash->root) . "\r\n\r\n ";
 					
 				
 				}
@@ -353,13 +328,11 @@ $err_status = [];
 
 	// Timer function
 	function timer($dose, $max, $filename){
-		global $sync, $server, $msg;
-	
-		if( !$server ){
+		global $sync, $msg;
+		
 			$percent = round(($dose / $max) * 100);
 			cli_set_process_title("{$msg["calculation"]} $percent%  —  $filename");
 			$sync = time();
-			}
 		}
 
 
@@ -400,32 +373,17 @@ $err_status = [];
 
 	// Error handler
 	function error_status(){
-		global $msg, $err_status, $server, $tmrr_result, $tmrr_error;
+		global $msg, $err_status;
 
 		if(!empty($err_status)){
-			
-				if($server){
-				$tmrr_error = $err_status;
-				$tmrr_result[0] = ob_get_clean();
-				return;
-			}
 			
 			echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
 			foreach($err_status as $key => $value){
 				echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
 				}
 			}
-			die();
-	}
-
-
-	// Base name calculation for web usage
-	function file_base($string){
-		global $server;
-		if($server){
-			return basename($string);
-		}
-		return $string;
+		
+		die();
 	}
 
 
