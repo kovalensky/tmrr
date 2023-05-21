@@ -2,10 +2,7 @@
 
 //Initialization
 
-// Constants for file Merkle calculation
-const BLOCK_SIZE = 16384;
-const HASH_SIZE = 32;
-// Timer variables
+// Timer variable
 $sync = time();
 // Language
 $msg = lang();
@@ -46,6 +43,7 @@ $err_status = [];
 		if($argv[1] == "e"){
 			$filec = 0;
 			foreach(array_slice($argv , 2) as $file){
+				
 				$decoded = @bencode_decode(@file_get_contents($file));
 				if(!validity_tcheck($file)){
 					continue;
@@ -59,9 +57,9 @@ $err_status = [];
 				echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
 				
 				unset($decoded);
-		}
+			}
 
-		error_status($err_status);
+		error_status();
 		
 	}
 
@@ -87,8 +85,10 @@ $err_status = [];
 						}
 					compare($hashes, $filec);
 					
-				}
-			error_status($err_status);
+			}
+				
+		error_status();
+		
 	}
 
 	
@@ -96,18 +96,21 @@ $err_status = [];
 		if ($argv[1] == "c") {
 			foreach(array_slice($argv, 2) as $file){
 				if(is_file($file) && filesize($file) !== 0){
-					$root = new HasherV2($file, BLOCK_SIZE);
-					$file = file_base($file); // Hide paths for web usage
-					echo "\r\n $file \r\n{$msg["root_hash"]}: " . @bin2hex($root->root) . "\r\n\r\n ";
+				
+					$hash = new HasherV2($file, 2**14);
 					
-					unset($root);
+					echo "\r\n " . file_base($file)  ."\r\n{$msg["root_hash"]}: " . @bin2hex($hash->root) . "\r\n\r\n ";
+					
 				
 				}
 				else{
+					
 					$err_status[$file] = $msg["noraw"];
-					}
+					
+				}
 			}
-		error_status($err_status);
+			
+		error_status();
 	}
 
 
@@ -135,9 +138,9 @@ $err_status = [];
 		}
 
 		$ch = $input[$pos];
-
+		$output = array();
+		
 		if ($ch === 'd') {
-			$output = array();
 			$pos++;
 
 			while ($pos < $len && $input[$pos] !== 'e') {
@@ -148,7 +151,6 @@ $err_status = [];
 			$pos++;
 			return $output;
 		} elseif ($ch === 'l') {
-			$output = array();
 			$pos++;
 
 			while ($pos < $len && $input[$pos] !== 'e') {
@@ -205,32 +207,6 @@ $err_status = [];
 
 
 	// Individual files Merkle computations
-	function next_power_2($value) {
-		if (!($value & ($value - 1)) && $value) {
-			return $value;
-		}
-		$start = 1;
-		while ($start < $value) {
-			$start <<= 1;
-		}
-		return $start;
-	}
-
-	function merkle_root($blocks) {
-		if (count($blocks) > 0) {
-			while (count($blocks) > 1) {
-				for ($i = 0; $i < count($blocks); $i += 2) {
-					$x = $blocks[$i];
-					$y = isset($blocks[$i + 1]) ? $blocks[$i + 1] : '';
-					$blocks[$i / 2] = hash('sha256', $x . $y, true);
-				}
-				$blocks = array_slice($blocks, 0, count($blocks) / 2);
-			}
-			return $blocks[0];
-		}
-		return $blocks;
-	}
-	// File hasher
 	class HasherV2 {
 		private $path;
 		public $root;
@@ -239,24 +215,29 @@ $err_status = [];
 		private $piece_length;
 		private $num_blocks;
 		public function __construct($path, $piece_length) {
+		define("BLOCK_SIZE", $piece_length);
+		define("HASH_SIZE", 32);
+		
 			$this->path = $path;
 			$this->root = null;
 			$this->piece_layer = null;
 			$this->layer_hashes = [];
-			$this->piece_length = $piece_length;
-			$this->num_blocks = $piece_length / BLOCK_SIZE;
+			$this->num_blocks = 1;
 			$fd = fopen($this->path, 'rb');
 			$this->process_file($fd, $this->path);
 			fclose($fd);
 		}
 
 		private function process_file($fd, $filename = "") {
+			global $sync;
 			$size = fstat($fd)["size"];
 			while (!feof($fd)) {
 				$blocks = [];
 				$leaf = fread($fd, BLOCK_SIZE);
 				
+				if(time() > $sync){
 				timer(ftell($fd), $size, $filename);
+				}
 				
 				$blocks[] = hash('sha256', $leaf, true);
 				if (count($blocks) != $this->num_blocks) {
@@ -292,6 +273,32 @@ $err_status = [];
 		}
 	}
 
+	function next_power_2($value) {
+		if (!($value & ($value - 1)) && $value) {
+			return $value;
+		}
+		$start = 1;
+		while ($start < $value) {
+			$start <<= 1;
+		}
+		return $start;
+	}
+
+	function merkle_root($blocks) {
+		if (count($blocks) > 0) {
+			while (count($blocks) > 1) {
+				for ($i = 0; $i < count($blocks); $i += 2) {
+					$x = $blocks[$i];
+					$y = isset($blocks[$i + 1]) ? $blocks[$i + 1] : '';
+					$blocks[$i / 2] = hash('sha256', $x . $y, true);
+				}
+				$blocks = array_slice($blocks, 0, count($blocks) / 2);
+			}
+			return $blocks[0];
+		}
+		return $blocks;
+	}
+	
 	// Comparator functions
 
 	//Extract and combine hashes in one array
@@ -309,7 +316,7 @@ $err_status = [];
 		}
 	}
 
-	// Do comparation
+	// Create an array and find duplicates
 	function compare($array, $filec) {
 		global $msg;
 		
@@ -346,9 +353,9 @@ $err_status = [];
 	function timer($dose, $max, $filename){
 		global $sync, $server, $msg;
 	
-		if( (time() > $sync) && !$server ){
+		if( !$server ){
 			$percent = round(($dose / $max) * 100);
-			cli_set_process_title("{$msg["calculation"]} $percent% — $filename");
+			cli_set_process_title("{$msg["calculation"]} $percent%  —  $filename");
 			$sync = time();
 			}
 		}
@@ -359,12 +366,13 @@ $err_status = [];
 		if(!isset($decoded["info"])){
 			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
 			return false;
-				}
+			}
 
 		if(!isset($decoded["info"]["meta version"])){
 			$err_status[$file] = $msg["no_v2"] . "\r\n";
 			return false;
-				}
+			}
+				
 		return true;
 	}
 
@@ -381,14 +389,17 @@ $err_status = [];
 	}
 
 	// Error handler
-	function error_status($err_status){
-		global $msg, $server, $tmrr_result, $tmrr_error;
-			if($server){
+	function error_status(){
+		global $msg, $err_status, $server, $tmrr_result, $tmrr_error;
+
+		if(!empty($err_status)){
+			
+				if($server){
 				$tmrr_error = $err_status;
 				$tmrr_result[0] = ob_get_clean();
 				return;
 			}
-		if(!empty($err_status)){
+			
 			echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
 			foreach($err_status as $key => $value){
 				echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n";
@@ -409,7 +420,7 @@ $err_status = [];
 	// Language option
 	function lang(){
 		global $argv;
-		$version = "2.0g"; // Code name: Gribovskaya Pumpkin
+		$version = "2.3g"; // Code name: Gribovskaya (Mushroom Pumpkin)
 		$strings = array(
 			"rus"=>
 			[
