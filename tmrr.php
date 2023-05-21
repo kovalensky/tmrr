@@ -2,10 +2,10 @@
 
 //Initialization
 
-// Timer variable
-$sync = time();
 // Language
 $msg = lang();
+// Timer variable
+$sync = time();
 // Error catcher
 $err_status = [];
 
