@@ -220,7 +220,7 @@ $err_status = [];
 		}
 	}
 
-	// Create an array and find duplicates
+	//Create an array and find duplicates
 	function compare($array) {
 		global $msg, $torrent_size, $filec;
 		$dups_size = 0;
