@@ -358,13 +358,18 @@ $err_status = [];
 	// Torrent validity checks
 	function validity_tcheck($file){
 		global $decoded, $msg, $err_status;
-		if(!isset($decoded["info"]["file tree"])){
+		if(!isset($decoded["info"])){
 			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
 			return false;
 			}
 
 		if(!isset($decoded["info"]["meta version"])){
 			$err_status[$file] = $msg["no_v2"] . "\r\n";
+			return false;
+			}
+			
+		if(!isset($decoded["info"]["file tree"])){
+			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
 			return false;
 			}
 				
