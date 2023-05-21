@@ -25,7 +25,7 @@ Find duplicates within .torrent file(s):
 ```
 tmrr d <example.torrent> <example2.torrent>.. <exampleN.torrent>
 ```
-To save large output:
+To save a large output:
 ```
 tmrr your_command > output.txt
 ```
