@@ -206,10 +206,10 @@ $err_status = [];
 		private $layer_hashes;
 		private $piece_length;
 		private $num_blocks;
+		
 		public function __construct($path, $piece_length) {
 		define("BLOCK_SIZE", $piece_length);
 		define("HASH_SIZE", 32);
-		
 			$this->path = $path;
 			$this->root = null;
 			$this->piece_layer = null;
