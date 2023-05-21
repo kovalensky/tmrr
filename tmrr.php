@@ -197,7 +197,64 @@ $err_status = [];
 			}
 		}
 	}
+	
 		
+	// Comparator functions
+
+	//Extract and combine hashes in one array
+	function combine_keys($array, &$hashes, $parent_key = "") {
+		global $torrent_size, $filec;
+		foreach($array as $key => $value) {
+			$current_key = $parent_key . "/" . $key;
+			if(is_array($value) && strlen($key) !== 0) {
+				combine_keys($value, $hashes, $current_key);
+			} else {
+				
+				$hashes[substr($current_key, 1, -1)] = [
+                "hash" => @bin2hex($value["pieces root"]) . " (" . @formatBytes($value["length"]) . ")",
+                "size" => (int)@$value["length"]
+            ];
+				$torrent_size += (int)@$value["length"];
+				$filec++;
+			}
+		}
+	}
+
+	// Create an array and find duplicates
+	function compare($array) {
+		global $msg, $torrent_size, $filec;
+		$dups_size = 0;
+		
+		foreach ($array as $key => $value) {
+			$hash = $value["hash"];
+			if (isset($keys[$hash])) {
+				$keys[$hash][] = $key;
+				$dups_size += $value["size"];
+				} else {
+				$keys[$hash] = array($key);
+				}
+			}
+		$dup_hashes = 0;
+		$filed = 0;
+		
+		if(!empty($keys)){
+			foreach ($keys as $key => $value) {
+				if (count($value) > 1) {
+					echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
+					$filed += count($value);
+					$dup_hashes++;
+				}
+			}
+		}
+
+		if(empty($dup_hashes)){
+			echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec (" . @formatBytes($torrent_size)  . ")\r\n";
+		}
+		else{
+			echo "{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size)  . ")\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . " (" . @formatBytes($dups_size) .  ")\r\n";
+		}
+			   
+	}
 
 
 	// Individual files Merkle computations
@@ -293,65 +350,6 @@ $err_status = [];
 		return $blocks;
 	}
 	
-	// Comparator functions
-
-	//Extract and combine hashes in one array
-	function combine_keys($array, &$hashes, $parent_key = "") {
-		global $torrent_size, $filec;
-		foreach($array as $key => $value) {
-			$current_key = $parent_key . "/" . $key;
-			if(is_array($value) && strlen($key) !== 0) {
-				combine_keys($value, $hashes, $current_key);
-			} else {
-				
-				$hashes[substr($current_key, 1, -1)] = [
-                "hash" => @bin2hex($value["pieces root"]) . " (" . @formatBytes($value["length"]) . ")",
-                "size" => (int)@$value["length"]
-            ];
-				$torrent_size += (int)@$value["length"];
-				$filec++;
-			}
-		}
-	}
-
-	// Create an array and find duplicates
-	function compare($array) {
-		global $msg, $torrent_size, $filec;
-		$dups_size = 0;
-		
-		foreach ($array as $key => $value) {
-			$hash = $value["hash"];
-			if (isset($keys[$hash])) {
-				$keys[$hash][] = $key;
-				$dups_size += $value["size"];
-				} else {
-				$keys[$hash] = array($key);
-				}
-			}
-		$dup_hashes = 0;
-		$filed = 0;
-		
-		if(!empty($keys)){
-			foreach ($keys as $key => $value) {
-				if (count($value) > 1) {
-					echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
-					$filed += count($value);
-					$dup_hashes++;
-				}
-			}
-		}
-
-		if(empty($dup_hashes)){
-			echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec (" . @formatBytes($torrent_size)  . ")\r\n";
-		}
-		else{
-			echo "{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size)  . ")\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . " (" . @formatBytes($dups_size) .  ")\r\n";
-		}
-			   
-	}
-
-
-
 
 	// Timer function
 	function timer($dose, $max, $filename){
@@ -363,6 +361,7 @@ $err_status = [];
 			$sync = time();
 			}
 		}
+
 
 	// Torrent validity checks
 	function validity_tcheck($file){
@@ -385,6 +384,7 @@ $err_status = [];
 		return true;
 	}
 
+
 	// Represent bytes
 	function formatBytes($bytes, $precision = 2) { 
 		$units = array('B', 'KB', 'MB', 'GB', 'TB'); 
@@ -396,6 +396,7 @@ $err_status = [];
 
 		return round($bytes, $precision) . ' ' . $units[$pow]; 
 	}
+
 
 	// Error handler
 	function error_status(){
@@ -417,6 +418,7 @@ $err_status = [];
 			die();
 	}
 
+
 	// Base name calculation for web usage
 	function file_base($string){
 		global $server;
@@ -425,6 +427,7 @@ $err_status = [];
 		}
 		return $string;
 	}
+
 
 	// Language option
 	function lang(){
