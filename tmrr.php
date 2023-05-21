@@ -316,16 +316,19 @@ $err_status = [];
 			if (isset($keys[$value])) {
 				$keys[$value][] = $key;
 				} else {
-					$keys[$value] = array($key);
+				$keys[$value] = array($key);
 				}
 			}
 		$dup_hashes = 0;
 		$filed = 0;
-		foreach ($keys as $key => $value) {
-			if (count($value) > 1) {
-				echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
-				$filed += count($value);
-				$dup_hashes++;
+		
+		if(!empty($keys)){
+			foreach ($keys as $key => $value) {
+				if (count($value) > 1) {
+					echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
+					$filed += count($value);
+					$dup_hashes++;
+				}
 			}
 		}
 
@@ -355,7 +358,7 @@ $err_status = [];
 	// Torrent validity checks
 	function validity_tcheck($file){
 		global $decoded, $msg, $err_status;
-		if(!isset($decoded["info"])){
+		if(!isset($decoded["info"]["file tree"])){
 			$err_status[$file] = $msg["invalid_torrent"] . "\r\n";
 			return false;
 			}
