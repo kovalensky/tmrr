@@ -180,7 +180,8 @@ $err_status = [];
 	function combine_keys($array, &$hashes, $parent_key = "") {
 		global $torrent_size, $filec;
 		foreach($array as $key => $value) {
-			$current_key = $parent_key . "/" . $key;
+			$current_key = 
+			$parent_key . "/" . $key;
 			if(is_array($value) && strlen($key) !== 0) {
 				combine_keys($value, $hashes, $current_key);
 			} else {
@@ -188,7 +189,7 @@ $err_status = [];
 				$hashes[substr($current_key, 1, -1)] = [
                 "hash" => @bin2hex($value["pieces root"]) . " (" . @formatBytes($value["length"]) . ")",
                 "size" => (int)@$value["length"]
-            ];
+				];
 				$torrent_size += (int)@$value["length"];
 				$filec++;
 			}
@@ -226,7 +227,7 @@ $err_status = [];
 			echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec (" . @formatBytes($torrent_size)  . ")\r\n";
 		}
 		else{
-			echo "{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size)  . ")\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . " (" . @formatBytes($dups_size) .  ")\r\n";
+			echo "{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size)  . ")\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . " (" . @formatBytes($dups_size) .  ") / " . round(($dups_size / $torrent_size) * 100, 2) . "%\r\n";
 		}
 			   
 	}
