@@ -11,7 +11,7 @@
 
 [Documentation for web usage](https://github.com/kovalensky/tmrr/wiki/Web-usage)
 
-Useful for finding the sources of the same copies of files on different trackers that support BitTorrent v2, thus reviving dead torrents.
+Useful for finding the sources of the same copies of files on different trackers & DHT indexers that support BitTorrent v2 protocol, thus reviving dead torrents, valuable Internet artifacts.
 
 Extract file hashes from .torrent files:
 ```
