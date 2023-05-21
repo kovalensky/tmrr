@@ -41,7 +41,6 @@ $err_status = [];
 
 		// Extract hashes
 		if($argv[1] == "e"){
-			$filec = 0;
 			foreach(array_slice($argv , 2) as $file){
 				
 				$decoded = @bencode_decode(@file_get_contents($file));
@@ -53,8 +52,9 @@ $err_status = [];
 				if(!$server){
 					cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
 				}
+				$filec = 0; // File count
 				printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
-				echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
+				echo "\r\n{$msg["total_files"]}: $filec\r\n";
 				
 			}
 
@@ -64,7 +64,6 @@ $err_status = [];
 
 		// Find duplicates; be aware that duplicates inside single .torrent file are also shown
 		if ($argv[1] == "d") {
-			$file_tree_array = [];
 			foreach(array_slice($argv, 2) as $file){
 			
 				$decoded = @bencode_decode(@file_get_contents($file));
@@ -94,7 +93,6 @@ $err_status = [];
 		// Calculate Merkle Root Hash
 		if ($argv[1] == "c") {
 			foreach(array_slice($argv, 2) as $file){
-				
 				if(is_file($file) && filesize($file) !== 0){
 				
 					$hash = new HasherV2($file, 2**14);
