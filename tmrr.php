@@ -242,8 +242,8 @@ $err_status = [];
 		private $num_blocks;
 		
 		public function __construct($path, $piece_length) {
-		define("BLOCK_SIZE", $piece_length);
-		define("HASH_SIZE", 32);
+		defined('BLOCK_SIZE') OR define('BLOCK_SIZE', $piece_length);
+		defined('HASH_SIZE') OR define('HASH_SIZE', 32);
 			$this->path = $path;
 			$this->root = null;
 			$this->piece_layer = null;
