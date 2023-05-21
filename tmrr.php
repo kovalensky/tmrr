@@ -56,7 +56,6 @@ $err_status = [];
 				printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 				echo "\r\n{$msg["total_files"]}: $filec\r\n"; $filec = 0;
 				
-				unset($decoded);
 			}
 
 		error_status();
@@ -83,7 +82,7 @@ $err_status = [];
 					if(!$server){
 						cli_set_process_title($msg["cli_dup_search"]);
 						}
-					compare($hashes, $filec);
+					compare($hashes);
 					
 			}
 				
@@ -95,6 +94,7 @@ $err_status = [];
 		// Calculate Merkle Root Hash
 		if ($argv[1] == "c") {
 			foreach(array_slice($argv, 2) as $file){
+				
 				if(is_file($file) && filesize($file) !== 0){
 				
 					$hash = new HasherV2($file, 2**14);
@@ -180,12 +180,6 @@ $err_status = [];
 			return $output;
 		}
 	}
-
-
-
-
-
-
 
 
 	// Loop through all arrays saving locations and showing result
@@ -317,16 +311,16 @@ $err_status = [];
 	}
 
 	// Create an array and find duplicates
-	function compare($array, $filec) {
-		global $msg;
-		
-			foreach ($array as $key => $value) {
-				if (isset($keys[$value])) {
-					$keys[$value][] = $key;
+	function compare($array) {
+		global $msg, $filec;
+
+		foreach ($array as $key => $value) {
+			if (isset($keys[$value])) {
+				$keys[$value][] = $key;
 				} else {
 					$keys[$value] = array($key);
 				}
-		}
+			}
 		$dup_hashes = 0;
 		$filed = 0;
 		foreach ($keys as $key => $value) {
