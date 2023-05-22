@@ -29,8 +29,8 @@ $err_status = [];
 
 				cli_set_process_title($msg["cli_hash_extraction"] . " — $file");
 
-				$filec = 0; // File count
 				$torrent_size = 0;
+				$filec = 0; // File count
 				printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
 				echo "\r\n{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size) . ")\r\n";
 				
@@ -159,7 +159,7 @@ $err_status = [];
 
 	// Loop through all arrays saving locations and showing result
 	function printArrayNames($array, $parent = "") {
-		global $msg, $filec, $torrent_size;
+		global $msg, $torrent_size, $filec;
 		foreach($array as $key => $value) {
 			$current = $parent . "/" . $key;
 			if(is_array($value) && strlen($key) !== 0) {
@@ -167,7 +167,7 @@ $err_status = [];
 			} else {
 			
 				echo "\r\n " . substr($current, 1, -1) . ' (' . @formatBytes($value["length"]) . ")\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . "\r\n";
-				$torrent_size += (int)@$value["length"];
+				$torrent_size += $value["length"] ?? 0;
 				$filec++;
 			}
 		}
@@ -185,11 +185,11 @@ $err_status = [];
 				combine_keys($value, $hashes, $current_key);
 			} else {
 				
-				$hashes[substr($current_key, 1, -1)] = [
+				$hashes[ substr($current_key, 1, -1) ] = [
                 "hash" => @bin2hex($value["pieces root"]) . " (" . @formatBytes($value["length"]) . ")",
-                "size" => (int)@$value["length"]
+                "size" => $value["length"] ?? 0
 				];
-				$torrent_size += (int)@$value["length"];
+				$torrent_size += $value["length"] ?? 0;
 				$filec++;
 			}
 		}
@@ -197,11 +197,11 @@ $err_status = [];
 
 	//Create an array and find duplicates
 	function compare($array) {
-		global $msg, $torrent_size, $filec;
+		global $msg, $torrent_size, $filec, $argc;
 		$dups_size = 0;
 		
 		foreach ($array as $key => $value) {
-			$hash = $value["hash"];
+			$hash = &$value["hash"];
 			if (isset($keys[$hash])) {
 				$keys[$hash][] = $key;
 				$dups_size += $value["size"];
@@ -226,7 +226,10 @@ $err_status = [];
 			echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec (" . @formatBytes($torrent_size)  . ")\r\n";
 		}
 		else{
-			echo "{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size)  . ")\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . " (" . @formatBytes($dups_size) .  ") / " . round(($dups_size / $torrent_size) * 100, 2) . "%\r\n";
+			echo "{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size)  . ")\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . " (" . @formatBytes($dups_size) . ")";
+			if($argc == 3){
+				echo " | " . round(($dups_size / $torrent_size) * 100, 2) . "%\r\n";
+			}
 		}
 			   
 	}
