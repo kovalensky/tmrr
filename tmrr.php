@@ -2,6 +2,8 @@
 
 //Initialization
 
+// Buffer enable
+ob_start();
 // Language
 $msg = lang();
 // Timer variable
@@ -31,7 +33,7 @@ $err_status = [];
 
 				$torrent_size = 0;
 				$filec = 0; // File count
-				printArrayNames($decoded["info"]["file tree"]); // Pass all files dictionary
+				printFiles($decoded["info"]["file tree"]); // Pass all files dictionary
 				echo "\r\n{$msg["total_files"]}: $filec (" . @formatBytes($torrent_size) . ")\r\n";
 				
 			}
@@ -158,17 +160,18 @@ $err_status = [];
 
 
 	// Loop through all arrays saving locations and showing result
-	function printArrayNames($array, $parent = "") {
+	function printFiles($array, $parent = "") {
 		global $msg, $torrent_size, $filec;
 		foreach($array as $key => $value) {
 			$current = $parent . "/" . $key;
 			if(is_array($value) && strlen($key) !== 0) {
-				printArrayNames($value, $current);
+				printFiles($value, $current);
 			} else {
-			
+				
 				echo "\r\n " . substr($current, 1, -1) . ' (' . @formatBytes($value["length"]) . ")\r\n{$msg["root_hash"]}: " . @bin2hex($value["pieces root"]) . "\r\n";
 				$torrent_size += $value["length"] ?? 0;
 				$filec++;
+				
 			}
 		}
 	}
@@ -196,27 +199,30 @@ $err_status = [];
 	}
 
 	//Create an array and find duplicates
-	function compare($array) {
-		global $msg, $torrent_size, $filec, $argc;
+	function compare() {
+		global $msg, $hashes, $torrent_size, $filec, $argc;
 		$dups_size = 0;
 		
-		foreach ($array as $key => $value) {
+		foreach ($hashes as $key => $value) {
 			$hash = &$value["hash"];
 			if (isset($keys[$hash])) {
 				$keys[$hash][] = $key;
 				$dups_size += $value["size"];
 				} else {
-				$keys[$hash] = array($key);
+				$keys[$hash] = [$key];
 				}
 			}
+
+		unset($hashes);
 		$dup_hashes = 0;
 		$filed = 0;
 		
 		if(!empty($keys)){
 			foreach ($keys as $key => $value) {
-				if (count($value) > 1) {
+				$count = count($value);
+				if ( $count > 1 ) {
 					echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
-					$filed += count($value);
+					$filed += $count;
 					$dup_hashes++;
 				}
 			}
@@ -363,7 +369,7 @@ $err_status = [];
 
 	// Represent bytes
 	function formatBytes($bytes, $precision = 2) { 
-		$units = array('B', 'KB', 'MB', 'GB', 'TB'); 
+		$units = ['B', 'KB', 'MB', 'GB', 'TB']; 
 
 		$bytes = max($bytes, 0); 
 		$pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
@@ -394,7 +400,7 @@ $err_status = [];
 	function lang(){
 		global $argv;
 		$version = "2.3g"; // Code name: Gribovskaya (Mushroom Pumpkin)
-		$strings = array(
+		$strings = [
 			"ru"=>
 			[
 			"main" => "\r\nСинтаксис:\r\n\r\ntmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\ntmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\ntmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
@@ -435,7 +441,7 @@ $err_status = [];
 			"cli_hash_extraction" => "Extracting file hashes",
 			"cli_hash_calculation" => "Calculating the hash of"
 			]
-			);
+			];
 			
 			
 			$locale_file = __DIR__ . DIRECTORY_SEPARATOR . "ru";
