@@ -22,7 +22,10 @@ $err_status = [];
 		if($argv[1] == "e"){
 			foreach(array_slice($argv , 2) as $file){
 				
+				if(file_exists($file)){
 				$decoded = @bencode_decode(@file_get_contents($file));
+				}
+				
 				if(!validity_tcheck($file)){
 					continue;
 				}
@@ -46,10 +49,14 @@ $err_status = [];
 		if ($argv[1] == "d") {
 			foreach(array_slice($argv, 2) as $file){
 			
+				if(file_exists($file)){
 				$decoded = @bencode_decode(@file_get_contents($file));
+				}
+				
 				if(!validity_tcheck($file)){
 					continue;
 				}
+				
 				$file_tree_array["  $file:  "] = $decoded["info"]["file tree"];
 			}
 				if(!empty($file_tree_array)){
