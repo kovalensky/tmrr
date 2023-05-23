@@ -23,7 +23,7 @@ $err_status = [];
 			foreach(array_slice($argv , 2) as $file){
 				
 				if(file_exists($file)){
-				$decoded = @bencode_decode(@file_get_contents($file));
+					$decoded = @bencode_decode(@file_get_contents($file));
 				}
 				
 				if(!validity_tcheck($file)){
@@ -50,7 +50,7 @@ $err_status = [];
 			foreach(array_slice($argv, 2) as $file){
 			
 				if(file_exists($file)){
-				$decoded = @bencode_decode(@file_get_contents($file));
+					$decoded = @bencode_decode(@file_get_contents($file));
 				}
 				
 				if(!validity_tcheck($file)){
