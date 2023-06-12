@@ -32,9 +32,9 @@ $msg = lang();
 				cli_set_process_title($msg["cli_hash_extraction"] . "  —  $file");
 
 				echo "\r\n\r\n — {$msg["file_location"]}: $file —\r\n";
-
+				
 				if (isset($torrent["info"]["name"])) {
-				echo " — {$msg["torrent_title"]}: " . $torrent["info"]["name"] . " — \r\n";
+					echo " — {$msg["torrent_title"]}: " . $torrent["info"]["name"] . " — \r\n";
 				}
 
 				printFiles($torrent["info"]["file tree"]); // Pass all files dictionary
@@ -78,7 +78,7 @@ $msg = lang();
 
 				if (is_file($file) && filesize($file) !== 0) {
 					$hash = new HasherV2($file, 2**14);
-					echo "\r\n $file\r\n{$msg["root_hash"]}: " . bin2hex($hash->root) . "\r\n\r\n";
+					echo "\r\n  $file\r\n {$msg["root_hash"]}: " . bin2hex($hash->root) . "\r\n\r\n";
 				} else{
 					$err_status[$file] = $msg["noraw"];
 				}
@@ -287,8 +287,8 @@ $msg = lang();
 			if (($torrent["info"]["meta version"] ?? null) !== 2 || !isset($torrent["info"]["file tree"])) { // BEP 0052
 
 				$title = "";
-				if(isset($torrent["info"]["name"])) {
-				$title = "\r\n{$msg["torrent_title"]}: " . $torrent["info"]["name"];
+				if (isset($torrent["info"]["name"])) {
+					$title = "\r\n{$msg["torrent_title"]}: " . $torrent["info"]["name"];
 				}
 				
 				$err_status[$file . $title] = $msg["no_v2"];
@@ -308,7 +308,7 @@ $msg = lang();
 					printFiles($value, $current);
 				} else{
 					$length = &$value["length"];
-					echo "\r\n " . substr($current, 1, -1) . ' (' . formatBytes($length) . ")\r\n{$msg["root_hash"]}: " . bin2hex($value["pieces root"]) . "\r\n";
+					echo "\r\n  " . substr($current, 1, -1) . ' (' . formatBytes($length) . ")\r\n {$msg["root_hash"]}: " . bin2hex($value["pieces root"]) . "\r\n";
 					$torrent_size += $length;
 					++$filec;
 				}
@@ -362,7 +362,7 @@ $msg = lang();
 				foreach ($keys as $key => $value) {
 					$count = count($value);
 					if ($count > 1) {
-						echo "\r\n{$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
+						echo "\r\n {$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
 						$filed += $count;
 						++$dup_hashes;
 					}
@@ -375,12 +375,13 @@ $msg = lang();
 				echo "{$msg["total_files"]}: $filec (" . formatBytes($torrent_size) . ")\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . " (" . formatBytes($dups_size) . ")";
 
 				if ($argc < 4) {
+
 					echo " | " . round(($dups_size / $torrent_size) * 100, 2) . "%\r\n";
 
 					cli_set_process_title($msg["magnet_proposal"]);
 					ob_end_flush();	
-						
-					
+
+
 					// Magnet handler
 
 					$cli_output = stream_isatty(STDOUT);
@@ -389,6 +390,7 @@ $msg = lang();
 					if ($cli_output) {
 						echo "\r\n	" . $msg["magnet_proposal"] . "\r\n	";
 					}
+
 					$acceptance_symbol = ["y", "d"];
 					$handle = strtolower(fgets(fopen('php://stdin', 'r')));
 
@@ -397,7 +399,7 @@ $msg = lang();
 						if ($cli_output) {
 							echo $clear_cli;
 						}
-						
+
 						echo "\r\n" . $magnetL . "\r\n";
 
 						if (PHP_OS_FAMILY == "Windows" && $cli_output) {
@@ -424,16 +426,23 @@ $msg = lang();
 		function magnet_gen()
 		{
 			global $magnet, $torrent;
+
 			$indices = "&so=" . formatSeq($magnet["indices"]); // BEP 0053
 
 			$trackers = "";
-			if (isset($torrent["announce"])) {
+			if (isset($torrent["announce"]) && !isset($torrent["announce-list"])) {
 				$trackers = "&tr=" . urlencode($torrent["announce"]);
 			}
 
 			if (isset($torrent["announce-list"])) {
-				foreach ($torrent["announce-list"] as $value) {
-					$trackers .= "&tr=" . urlencode($value[0]);
+				$tracker_list = &$torrent["announce-list"];
+				if(count($tracker_list[0]) > 1){
+					$trackers .= "&tr=" . implode('&tr=', array_map('urlencode', $tracker_list[0]));
+				}
+				else{
+					foreach ($tracker_list as $value) {
+						$trackers .= "&tr=" . urlencode($value[0]); // For tracker lists created with additional space separations
+					}
 				}
 			}
 
@@ -448,18 +457,18 @@ $msg = lang();
 					}
 				}
 			}
-			
+
 			$name = "";
 			if (isset($torrent["info"]["name"])) {
 				$name = "&dn=" . urlencode($torrent["info"]["name"]);
 			}
 
-			$encoded = bencode_encode($torrent["info"]);
+			$bencoded = bencode_encode($torrent["info"]);
 			$bt_v1 = "";
 			if (isset($torrent["info"]["pieces"])) { // Hybrid torrent
-				$bt_v1 = "&xt=urn:btih:" . hash("sha1", $encoded);
+				$bt_v1 = "&xt=urn:btih:" . hash("sha1", $bencoded);
 			}
-			$bt_v2 = hash("sha256", $encoded);
+			$bt_v2 = hash("sha256", $bencoded);
 			$hash = "magnet:?xt=urn:btmh:1220" . $bt_v2 . $bt_v1;
 			
 			return $hash . $name . $trackers . $web_seeds . $indices;
@@ -493,15 +502,14 @@ $msg = lang();
 			private function process_file($fd, $filename = "")
 			{
 				global $msg;
-				$size = fstat($fd)["size"];
-				$padding = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
+				$file_size = fstat($fd)["size"];
 
 				while (!feof($fd)) {
 					$blocks = [];
 					$leaf = fread($fd, BLOCK_SIZE);
 
 					if (time() > $this->sync) { // Show percentage status
-						$percent = round((ftell($fd) / $size) * 100);
+						$percent = round((ftell($fd) / $file_size) * 100);
 						cli_set_process_title("{$msg["calculation"]} $percent%  —  $filename");
 						$this->sync = time();
 					}
@@ -513,9 +521,10 @@ $msg = lang();
 							$power2 = next_power_2(count($blocks));
 							$remaining = $power2 - count($blocks);
 						}
+						$padding = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
 						$blocks = array_merge($blocks, array_slice($padding, 0, $remaining));
 					}
-					$layer_hash = merkle_root($blocks);
+					$layer_hash = $this->merkle_root($blocks);
 					$this->layer_hashes[] = $layer_hash;
 					}
 				$this->_calculate_root();
@@ -524,51 +533,50 @@ $msg = lang();
 			private function _calculate_root()
 			{
 				$this->piece_layer = implode('', $this->layer_hashes);
-
 				$hashes = count($this->layer_hashes);
 				if ($hashes > 1) {
-					$pow2 = next_power_2($hashes);
+					$pow2 = $this->next_power_2($hashes);
 					$remainder = $pow2 - $hashes;
 					$pad_piece = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
 					while ($remainder > 0) {
-						$this->layer_hashes[] = merkle_root($pad_piece);
+						$this->layer_hashes[] = $this->merkle_root($pad_piece);
 						$remainder--;
 					}
 				}
-				$this->root = merkle_root($this->layer_hashes);
+				$this->root = $this->merkle_root($this->layer_hashes);
 			}
-		}
-
-		function merkle_root($blocks)
-		{
-			if (count($blocks) > 0) {
-				while (count($blocks) > 1) {
-					$blocks_count = count($blocks);
-					$next_level_blocks = [];
-					$i = 0;
-					while ($i < $blocks_count) {
-						$x = $blocks[$i];
-						$y = ($i + 1 < $blocks_count) ? $blocks[$i + 1] : '';
-						$next_level_blocks[] = hash('sha256', $x . $y, true);
-						$i += 2;
+			
+			private function merkle_root($blocks)
+			{
+				if (count($blocks) > 0) {
+					while (count($blocks) > 1) {
+						$blocks_count = count($blocks);
+						$next_level_blocks = [];
+						$i = 0;
+						while ($i < $blocks_count) {
+							$x = $blocks[$i];
+							$y = ($i + 1 < $blocks_count) ? $blocks[$i + 1] : '';
+							$next_level_blocks[] = hash('sha256', $x . $y, true);
+							$i += 2;
+						}
+						$blocks = $next_level_blocks;
 					}
-					$blocks = $next_level_blocks;
+					return $blocks[0];
 				}
-				return $blocks[0];
+				return $blocks;
 			}
-			return $blocks;
-		}
 		
-		function next_power_2($value)
-		{
-			if (!($value & ($value - 1)) && $value) {
-				return $value;
+			private function next_power_2($value)
+			{
+				if (!($value & ($value - 1)) && $value) {
+					return $value;
+				}
+				$start = 1;
+				while ($start < $value) {
+					$start <<= 1;
+				}
+				return $start;
 			}
-			$start = 1;
-			while ($start < $value) {
-				$start <<= 1;
-			}
-			return $start;
 		}
 
 		// Represent bytes
@@ -615,6 +623,7 @@ $msg = lang();
 			global $msg, $err_status;
 
 			if (!empty($err_status)) {
+
 				echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
 
 				foreach ($err_status as $key => $value) {
