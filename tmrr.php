@@ -18,7 +18,6 @@ $msg = lang();
 		if ($argv[1] == "e") {
 			foreach (array_slice($argv, 2) as $file) {
 
-				$torrent = [];
 				if (is_file($file)) {
 					$torrent = bencode_decode(file_get_contents($file));
 				}
@@ -48,7 +47,6 @@ $msg = lang();
 		if ($argv[1] == "d") {
 			foreach (array_slice($argv, 2) as $file) {
 
-				$torrent = [];
 				if (is_file($file)) {
 					$torrent = bencode_decode(file_get_contents($file));
 				}
@@ -78,7 +76,7 @@ $msg = lang();
 
 				if (is_file($file) && filesize($file) !== 0) {
 					$hash = new HasherV2($file, 2**14);
-					echo "\r\n  $file\r\n {$msg["root_hash"]}: " . bin2hex($hash->root) . "\r\n\r\n";
+					echo "\r\n $file\r\n{$msg["root_hash"]}: " . bin2hex($hash->root) . "\r\n\r\n";
 				} else{
 					$err_status[$file] = $msg["noraw"];
 				}
