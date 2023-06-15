@@ -29,13 +29,17 @@ $msg = lang();
 				$torrent_size = 0;	$filec = 0; // Size&File count
 
 				cli_set_process_title($msg["cli_hash_extraction"] . "  —  $file");
-
+				
 				echo "\r\n\r\n — {$msg["file_location"]}: $file —\r\n";
 				
-				if (isset($torrent["info"]["name"])) {
-					echo " — {$msg["torrent_title"]}: " . $torrent["info"]["name"] . " — \r\n";
+				if (isset($torrent["info"]["name"])) { // BEP 0052
+					echo " — {$msg["torrent_title"]}: " . (string)$torrent["info"]["name"] . " — \r\n";
 				}
-
+				
+				if (isset($torrent["creation date"], $torrent["created by"])){
+					echo " — {$msg["created_by_client"]}: " . (string)$torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ") — \r\n";
+				}
+				
 				printFiles($torrent["info"]["file tree"]); // Pass all files dictionary
 				echo "\r\n{$msg["total_files"]}: $filec (" . formatBytes($torrent_size) . ")\r\n";
 			}
@@ -113,7 +117,8 @@ $msg = lang();
 					"cli_hash_extraction" => "Извлечение хешей",
 					"cli_hash_calculation" => "Вычисление хеша",
 					"magnet_proposal" => "Создать магнит ссылку для загрузки раздачи без дубликатов? Да (d) | Нет (n) : ",
-					"magnet_copy" => "Скопируйте магнит ссылку в ваш торрент клиент."
+					"magnet_copy" => "Скопируйте магнит ссылку в ваш торрент клиент.",
+					"created_by_client" => "Создан"
 				],
 				"en" => [
 					"main" => "\r\nPlease use the correct syntax, as:\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
@@ -134,7 +139,8 @@ $msg = lang();
 					"cli_hash_extraction" => "Extracting file hashes",
 					"cli_hash_calculation" => "Calculating the hash of",
 					"magnet_proposal" => "Create a magnet download link without duplicates? Yes (y) | No (n) : ",
-					"magnet_copy" => "Paste this magnet link into your torrent client."
+					"magnet_copy" => "Paste this magnet link into your torrent client.",
+					"created_by_client" => "Created by"
 				]
 			];
 
@@ -285,14 +291,18 @@ $msg = lang();
 			if (($torrent["info"]["meta version"] ?? null) !== 2 || !isset($torrent["info"]["file tree"])) { // BEP 0052
 
 				$title = "";
+				$client_date = "";
 				if (isset($torrent["info"]["name"])) {
-					$title = "\r\n{$msg["torrent_title"]}: " . $torrent["info"]["name"];
+					$title = "\r\n{$msg["torrent_title"]}: " . (string)$torrent["info"]["name"];
 				}
 				
-				$err_status[$file . $title] = $msg["no_v2"];
+				if (isset($torrent["creation date"], $torrent["created by"])){
+					$client_date =  "\r\n{$msg["created_by_client"]}: " . (string)$torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ")";
+				}
+				
+				$err_status[$file . $title . $client_date] = $msg["no_v2"];
 				return false;
 			}
-
 			return true;
 		}
 
@@ -434,7 +444,7 @@ $msg = lang();
 
 			if (isset($torrent["announce-list"])) {
 				$tracker_list = &$torrent["announce-list"];
-				if(count($tracker_list[0]) > 1){
+				if (count($tracker_list[0]) > 1){
 					$trackers .= "&tr=" . implode('&tr=', array_map('urlencode', $tracker_list[0]));
 				}
 				else{
