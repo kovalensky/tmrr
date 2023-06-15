@@ -33,11 +33,11 @@ $msg = lang();
 				echo "\r\n\r\n — {$msg["file_location"]}: $file —\r\n";
 				
 				if (isset($torrent["info"]["name"])) { // BEP 0052
-					echo " — {$msg["torrent_title"]}: " . (string)$torrent["info"]["name"] . " — \r\n";
+					echo " — {$msg["torrent_title"]}: " . $torrent["info"]["name"] . " — \r\n";
 				}
 				
 				if (isset($torrent["creation date"], $torrent["created by"])) {
-					echo " — {$msg["created_by_client"]}: " . (string)$torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ") — \r\n";
+					echo " — {$msg["created_by_client"]}: " . $torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ") — \r\n";
 				}
 				
 				printFiles($torrent["info"]["file tree"]); // Pass all files dictionary
@@ -293,11 +293,11 @@ $msg = lang();
 				$title = "";
 				$client_date = "";
 				if (isset($torrent["info"]["name"])) {
-					$title = "\r\n{$msg["torrent_title"]}: " . (string)$torrent["info"]["name"];
+					$title = "\r\n{$msg["torrent_title"]}: " . $torrent["info"]["name"];
 				}
 				
 				if (isset($torrent["creation date"], $torrent["created by"])) {
-					$client_date =  "\r\n{$msg["created_by_client"]}: " . (string)$torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ")";
+					$client_date =  "\r\n{$msg["created_by_client"]}: " . $torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ")";
 				}
 				
 				$err_status[$file . $title . $client_date] = $msg["no_v2"];
