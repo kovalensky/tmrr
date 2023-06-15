@@ -37,7 +37,7 @@ $msg = lang();
 				}
 				
 				if (isset($torrent["creation date"], $torrent["created by"])) {
-					echo " — {$msg["created_by_client"]}: " . $torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ") — \r\n";
+					echo " — {$msg["created_by_client"]}: " . $torrent["created by"] . " (" . date("d M Y | G:i:s T", $torrent["creation date"]) . ") — \r\n";
 				}
 				
 				printFiles($torrent["info"]["file tree"]); // Pass all files dictionary
@@ -297,7 +297,7 @@ $msg = lang();
 				}
 				
 				if (isset($torrent["creation date"], $torrent["created by"])) {
-					$client_date =  "\r\n{$msg["created_by_client"]}: " . $torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ")";
+					$client_date =  "\r\n{$msg["created_by_client"]}: " . $torrent["created by"] . " (" . date("d M Y | G:i:s T", $torrent["creation date"]) . ")";
 				}
 				
 				$err_status[$file . $title . $client_date] = $msg["no_v2"];
