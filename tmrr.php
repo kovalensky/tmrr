@@ -36,7 +36,7 @@ $msg = lang();
 					echo " — {$msg["torrent_title"]}: " . (string)$torrent["info"]["name"] . " — \r\n";
 				}
 				
-				if (isset($torrent["creation date"], $torrent["created by"])){
+				if (isset($torrent["creation date"], $torrent["created by"])) {
 					echo " — {$msg["created_by_client"]}: " . (string)$torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ") — \r\n";
 				}
 				
@@ -296,7 +296,7 @@ $msg = lang();
 					$title = "\r\n{$msg["torrent_title"]}: " . (string)$torrent["info"]["name"];
 				}
 				
-				if (isset($torrent["creation date"], $torrent["created by"])){
+				if (isset($torrent["creation date"], $torrent["created by"])) {
 					$client_date =  "\r\n{$msg["created_by_client"]}: " . (string)$torrent["created by"] . " (" . @date("d M Y | G:i:s T", $torrent["creation date"]) . ")";
 				}
 				
@@ -444,7 +444,7 @@ $msg = lang();
 
 			if (isset($torrent["announce-list"])) {
 				$tracker_list = &$torrent["announce-list"];
-				if (count($tracker_list[0]) > 1){
+				if (count($tracker_list[0]) > 1) {
 					$trackers .= "&tr=" . implode('&tr=', array_map('urlencode', $tracker_list[0]));
 				}
 				else{
