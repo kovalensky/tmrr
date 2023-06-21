@@ -18,6 +18,7 @@ $msg = lang();
 		if ($argv[1] == "e") {
 			foreach (array_slice($argv, 2) as $file) {
 
+				$torrent = [];
 				if (is_file($file)) {
 					$torrent = bencode_decode(file_get_contents($file));
 				}
@@ -40,7 +41,7 @@ $msg = lang();
 					echo " — {$msg["created_by_client"]}: " . $torrent["created by"] . " (" . date("d M Y | G:i:s T", $torrent["creation date"]) . ") — \r\n";
 				}
 				
-				printFiles($torrent["info"]["file tree"]); // Pass all files dictionary
+				printFiles($torrent["info"]["file tree"]); // Passing the dictionary of all files
 				echo "\r\n{$msg["total_files"]}: $filec (" . formatBytes($torrent_size) . ")\r\n";
 			}
 
@@ -51,6 +52,7 @@ $msg = lang();
 		if ($argv[1] == "d") {
 			foreach (array_slice($argv, 2) as $file) {
 
+				$torrent = [];
 				if (is_file($file)) {
 					$torrent = bencode_decode(file_get_contents($file));
 				}
@@ -117,7 +119,7 @@ $msg = lang();
 					"cli_hash_extraction" => "Извлечение хешей",
 					"cli_hash_calculation" => "Вычисление хеша",
 					"magnet_proposal" => "Создать магнит ссылку для загрузки раздачи без дубликатов? Да (d) | Нет (n) : ",
-					"magnet_copy" => "Скопируйте магнит ссылку в ваш торрент клиент.",
+					"magnet_copy" => "Скопируйте магнит ссылку в торрент клиент.",
 					"created_by_client" => "Создан"
 				],
 				"en" => [
@@ -503,14 +505,13 @@ $msg = lang();
 				$this->num_blocks = 1;
 				$this->sync = time();
 				$fd = fopen($this->path, 'rb');
-				$this->process_file($fd, $this->path);
+				$this->process_file($fd, fstat($fd)["size"], $this->path);
 				fclose($fd);
 			}
 
-			private function process_file($fd, $filename = "")
+			private function process_file($fd, $file_size, $filename = "")
 			{
 				global $msg;
-				$file_size = fstat($fd)["size"];
 
 				while (!feof($fd)) {
 					$blocks = [];
