@@ -10,12 +10,12 @@ $msg = lang();
 //Main
 
 	// Check for arguments
-	if ($argc <= 2 || !in_array($argv[1], ["e", "d", "c"])) {
-		die($msg["main"]);
+	if ($argc <= 2 || !in_array($argv[1], ['e', 'd', 'c'])) {
+		die($msg['main']);
 	}
 
 		// Extract hashes
-		if ($argv[1] == "e") {
+		if ($argv[1] == 'e') {
 			foreach (array_slice($argv, 2) as $file) {
 
 				$torrent = [];
@@ -29,27 +29,27 @@ $msg = lang();
 
 				$torrent_size = 0;	$filec = 0; // Size&File count
 
-				cli_set_process_title($msg["cli_hash_extraction"] . "  —  $file");
+				cli_set_process_title($msg['cli_hash_extraction'] . "  —  $file");
 				
-				echo "\r\n\r\n — {$msg["file_location"]}: $file —\r\n";
+				echo "\r\n\r\n — {$msg['file_location']}: $file —\r\n";
 				
-				if (isset($torrent["info"]["name"])) { // BEP 0052
-					echo " — {$msg["torrent_title"]}: " . $torrent["info"]["name"] . " — \r\n";
+				if (isset($torrent['info']['name'])) { // BEP 0052
+					echo " — {$msg['torrent_title']}: " . $torrent['info']['name'] . " — \r\n";
 				}
 				
-				if (isset($torrent["creation date"], $torrent["created by"])) {
-					echo " — {$msg["created_by_client"]}: " . $torrent["created by"] . " (" . date("d M Y | G:i:s T", $torrent["creation date"]) . ") — \r\n";
+				if (isset($torrent['creation date'], $torrent['created by'])) {
+					echo " — {$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ") — \r\n";
 				}
 				
-				printFiles($torrent["info"]["file tree"]); // Passing the dictionary of all files
-				echo "\r\n{$msg["total_files"]}: $filec (" . formatBytes($torrent_size) . ")\r\n";
+				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
+				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n";
 			}
 
 			error_status();
 		}
 
 		// Find duplicates; be aware that duplicates inside single .torrent file are also shown
-		if ($argv[1] == "d") {
+		if ($argv[1] == 'd') {
 			foreach (array_slice($argv, 2) as $file) {
 
 				$torrent = [];
@@ -61,14 +61,14 @@ $msg = lang();
 					continue;
 				}
 
-				$file_tree_array["  $file:  "] = $torrent["info"]["file tree"];
+				$file_tree_array["  $file:  "] = $torrent['info']['file tree'];
 			}
 
 			if (!empty($file_tree_array)) {
 				$torrent_size = 0;	$filec = 0;
 				combine_keys($file_tree_array, $hashes);
 				unset($file_tree_array);
-				cli_set_process_title($msg["cli_dup_search"]);
+				cli_set_process_title($msg['cli_dup_search']);
 				compare();
 			}
 
@@ -76,15 +76,15 @@ $msg = lang();
 		}
 
 
-		// Calculate Merkle Root Hash
-		if ($argv[1] == "c") {
+		// Calculate BTMR (BitTorrent Merkle Root) hash
+		if ($argv[1] == 'c') {
 			foreach (array_slice($argv, 2) as $file) {
 
 				if (is_file($file) && filesize($file) !== 0) {
 					$hash = new HasherV2($file, 2**14);
-					echo "\r\n $file\r\n{$msg["root_hash"]}: " . bin2hex($hash->root) . "\r\n\r\n";
+					echo "\r\n $file\r\n{$msg['root_hash']}: " . bin2hex($hash->root) . "\r\n\r\n";
 				} else{
-					$err_status[$file] = $msg["noraw"];
+					$err_status[$file] = $msg['noraw'];
 				}
 			}
 
@@ -98,75 +98,75 @@ $msg = lang();
 		function lang()
 		{
 			global $argv;
-			$version = "2.3g"; // Code name: Gribovskaya (Mushroom Pumpkin)
+			$version = '2.3g'; // Code name: Gribovskaya (Mushroom Pumpkin)
 			$strings = [
-				"ru" => [
-					"main" => "\r\nСинтаксис:\r\n\r\n\r\n tmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\n tmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\n tmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
-					"noraw" => "Укажите расположение файла, он не должен быть пустым.",
-					"invalid_torrent" => "Неопознанный .torrent файл.",
-					"no_v2" => "Торрент файл не содержит признаки v2 / гибрида.\r\nЗаметка: Торренты v1 протокола не поддерживают привязку хешей файлов.",
-					"root_hash" => "Хеш",
-					"calculation" => "Вычисление",
-					"torrent_title" => "Название раздачи",
-					"file_location" => "Файл",
-					"unfinished_files" => "Необработанные файлы",
-					"error_type" => "Ошибка",
-					"no_duplicates" => "Дубликаты не найдены.",
-					"dup_found" => "найден в",
-					"total_files" => "Количество файлов",
-					"total_dup_files" => "Количество дубликатов",
-					"cli_dup_search" => "Поиск дубликатов",
-					"cli_hash_extraction" => "Извлечение хешей",
-					"cli_hash_calculation" => "Вычисление хеша",
-					"magnet_proposal" => "Создать магнит ссылку для загрузки раздачи без дубликатов? Да (d) | Нет (n) : ",
-					"magnet_copy" => "Скопируйте магнит ссылку в торрент клиент.",
-					"created_by_client" => "Создан"
+				'ru' => [
+					'main' => "\r\nСинтаксис:\r\n\r\n\r\n tmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\n tmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\n tmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
+					'noraw' => 'Укажите расположение файла, он не должен быть пустым.',
+					'invalid_torrent' => 'Неопознанный .torrent файл.',
+					'no_v2' => 'Торрент файл не содержит признаки v2 / гибрида.\r\nЗаметка: Торренты v1 протокола не поддерживают привязку хешей файлов.',
+					'root_hash' => 'Хеш',
+					'calculation' => 'Вычисление',
+					'torrent_title' => 'Название раздачи',
+					'file_location' => 'Файл',
+					'unfinished_files' => 'Необработанные файлы',
+					'error_type' => 'Ошибка',
+					'no_duplicates' => 'Дубликаты не найдены.',
+					'dup_found' => 'найден в',
+					'total_files' => 'Количество файлов',
+					'total_dup_files' => 'Количество дубликатов',
+					'cli_dup_search' => 'Поиск дубликатов',
+					'cli_hash_extraction' => 'Извлечение хешей',
+					'cli_hash_calculation' => 'Вычисление хеша',
+					'magnet_proposal' => 'Создать магнит ссылку для загрузки раздачи без дубликатов? Да (d) | Нет (n) : ',
+					'magnet_copy' => 'Скопируйте магнит ссылку в торрент клиент.',
+					'created_by_client' => 'Создан'
 				],
-				"en" => [
-					"main" => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
-					"noraw" => "This is not a valid file, is it empty?",
-					"invalid_torrent" => "Invalid torrent file.",
-					"no_v2" => "This is an invalid v2 / hybrid torrent.\r\nNote: v1 protocol torrents do not support embedding file hashes.",
-					"root_hash" => "Hash",
-					"calculation" => "Processing",
-					"torrent_title" => "Name",
-					"file_location" => "File",
-					"unfinished_files" => "Unprocessed files",
-					"error_type" => "Error type",
-					"no_duplicates" => "No duplicates were found.",
-					"dup_found" => "found in",
-					"total_files" => "Total files",
-					"total_dup_files" => "Duplicate count",
-					"cli_dup_search" => "Searching for duplicates",
-					"cli_hash_extraction" => "Extracting file hashes",
-					"cli_hash_calculation" => "Calculating the hash of",
-					"magnet_proposal" => "Create a magnet download link without duplicates? Yes (y) | No (n) : ",
-					"magnet_copy" => "Paste this magnet link into your torrent client.",
-					"created_by_client" => "Created by"
+				'en' => [
+					'main' => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+					'noraw' => 'This is not a valid file, is it empty?',
+					'invalid_torrent' => 'Invalid torrent file.',
+					'no_v2' => 'This is an invalid v2 / hybrid torrent.\r\nNote: v1 protocol torrents do not support embedding file hashes.',
+					'root_hash' => 'Hash',
+					'calculation' => 'Processing',
+					'torrent_title' => 'Name',
+					'file_location' => 'File',
+					'unfinished_files' => 'Unprocessed files',
+					'error_type' => 'Error type',
+					'no_duplicates' => 'No duplicates were found.',
+					'dup_found' => 'found in',
+					'total_files' => 'Total files',
+					'total_dup_files' => 'Duplicate count',
+					'cli_dup_search' => 'Searching for duplicates',
+					'cli_hash_extraction' => 'Extracting file hashes',
+					'cli_hash_calculation' => 'Calculating the hash of',
+					'magnet_proposal' => 'Create a magnet download link without duplicates? Yes (y) | No (n) : ',
+					'magnet_copy' => 'Paste this magnet link into your torrent client.',
+					'created_by_client' => 'Created by'
 				]
 			];
 
-			$ru_file = __DIR__  . "/ru"; 
+			$ru_file = __DIR__  . '/ru'; 
 
 			// Great and mighty, free and sincere Russian language.
 			// I.S. Turgenev's poem (1882)
 
-			if (@$argv[1] == "locale") {
+			if (@$argv[1] == 'locale') {
 				switch (@$argv[2]) {
-					case "en":
+					case 'en':
 						@unlink($ru_file);
-						die("Language changed to English.");
+						die('Language changed to English.');
 
-					case "ru":
-						file_put_contents($ru_file, "");
-						die("Язык был изменён на русский.");
+					case 'ru':
+						file_put_contents($ru_file, '');
+						die('Язык был изменён на русский.');
 				}
 			}
 
 			if (!file_exists($ru_file)) {
-				return $strings["en"];
+				return $strings['en'];
 			} else{
-				return $strings["ru"];
+				return $strings['ru'];
 			}
 		}
 
@@ -285,40 +285,40 @@ $msg = lang();
 		{
 			global $torrent, $msg, $err_status;
 
-			if (!isset($torrent["info"])) {
-				$err_status[$file] = $msg["invalid_torrent"];
+			if (!isset($torrent['info'])) {
+				$err_status[$file] = $msg['invalid_torrent'];
 				return false;
 			}
 
-			if (($torrent["info"]["meta version"] ?? null) !== 2 || !isset($torrent["info"]["file tree"])) { // BEP 0052
+			if (($torrent['info']['meta version'] ?? null) !== 2 || !isset($torrent['info']['file tree'])) { // BEP 0052
 
-				$title = "";
-				$client_date = "";
-				if (isset($torrent["info"]["name"])) {
-					$title = "\r\n{$msg["torrent_title"]}: " . $torrent["info"]["name"];
+				$title = '';
+				$client_date = '';
+				if (isset($torrent['info']['name'])) {
+					$title = "\r\n{$msg['torrent_title']}: " . $torrent['info']['name'];
 				}
 				
-				if (isset($torrent["creation date"], $torrent["created by"])) {
-					$client_date =  "\r\n{$msg["created_by_client"]}: " . $torrent["created by"] . " (" . date("d M Y | G:i:s T", $torrent["creation date"]) . ")";
+				if (isset($torrent['creation date'], $torrent['created by'])) {
+					$client_date =  "\r\n{$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ')';
 				}
 				
-				$err_status[$file . $title . $client_date] = $msg["no_v2"];
+				$err_status[$file . $title . $client_date] = $msg['no_v2'];
 				return false;
 			}
 			return true;
 		}
 
 		// Loop through all arrays saving locations and showing result
-		function printFiles($array, $parent = "")
+		function printFiles($array, $parent = '')
 		{
 			global $msg, $torrent_size, $filec;
 			foreach ($array as $key => $value) {
-				$current = $parent . "/" . $key;
+				$current = $parent . '/' . $key;
 				if (is_array($value) && !empty($key)) {
 					printFiles($value, $current);
 				} else{
-					$length = &$value["length"];
-					echo "\r\n  " . substr($current, 1, -1) . ' (' . formatBytes($length) . ")\r\n {$msg["root_hash"]}: " . bin2hex($value["pieces root"]) . "\r\n";
+					$length = &$value['length'];
+					echo "\r\n  " . substr($current, 1, -1) . ' (' . formatBytes($length) . ")\r\n {$msg['root_hash']}: " . bin2hex($value['pieces root']) . "\r\n";
 					$torrent_size += $length;
 					++$filec;
 				}
@@ -328,19 +328,19 @@ $msg = lang();
 		// Comparator functions
 
 		//Extract and combine hashes in one array
-		function combine_keys($array, &$hashes, $parent_key = "")
+		function combine_keys($array, &$hashes, $parent_key = '')
 		{
 			global $torrent_size, $filec;
 			foreach ($array as $key => $value) {
-				$current_key = $parent_key . "/" . $key;
+				$current_key = $parent_key . '/' . $key;
 				if (is_array($value) && !empty($key)) {
 					combine_keys($value, $hashes, $current_key);
 				} else{
-					$length = &$value["length"];
+					$length = &$value['length'];
 					$hashes[substr($current_key, 1, -1)] = [
-						"hash" => bin2hex($value["pieces root"]) . " (" . formatBytes($length) . ")",
-						"size" => $length,
-						"pos" => $filec
+						'hash' => bin2hex($value['pieces root']) . ' (' . formatBytes($length) . ')',
+						'size' => $length,
+						'pos' => $filec
 					];
 					$torrent_size += $length;
 					++$filec;
@@ -351,16 +351,16 @@ $msg = lang();
 		//Create an array and find duplicates
 		function compare()
 		{
-			global $msg, $hashes, $torrent_size, $magnet, $filec, $argc;
+			global $msg, $hashes, $torrent_size, $filec, $magnet, $argc;
 			$dups_size = 0;
 			foreach ($hashes as $key => $value) {
-				$hash = &$value["hash"];
+				$hash = &$value['hash'];
 				if (isset($keys[$hash])) {
 					$keys[$hash][] = $key;
-					$dups_size += $value["size"];
+					$dups_size += $value['size'];
 				} else{
 					$keys[$hash] = [$key];
-					$magnet["indices"][] = $value["pos"];
+					$magnet['indices'][] = $value['pos'];
 				}
 			}
 
@@ -372,7 +372,7 @@ $msg = lang();
 				foreach ($keys as $key => $value) {
 					$count = count($value);
 					if ($count > 1) {
-						echo "\r\n {$msg["root_hash"]} " . $key . " {$msg["dup_found"]}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
+						echo "\r\n {$msg['root_hash']} " . $key . " {$msg['dup_found']}:\r\n\r\n" . implode("\r\n", $value) . "\r\n\r\n";
 						$filed += $count;
 						++$dup_hashes;
 					}
@@ -380,15 +380,15 @@ $msg = lang();
 			}
 
 			if (empty($dup_hashes)) {
-				echo "\r\n " . $msg["no_duplicates"] . "\r\n\r\n" . $msg["total_files"] . ": $filec (" . formatBytes($torrent_size) . ")\r\n";
+				echo "\r\n " . $msg['no_duplicates'] . "\r\n\r\n" . $msg['total_files'] . ": $filec (" . formatBytes($torrent_size) . ")\r\n";
 			} else{
-				echo "{$msg["total_files"]}: $filec (" . formatBytes($torrent_size) . ")\r\n{$msg["total_dup_files"]}: " . ($filed - $dup_hashes) . " (" . formatBytes($dups_size) . ")";
+				echo "{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n{$msg['total_dup_files']}: " . ($filed - $dup_hashes) . ' (' . formatBytes($dups_size) . ')';
 
 				if ($argc < 4) {
 
-					echo " | " . round(($dups_size / $torrent_size) * 100, 2) . "%\r\n";
+					echo ' | ' . round(($dups_size / $torrent_size) * 100, 2) . "%\r\n";
 
-					cli_set_process_title($msg["magnet_proposal"]);
+					cli_set_process_title($msg['magnet_proposal']);
 					ob_end_flush();	
 
 
@@ -398,10 +398,10 @@ $msg = lang();
 					$clear_cli = "\033[2A" . "\033[2K"; // Escape symbols
 
 					if ($cli_output) {
-						echo "\r\n	" . $msg["magnet_proposal"] . "\r\n	";
+						echo "\r\n	" . $msg['magnet_proposal'] . "\r\n	";
 					}
 
-					$acceptance_symbol = ["y", "d"];
+					$acceptance_symbol = ['y', 'd'];
 					$handle = strtolower(fgets(fopen('php://stdin', 'r')));
 
 					if (in_array(trim($handle), $acceptance_symbol) || $handle == PHP_EOL) {
@@ -412,14 +412,14 @@ $msg = lang();
 
 						echo "\r\n" . $magnetL . "\r\n";
 
-						if (PHP_OS_FAMILY == "Windows" && $cli_output) {
+						if (PHP_OS_FAMILY == 'Windows' && $cli_output) {
 							$command = 'start "" "' . $magnetL . '"';
 							if (strlen($command) <= 8191) { // Windows command length limit
 								@exec($command);
 							} else{
-								echo "\r\n " . $msg["magnet_copy"] . "\r\n";
+								echo "\r\n " . $msg['magnet_copy'] . "\r\n";
 							}
-						} elseif (PHP_OS_FAMILY == "Linux" && $cli_output) {
+						} elseif (PHP_OS_FAMILY == 'Linux' && $cli_output) {
 							$command = 'xdg-open "" "' . $magnetL . '"';
 							@exec($command);
 						}
@@ -437,49 +437,49 @@ $msg = lang();
 		{
 			global $magnet, $torrent;
 
-			$indices = "&so=" . formatSeq($magnet["indices"]); // BEP 0053
+			$indices = '&so=' . formatSeq($magnet['indices']); // BEP 0053
 
-			$trackers = "";
-			if (isset($torrent["announce"]) && !isset($torrent["announce-list"])) {
-				$trackers = "&tr=" . urlencode($torrent["announce"]);
+			$trackers = '';
+			if (isset($torrent['announce']) && !isset($torrent['announce-list'])) {
+				$trackers = '&tr=' . urlencode($torrent['announce']);
 			}
 
-			if (isset($torrent["announce-list"])) {
-				$tracker_list = &$torrent["announce-list"];
+			if (isset($torrent['announce-list'])) {
+				$tracker_list = &$torrent['announce-list'];
 				if (count($tracker_list[0]) > 1) {
-					$trackers .= "&tr=" . implode('&tr=', array_map('urlencode', $tracker_list[0]));
+					$trackers .= '&tr=' . implode('&tr=', array_map('urlencode', $tracker_list[0]));
 				}
 				else{
 					foreach ($tracker_list as $value) {
-						$trackers .= "&tr=" . urlencode($value[0]); // For tracker lists created with additional space separations
+						$trackers .= '&tr=' . urlencode($value[0]); // For tracker lists created with additional space separations
 					}
 				}
 			}
 
-			$web_seeds = "";
-			if (isset($torrent["url-list"])) {
-				$url_list = &$torrent["url-list"];
+			$web_seeds = '';
+			if (isset($torrent['url-list'])) {
+				$url_list = &$torrent['url-list'];
 				if (!is_array($url_list)) {
-					$web_seeds = "&ws=" . urlencode($url_list);
+					$web_seeds = '&ws=' . urlencode($url_list);
 				} else{
 					foreach ($url_list as $value) {
-						$web_seeds .= "&ws=" . urlencode($value);
+						$web_seeds .= '&ws=' . urlencode($value);
 					}
 				}
 			}
 
-			$name = "";
-			if (isset($torrent["info"]["name"])) {
-				$name = "&dn=" . urlencode($torrent["info"]["name"]);
+			$name = '';
+			if (isset($torrent['info']['name'])) {
+				$name = '&dn=' . urlencode($torrent['info']['name']);
 			}
 
-			$bencoded = bencode_encode($torrent["info"]);
-			$bt_v1 = "";
-			if (isset($torrent["info"]["pieces"])) { // Hybrid torrent
-				$bt_v1 = "&xt=urn:btih:" . hash("sha1", $bencoded);
+			$bencoded_string = bencode_encode($torrent['info']);
+			$bt_v1 = '';
+			if (isset($torrent['info']['pieces'])) { // Hybrid torrent
+				$bt_v1 = '&xt=urn:btih:' . hash('sha1', $bencoded_string);
 			}
-			$bt_v2 = hash("sha256", $bencoded);
-			$hash = "magnet:?xt=urn:btmh:1220" . $bt_v2 . $bt_v1;
+			$bt_v2 = hash('sha256', $bencoded_string);
+			$hash = 'magnet:?xt=urn:btmh:1220' . $bt_v2 . $bt_v1;
 			
 			return $hash . $name . $trackers . $web_seeds . $indices;
 		}
@@ -505,11 +505,11 @@ $msg = lang();
 				$this->num_blocks = 1;
 				$this->sync = time();
 				$fd = fopen($this->path, 'rb');
-				$this->process_file($fd, fstat($fd)["size"], $this->path);
+				$this->process_file($fd, fstat($fd)['size'], $this->path);
 				fclose($fd);
 			}
 
-			private function process_file($fd, $file_size, $filename = "")
+			private function process_file($fd, $file_size, $filename = '')
 			{
 				global $msg;
 
@@ -519,7 +519,7 @@ $msg = lang();
 
 					if (time() > $this->sync) { // Show percentage status
 						$percent = round((ftell($fd) / $file_size) * 100);
-						cli_set_process_title("{$msg["calculation"]} $percent%  —  $filename");
+						cli_set_process_title("{$msg['calculation']} $percent%  —  $filename");
 						$this->sync = time();
 					}
 
@@ -616,14 +616,14 @@ $msg = lang();
 
 				if ($index === $count - 1 || $numbers[$index + 1] - $number !== 1) {
 					if ($sequenceStart !== $number) {
-						$sequences[] = $sequenceStart . "-" . $number;
+						$sequences[] = $sequenceStart . '-' . $number;
 					} else{
 						$sequences[] = $number;
 					}
 				}
 			}
 
-			return implode(",", $sequences);
+			return implode(',', $sequences);
 		}
 
 		// Error handler
@@ -633,10 +633,10 @@ $msg = lang();
 
 			if (!empty($err_status)) {
 
-				echo "\r\n\r\n--- {$msg["unfinished_files"]}: ---\r\n";
+				echo "\r\n\r\n--- {$msg['unfinished_files']}: ---\r\n";
 
 				foreach ($err_status as $key => $value) {
-					echo "\r\n{$msg["file_location"]}: $key \r\n" . "{$msg["error_type"]}: $value\r\n\r\n";
+					echo "\r\n{$msg['file_location']}: $key \r\n" . "{$msg['error_type']}: $value\r\n\r\n";
 
 				}
 			}
