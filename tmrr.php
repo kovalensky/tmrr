@@ -208,7 +208,7 @@ $msg = lang();
 				while ($currentChar !== 'e') {
 					$value = bencode_decode($data, $pos);
 					if ($value === null) {
-					break;
+						break;
 					}
 					$return[] = $value;
 				}
