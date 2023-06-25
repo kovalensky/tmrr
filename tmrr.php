@@ -480,13 +480,14 @@ $msg = lang();
 			}
 
 			$bencoded_string = bencode_encode($torrent['info']);
+
 			$bt_v1 = '';
 			if (isset($torrent['info']['pieces'])) { // Hybrid torrent
 				$bt_v1 = '&xt=urn:btih:' . hash('sha1', $bencoded_string);
 			}
 			$bt_v2 = hash('sha256', $bencoded_string);
 			$hash = 'magnet:?xt=urn:btmh:1220' . $bt_v2 . $bt_v1;
-			
+
 			return $hash . $name . $trackers . $web_seeds . $indices;
 		}
 
@@ -560,7 +561,7 @@ $msg = lang();
 				}
 				$this->root = $this->merkle_root($this->layer_hashes);
 			}
-			
+
 			private function merkle_root($blocks)
 			{
 				if (count($blocks) > 0) {
@@ -580,7 +581,7 @@ $msg = lang();
 				}
 				return $blocks;
 			}
-		
+
 			private function next_power_2($value)
 			{
 				if (!($value & ($value - 1)) && $value) {
