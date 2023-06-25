@@ -30,17 +30,17 @@ $msg = lang();
 				$torrent_size = 0;	$filec = 0; // Size&File count
 
 				cli_set_process_title($msg['cli_hash_extraction'] . "  —  $file");
-				
+
 				echo "\r\n\r\n — {$msg['file_location']}: $file —\r\n";
-				
+
 				if (isset($torrent['info']['name'])) { // BEP 0052
 					echo " — {$msg['torrent_title']}: " . $torrent['info']['name'] . " — \r\n";
 				}
-				
+
 				if (isset($torrent['creation date'], $torrent['created by'])) {
 					echo " — {$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ") — \r\n";
 				}
-				
+
 				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
 				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n";
 			}
