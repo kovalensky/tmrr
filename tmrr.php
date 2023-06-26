@@ -104,13 +104,15 @@ $msg = lang();
 					'main' => "\r\nСинтаксис:\r\n\r\n\r\n tmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\n tmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\n tmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
 					'noraw' => 'Укажите расположение файла, он не должен быть пустым.',
 					'invalid_torrent' => 'Неопознанный .torrent файл.',
-					'no_v2' => "Торрент файл не содержит признаки v2 / гибрида.\r\nЗаметка: Торренты v1 протокола не поддерживают привязку хешей файлов.",
+					'no_v2' => 'Торрент файл не содержит признаки v2 / гибрида.',
+					'hint_v1' => 'Торренты v1 протокола не поддерживают привязку хешей файлов.',
 					'root_hash' => 'Хеш',
 					'calculation' => 'Вычисление',
 					'torrent_title' => 'Название раздачи',
 					'file_location' => 'Файл',
 					'unfinished_files' => 'Необработанные файлы',
 					'error_type' => 'Ошибка',
+					'note' => 'Заметка',
 					'no_duplicates' => 'Дубликаты не найдены.',
 					'dup_found' => 'найден в',
 					'total_files' => 'Количество файлов',
@@ -126,13 +128,15 @@ $msg = lang();
 					'main' => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 					'noraw' => 'This is not a valid file, is it empty?',
 					'invalid_torrent' => 'Invalid torrent file.',
-					'no_v2' => "This is an invalid v2 / hybrid torrent.\r\nNote: v1 protocol torrents do not support embedding file hashes.",
+					'no_v2' => 'This is an invalid v2 / hybrid torrent.',
+					'hint_v1' => 'v1 protocol torrents do not support embedding file hashes.',
 					'root_hash' => 'Hash',
 					'calculation' => 'Processing',
 					'torrent_title' => 'Name',
 					'file_location' => 'File',
 					'unfinished_files' => 'Unprocessed files',
 					'error_type' => 'Error type',
+					'note' => 'Note',
 					'no_duplicates' => 'No duplicates were found.',
 					'dup_found' => 'found in',
 					'total_files' => 'Total files',
@@ -295,6 +299,7 @@ $msg = lang();
 				$title = '';
 				$client_date = '';
 				$hash_v1 = '';
+				$hint_v1 = '';
 
 				if (isset($torrent['info']['name'])) {
 					$title = "\r\n{$msg['torrent_title']}: " . $torrent['info']['name'];
@@ -308,7 +313,11 @@ $msg = lang();
 					$hash_v1 = "\r\n{$msg['root_hash']}: " . hash('sha1', bencode_encode($torrent['info']));
 				}
 
-				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'];
+				if (!isset($torrent['info']['meta version'])) {
+					$hint_v1 = "\r\n{$msg['note']}: {$msg['hint_v1']}";
+				}
+
+				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $hint_v1;
 				return false;
 			}
 			return true;
