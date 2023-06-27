@@ -296,10 +296,8 @@ $msg = lang();
 
 			if (($torrent['info']['meta version'] ?? null) !== 2 || !isset($torrent['info']['file tree'])) { // BEP 0052
 
-				$title = '';
-				$client_date = '';
-				$hash_v1 = '';
-				$hint_v1 = '';
+				$title = '';	$client_date = '';
+				$hash_v1 = '';	$hint_v1 = '';
 
 				if (isset($torrent['info']['name'])) {
 					$title = "\r\n{$msg['torrent_title']}: " . $torrent['info']['name'];
@@ -309,7 +307,7 @@ $msg = lang();
 					$client_date =  "\r\n{$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ')';
 				}
 
-				if (isset($torrent['info']['pieces'])) {
+				if (isset($torrent['info']['pieces']) && !isset($torrent['info']['meta version'])) {
 					$hash_v1 = "\r\n{$msg['root_hash']}: " . hash('sha1', bencode_encode($torrent['info']));
 				}
 
