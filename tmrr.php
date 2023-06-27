@@ -307,7 +307,7 @@ $msg = lang();
 					$client_date =  "\r\n{$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ')';
 				}
 
-				if (isset($torrent['info']['pieces']) && !isset($torrent['info']['meta version'])) {
+				if (isset($torrent['info']['pieces'])) {
 					$hash_v1 = "\r\n{$msg['root_hash']}: " . hash('sha1', bencode_encode($torrent['info']));
 				}
 
@@ -318,6 +318,7 @@ $msg = lang();
 				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $hint_v1;
 				return false;
 			}
+
 			return true;
 		}
 
