@@ -155,8 +155,8 @@ $msg = lang();
 			// Great and mighty, free and sincere Russian language.
 			// I.S. Turgenev's poem (1882)
 
-			if (@$argv[1] == 'locale') {
-				switch (@$argv[2]) {
+			if (($argv[1] ?? null) == 'locale') {
+				switch ($argv[2] ?? null) {
 					case 'en':
 						@unlink($ru_file);
 						die('Language changed to English.');
