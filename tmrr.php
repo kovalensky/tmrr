@@ -150,7 +150,7 @@ $msg = lang();
 				]
 			];
 
-			$ru_file = __DIR__  . '/ru'; 
+			$ru_file = __DIR__  . '/ru';
 
 			// Great and mighty, free and sincere Russian language.
 			// I.S. Turgenev's poem (1882)
@@ -403,7 +403,7 @@ $msg = lang();
 					echo ' | ' . round(($dups_size / $torrent_size) * 100, 2) . "%\r\n";
 
 					cli_set_process_title($msg['magnet_proposal']);
-					ob_end_flush();	
+					ob_end_flush();
 
 
 					// Magnet handler
