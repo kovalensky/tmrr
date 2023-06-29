@@ -101,7 +101,7 @@ $msg = lang();
 			$version = '2.3g'; // Code name: Gribovskaya (Mushroom Pumpkin)
 			$strings = [
 				'ru' => [
-					'main' => "\r\nСинтаксис:\r\n\r\n\r\n tmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\n tmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\n tmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Синтаксис поддерживает передачу нескольких файлов, как <файл1> <файл2>.. <файлN> для всех команд.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
+					'main' => "\r\nСинтаксис:\r\n\r\n\r\n tmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\n tmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\n tmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Поддерживается пакетная обработка, как <файл1> <файл2>.. <файлN>.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
 					'noraw' => 'Укажите расположение файла, он не должен быть пустым.',
 					'invalid_torrent' => 'Неопознанный .torrent файл.',
 					'no_v2' => 'Торрент файл не содержит признаки v2 / гибрида.',
@@ -125,7 +125,7 @@ $msg = lang();
 					'created_by_client' => 'Создан'
 				],
 				'en' => [
-					'main' => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Syntax is supported for multiple files, as <file1> <file2>.. <fileN> for all commands accordingly.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+					'main' => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Batch processing is supported, such as <file1> <file2>.. <fileN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 					'noraw' => 'This is not a valid file, is it empty?',
 					'invalid_torrent' => 'Invalid torrent file.',
 					'no_v2' => 'This is an invalid v2 / hybrid torrent.',
