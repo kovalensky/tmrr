@@ -426,17 +426,19 @@ $msg = lang();
 
 						echo "\r\n" . $magnetL . "\r\n";
 
-						if (PHP_OS_FAMILY == 'Windows' && $cli_output) {
-							$command = 'start "" "' . $magnetL . '"';
-							if (strlen($command) <= 8191) { // Windows command length limit
+						if ($cli_output) {
+							if (PHP_OS_FAMILY == 'Windows') {
+								$command = 'start "" "' . $magnetL . '"';
+								if (strlen($command) <= 8191) { // Windows command length limit
+									@exec($command);
+								} else{
+									echo "\r\n " . $msg['magnet_copy'] . "\r\n";
+								}
+							} elseif (PHP_OS_FAMILY == 'Linux') {
+								$command = 'xdg-open "" "' . $magnetL . '"';
 								@exec($command);
-							} else{
-								echo "\r\n " . $msg['magnet_copy'] . "\r\n";
 							}
-						} elseif (PHP_OS_FAMILY == 'Linux' && $cli_output) {
-							$command = 'xdg-open "" "' . $magnetL . '"';
-							@exec($command);
-						}
+					}
 					} elseif ($cli_output) {
 						echo $clear_cli . "\033[1B" . "\033[2K";
 					}
