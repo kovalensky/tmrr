@@ -27,8 +27,6 @@ $msg = lang();
 					continue;
 				}
 
-				$torrent_size = 0;	$filec = 0; // Size&File count
-
 				cli_set_process_title($msg['cli_hash_extraction'] . "  —  $file");
 
 				echo "\r\n\r\n — {$msg['file_location']}: $file —\r\n";
@@ -65,7 +63,6 @@ $msg = lang();
 			}
 
 			if (!empty($file_tree_array)) {
-				$torrent_size = 0;	$filec = 0;
 				combine_keys($file_tree_array, $hashes);
 				unset($file_tree_array);
 				cli_set_process_title($msg['cli_dup_search']);
@@ -75,13 +72,12 @@ $msg = lang();
 			error_status();
 		}
 
-
 		// Calculate BTMR (BitTorrent Merkle Root) hash
 		if ($argv[1] == 'c') {
 			foreach (array_slice($argv, 2) as $file) {
 
 				if (is_file($file) && filesize($file) !== 0) {
-					$hash = new HasherV2($file, 2**14);
+					$hash = new HasherV2($file, 2**14); // 16KiB blocks
 					echo "\r\n $file\r\n{$msg['root_hash']}: " . bin2hex($hash->root) . "\r\n\r\n";
 				} else{
 					$err_status[$file] = $msg['noraw'];
@@ -164,6 +160,7 @@ $msg = lang();
 					case 'ru':
 						file_put_contents($ru_file, '');
 						die('Язык был изменён на русский.');
+
 				}
 			}
 
@@ -225,6 +222,7 @@ $msg = lang();
 				if ($return < 0) {
 					return null;
 				}
+
 				$pos += $digits + 1;
 			} else{
 				$digits = strpos($data, ':', $pos) - $pos;
@@ -235,7 +233,6 @@ $msg = lang();
 
 				$pos += ($digits + 1);
 				$return = substr($data, $pos, $len);
-
 				if (strlen($return) != $len) {
 					return null;
 				}
@@ -246,6 +243,7 @@ $msg = lang();
 			if ($start_decode && $pos !== $data_len) {
 				return null;
 			}
+
 			return $return;
 		}
 
