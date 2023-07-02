@@ -64,7 +64,7 @@ $msg = lang();
 
 			if (!empty($file_tree_array)) {
 				combine_keys($file_tree_array, $hashes);
-				unset($file_tree_array);
+				unset($file_tree_array, $torrent);
 				cli_set_process_title($msg['cli_dup_search']);
 				compare();
 			}
