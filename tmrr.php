@@ -64,7 +64,7 @@ $msg = lang();
 
 			if (!empty($file_tree_array)) {
 				combine_keys($file_tree_array, $hashes);
-				unset($file_tree_array, $torrent);
+				unset($file_tree_array);
 				cli_set_process_title($msg['cli_dup_search']);
 				compare();
 			}
@@ -352,7 +352,7 @@ $msg = lang();
 					$hashes[substr($current_key, 1, -1)] = [
 						'hash' => bin2hex($value['pieces root'] ?? '') . ' (' . formatBytes($length) . ')',
 						'size' => $length,
-						'pos' => $filec
+						'pos' => $filec ?? 0
 					];
 					$torrent_size += $length;
 					++$filec;
