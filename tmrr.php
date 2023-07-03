@@ -174,6 +174,7 @@ $msg = lang();
 		{
 			$data_len = strlen($data);
 			$start_decode = ($pos === 0);
+
 			if ($start_decode && (!is_string($data) || $data_len == 0)) {
 				return null;
 			}
@@ -292,8 +293,7 @@ $msg = lang();
 
 			if (($torrent['info']['meta version'] ?? null) !== 2 || !isset($torrent['info']['file tree'])) { // BEP 0052
 
-				$title = '';	$client_date = '';
-				$hash_v1 = '';	$hint_v1 = '';
+				$title = $client_date = $hash_v1 = $note_v1 = '';
 
 				if (isset($torrent['info']['name'])) {
 					$title = "\r\n{$msg['torrent_title']}: " . $torrent['info']['name'];
@@ -308,10 +308,11 @@ $msg = lang();
 				}
 
 				if (!isset($torrent['info']['meta version'])) {
-					$hint_v1 = "\r\n{$msg['note']}: {$msg['hint_v1']}";
+					$note_v1 = "\r\n{$msg['note']}: {$msg['hint_v1']}";
 				}
 
-				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $hint_v1;
+				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $note_v1;
+
 				return false;
 			}
 
@@ -327,7 +328,7 @@ $msg = lang();
 				if (is_array($value) && !empty($key)) {
 					printFiles($value, $current);
 				} else{
-					$length = &$value['length'];
+					$length = $value['length'];
 					echo "\r\n  " . substr($current, 1, -1) . ' (' . formatBytes($length) . ")\r\n {$msg['root_hash']}: " . bin2hex($value['pieces root'] ?? '') . "\r\n";
 					$torrent_size += $length;
 					++$filec;
@@ -346,7 +347,7 @@ $msg = lang();
 				if (is_array($value) && !empty($key)) {
 					combine_keys($value, $hashes, $current_key);
 				} else{
-					$length = &$value['length'];
+					$length = $value['length'];
 					$hashes[substr($current_key, 1, -1)] = [
 						'hash' => bin2hex($value['pieces root'] ?? '') . ' (' . formatBytes($length) . ')',
 						'size' => $length,
@@ -364,7 +365,7 @@ $msg = lang();
 			global $msg, $hashes, $torrent_size, $filec, $magnet, $argc;
 			$dups_size = 0;
 			foreach ($hashes as $key => $value) {
-				$hash = &$value['hash'];
+				$hash = $value['hash'];
 				if (isset($keys[$hash])) {
 					$keys[$hash][] = $key;
 					$dups_size += $value['size'];
@@ -430,12 +431,14 @@ $msg = lang();
 								} else{
 									echo "\r\n " . $msg['magnet_copy'] . "\r\n";
 								}
-							} elseif (PHP_OS_FAMILY == 'Linux') {
+							}
+							elseif (PHP_OS_FAMILY == 'Linux') {
 								$command = 'xdg-open "" "' . $magnetL . '"';
 								@exec($command);
 							}
+						}
 					}
-					} elseif ($cli_output) {
+					elseif ($cli_output) {
 						echo $clear_cli . "\033[1B" . "\033[2K";
 					}
 				} else{
@@ -451,7 +454,8 @@ $msg = lang();
 
 			$indices = '&so=' . formatSeq($magnet['indices']); // BEP 0053
 
-			$trackers = '';
+			$name = $trackers = $web_seeds = $bt_v1 = '';
+
 			if (isset($torrent['announce']) && !isset($torrent['announce-list'])) {
 				$trackers = '&tr=' . urlencode($torrent['announce']);
 			}
@@ -468,7 +472,6 @@ $msg = lang();
 				}
 			}
 
-			$web_seeds = '';
 			if (isset($torrent['url-list'])) {
 				$url_list = &$torrent['url-list'];
 				if (!is_array($url_list)) {
@@ -480,17 +483,16 @@ $msg = lang();
 				}
 			}
 
-			$name = '';
 			if (isset($torrent['info']['name'])) {
 				$name = '&dn=' . urlencode($torrent['info']['name']);
 			}
 
 			$bencoded_string = bencode_encode($torrent['info']);
 
-			$bt_v1 = '';
 			if (isset($torrent['info']['pieces'])) { // Hybrid torrent
 				$bt_v1 = '&xt=urn:btih:' . hash('sha1', $bencoded_string);
 			}
+
 			$bt_v2 = hash('sha256', $bencoded_string);
 			$hash = 'magnet:?xt=urn:btmh:1220' . $bt_v2 . $bt_v1;
 
