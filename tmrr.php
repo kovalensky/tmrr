@@ -328,7 +328,7 @@ $msg = lang();
 				if (is_array($value) && !empty($key)) {
 					printFiles($value, $current);
 				} else{
-					$length = $value['length'];
+					$length = &$value['length'];
 					echo "\r\n  " . substr($current, 1, -1) . ' (' . formatBytes($length) . ")\r\n {$msg['root_hash']}: " . bin2hex($value['pieces root'] ?? '') . "\r\n";
 					$torrent_size += $length;
 					++$filec;
@@ -347,7 +347,7 @@ $msg = lang();
 				if (is_array($value) && !empty($key)) {
 					combine_keys($value, $hashes, $current_key);
 				} else{
-					$length = $value['length'];
+					$length = &$value['length'];
 					$hashes[substr($current_key, 1, -1)] = [
 						'hash' => bin2hex($value['pieces root'] ?? '') . ' (' . formatBytes($length) . ')',
 						'size' => $length,
@@ -365,7 +365,7 @@ $msg = lang();
 			global $msg, $hashes, $torrent_size, $filec, $magnet, $argc;
 			$dups_size = 0;
 			foreach ($hashes as $key => $value) {
-				$hash = $value['hash'];
+				$hash = &$value['hash'];
 				if (isset($keys[$hash])) {
 					$keys[$hash][] = $key;
 					$dups_size += $value['size'];
