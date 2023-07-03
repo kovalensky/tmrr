@@ -1,5 +1,5 @@
 <?php
-
+$t = microtime(true);
 //Initialization
 
 // Output buffer
@@ -42,7 +42,7 @@ $msg = lang();
 				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
 				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n";
 			}
-
+echo microtime(true) - $t;
 			error_status();
 		}
 
@@ -329,7 +329,10 @@ $msg = lang();
 					printFiles($value, $current);
 				} else{
 					$length = &$value['length'];
-					echo "\r\n  " . substr($current, 1, -1) . ' (' . formatBytes($length) . ")\r\n {$msg['root_hash']}: " . bin2hex($value['pieces root'] ?? '') . "\r\n";
+					$path = substr($current, 1, -1);
+					$size = formatBytes($length);
+					$root = bin2hex($value['pieces root'] ?? '');
+					echo "\r\n  $path ($size)\r\n {$msg['root_hash']}: $root\r\n";
 					$torrent_size += $length;
 					++$filec;
 				}
@@ -348,8 +351,10 @@ $msg = lang();
 					combine_keys($value, $hashes, $current_key);
 				} else{
 					$length = &$value['length'];
+					$size = formatBytes($length);
+					$root = bin2hex($value['pieces root'] ?? '');
 					$hashes[substr($current_key, 1, -1)] = [
-						'hash' => bin2hex($value['pieces root'] ?? '') . ' (' . formatBytes($length) . ')',
+						'hash' => "$root ($size)",
 						'size' => $length,
 						'pos' => $filec ?? 0
 					];
