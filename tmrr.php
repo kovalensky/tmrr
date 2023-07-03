@@ -78,7 +78,7 @@ $msg = lang();
 
 				if (is_file($file) && filesize($file) !== 0) {
 					$hash = new HasherV2($file, 2**14); // 16KiB blocks
-					echo "\r\n $file\r\n{$msg['root_hash']}: " . bin2hex($hash->root) . "\r\n\r\n";
+					echo "\r\n $file\r\n{$msg['root_hash']}: {$hash->root}\r\n\r\n";
 				} else{
 					$err_status[$file] = $msg['noraw'];
 				}
@@ -259,6 +259,7 @@ $msg = lang();
 		{
 			if (is_array($data)) {
 				$return = '';
+
 				if (array_is_list($data)) {
 					$return .= 'l';
 					foreach ($data as $value) {
@@ -573,7 +574,7 @@ $msg = lang();
 						$remainder--;
 					}
 				}
-				$this->root = $this->merkle_root($this->layer_hashes);
+				$this->root = bin2hex($this->merkle_root($this->layer_hashes));
 			}
 
 			private function merkle_root($blocks)
