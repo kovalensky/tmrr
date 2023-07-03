@@ -388,6 +388,7 @@ $msg = lang();
 						++$dup_hashes;
 					}
 				}
+				unset($keys); // Unnecessary, but convenient for debugging purposes
 			}
 
 			if (empty($dup_hashes)) {
