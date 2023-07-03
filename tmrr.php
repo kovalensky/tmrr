@@ -1,5 +1,5 @@
 <?php
-$t = microtime(true);
+
 //Initialization
 
 // Output buffer
@@ -42,7 +42,7 @@ $msg = lang();
 				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
 				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n";
 			}
-echo microtime(true) - $t;
+
 			error_status();
 		}
 
