@@ -405,7 +405,9 @@ $msg = lang();
 
 				if ($argc < 4) {
 
-					echo ' | ' . round(($dups_size / $torrent_size) * 100, 2) . "%\r\n";
+					$percentage = ($dups_size / $torrent_size) * 100;
+					$precision = ($percentage < 1) ? 5 : 2;
+					echo ' | ' . round($percentage, $precision) . "%\r\n";
 
 					cli_set_process_title($msg['magnet_proposal']);
 					ob_end_flush();
