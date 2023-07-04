@@ -368,7 +368,7 @@ $msg = lang();
 		//Create an array and find duplicates
 		function compare()
 		{
-			global $msg, $hashes, $torrent_size, $filec, $magnet, $argc;
+			global $msg, $torrent, $hashes, $torrent_size, $filec, $magnet, $argv, $argc;
 			$dups_size = 0;
 			foreach ($hashes as $key => $value) {
 				$hash = &$value['hash'];
@@ -386,6 +386,19 @@ $msg = lang();
 			$filed = 0;
 
 			if (!empty($keys)) {
+				if ($argc < 4) { // Single torrent
+
+					echo "\r\n\r\n — {$msg['file_location']}: {$argv[2]} —\r\n";
+
+					if (isset($torrent['info']['name'])) {
+						echo " — {$msg['torrent_title']}: " . $torrent['info']['name'] . " — \r\n";
+					}
+
+					if (isset($torrent['creation date'], $torrent['created by'])) {
+						echo " — {$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ") — \r\n";
+					}
+				}
+
 				foreach ($keys as $key => $value) {
 					$count = count($value);
 					if ($count > 1) {
@@ -406,7 +419,7 @@ $msg = lang();
 				if ($argc < 4) {
 
 					$percentage = ($dups_size / $torrent_size) * 100;
-					$precision = ($percentage < 0.01) ? 5 : 2;
+					$precision = ($percentage < 0.1) ? 5 : 2;
 					echo ' | ' . round($percentage, $precision) . "%\r\n";
 
 					cli_set_process_title($msg['magnet_proposal']);
