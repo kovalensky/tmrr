@@ -32,7 +32,7 @@ $msg = lang();
 				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
 
-				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n";
+				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n\r\n";
 			}
 
 			error_status();
@@ -317,7 +317,7 @@ $msg = lang();
 		{
 			global $torrent, $msg;
 
-			echo "\r\n\r\n — {$msg['file_location']}: $filename —\r\n";
+			echo "\r\n — {$msg['file_location']}: $filename —\r\n";
 
 			if (isset($torrent['info']['name'])) { // BEP 0052
 				echo " — {$msg['torrent_title']}: " . $torrent['info']['name'] . " — \r\n";
