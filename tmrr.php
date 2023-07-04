@@ -29,17 +29,9 @@ $msg = lang();
 
 				cli_set_process_title($msg['cli_hash_extraction'] . "  —  $file");
 
-				echo "\r\n\r\n — {$msg['file_location']}: $file —\r\n";
-
-				if (isset($torrent['info']['name'])) { // BEP 0052
-					echo " — {$msg['torrent_title']}: " . $torrent['info']['name'] . " — \r\n";
-				}
-
-				if (isset($torrent['creation date'], $torrent['created by'])) {
-					echo " — {$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ") — \r\n";
-				}
-
+				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
+
 				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n";
 			}
 
@@ -320,6 +312,22 @@ $msg = lang();
 			return true;
 		}
 
+		// Print torrent name, client and creation date
+		function torrent_metainfo($filename)
+		{
+			global $torrent, $msg;
+
+			echo "\r\n\r\n — {$msg['file_location']}: $filename —\r\n";
+
+			if (isset($torrent['info']['name'])) { // BEP 0052
+				echo " — {$msg['torrent_title']}: " . $torrent['info']['name'] . " — \r\n";
+			}
+
+			if (isset($torrent['creation date'], $torrent['created by'])) {
+				echo " — {$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ") — \r\n";
+			}
+		}
+
 		// Loop through all arrays saving locations and showing result
 		function printFiles($array, $parent = '')
 		{
@@ -386,17 +394,9 @@ $msg = lang();
 			$filed = 0;
 
 			if (!empty($keys)) {
+
 				if ($argc < 4) { // Single torrent
-
-					echo "\r\n\r\n — {$msg['file_location']}: {$argv[2]} —\r\n";
-
-					if (isset($torrent['info']['name'])) {
-						echo " — {$msg['torrent_title']}: " . $torrent['info']['name'] . " — \r\n";
-					}
-
-					if (isset($torrent['creation date'], $torrent['created by'])) {
-						echo " — {$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ") — \r\n";
-					}
+					torrent_metainfo($argv[2]);
 				}
 
 				foreach ($keys as $key => $value) {
@@ -464,7 +464,8 @@ $msg = lang();
 					elseif ($cli_output) {
 						echo $clear_cli . "\033[1B" . "\033[2K";
 					}
-				} else{
+				}
+				else{
 					echo "\r\n";
 				}
 			}
