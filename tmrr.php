@@ -31,8 +31,9 @@ $msg = lang();
 
 				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
+				$size_t = formatBytes($torrent_size); // Calculated & formatted torrent size
 
-				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n\r\n";
+				echo "\r\n{$msg['total_files']}: $filec ($size_t)\r\n\r\n";
 			}
 
 			error_status();
@@ -56,7 +57,6 @@ $msg = lang();
 
 			if (!empty($file_tree_array)) {
 				combine_keys($file_tree_array, $hashes);
-				unset($file_tree_array);
 				cli_set_process_title($msg['cli_dup_search']);
 				compare();
 			}
@@ -289,15 +289,17 @@ $msg = lang();
 				$title = $client_date = $hash_v1 = $note_v1 = '';
 
 				if (isset($torrent['info']['name'])) {
-					$title = "\r\n{$msg['torrent_title']}: " . $torrent['info']['name'];
+					$title = "\r\n{$msg['torrent_title']}: {$torrent['info']['name']}";
 				}
 
 				if (isset($torrent['creation date'], $torrent['created by'])) {
-					$client_date =  "\r\n{$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ')';
+					$date = date("d M Y | G:i:s T", $torrent['creation date']);
+					$client_date =  "\r\n{$msg['created_by_client']}: {$torrent['created by']} ($date)";
 				}
 
 				if (isset($torrent['info']['pieces'])) {
-					$hash_v1 = "\r\n{$msg['root_hash']}: " . hash('sha1', bencode_encode($torrent['info']));
+					$info_hash_v1 = hash('sha1', bencode_encode($torrent['info']));
+					$hash_v1 = "\r\n{$msg['root_hash']}: $info_hash_v1";
 				}
 
 				if (!isset($torrent['info']['meta version'])) {
@@ -320,11 +322,12 @@ $msg = lang();
 			echo "\r\n — {$msg['file_location']}: $filename —\r\n";
 
 			if (isset($torrent['info']['name'])) { // BEP 0052
-				echo " — {$msg['torrent_title']}: " . $torrent['info']['name'] . " — \r\n";
+				echo " — {$msg['torrent_title']}: {$torrent['info']['name']} — \r\n";
 			}
 
 			if (isset($torrent['creation date'], $torrent['created by'])) {
-				echo " — {$msg['created_by_client']}: " . $torrent['created by'] . ' (' . date("d M Y | G:i:s T", $torrent['creation date']) . ") — \r\n";
+				$creation_date = date("d M Y | G:i:s T", $torrent['creation date']);
+				echo " — {$msg['created_by_client']}: {$torrent['created by']} ($creation_date) — \r\n";
 			}
 		}
 
@@ -389,7 +392,6 @@ $msg = lang();
 				}
 			}
 
-			unset($hashes);
 			$dup_hashes = 0;
 			$filed = 0;
 
@@ -408,13 +410,15 @@ $msg = lang();
 						++$dup_hashes;
 					}
 				}
-				unset($keys); // Unnecessary, but convenient for debugging purposes
 			}
+			$size_t = formatBytes($torrent_size);
 
 			if (empty($dup_hashes)) {
-				echo "\r\n " . $msg['no_duplicates'] . "\r\n\r\n" . $msg['total_files'] . ": $filec (" . formatBytes($torrent_size) . ")\r\n";
+				echo "\r\n {$msg['no_duplicates']}\r\n\r\n{$msg['total_files']}: $filec ($size_t)\r\n";
 			} else{
-				echo "{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n{$msg['total_dup_files']}: " . ($filed - $dup_hashes) . ' (' . formatBytes($dups_size) . ')';
+				$count_d = $filed - $dup_hashes;
+				$size_d = formatBytes($dups_size);
+				echo "{$msg['total_files']}: $filec ($size_t)\r\n{$msg['total_dup_files']}: $count_d ($size_d)";
 
 				if ($argc < 4) {
 
@@ -675,7 +679,7 @@ $msg = lang();
 				echo "\r\n\r\n--- {$msg['unfinished_files']}: ---\r\n";
 
 				foreach ($err_status as $key => $value) {
-					echo "\r\n{$msg['file_location']}: $key \r\n" . "{$msg['error_type']}: $value\r\n\r\n";
+					echo "\r\n{$msg['file_location']}: $key \r\n{$msg['error_type']}: $value\r\n\r\n";
 
 				}
 			}
