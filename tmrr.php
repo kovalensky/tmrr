@@ -322,12 +322,12 @@ $msg = lang();
 			echo "\r\n — {$msg['file_location']}: $filename —\r\n";
 
 			if (isset($torrent['info']['name'])) { // BEP 0052
-				echo " — {$msg['torrent_title']}: {$torrent['info']['name']} — \r\n";
+				echo " — {$msg['torrent_title']}: {$torrent['info']['name']} —\r\n";
 			}
 
 			if (isset($torrent['creation date'], $torrent['created by'])) {
 				$creation_date = date("d M Y | G:i:s T", $torrent['creation date']);
-				echo " — {$msg['created_by_client']}: {$torrent['created by']} ($creation_date) — \r\n";
+				echo " — {$msg['created_by_client']}: {$torrent['created by']} ($creation_date) —\r\n";
 			}
 		}
 
@@ -381,6 +381,8 @@ $msg = lang();
 		{
 			global $msg, $torrent, $hashes, $torrent_size, $filec, $magnet, $argv, $argc;
 			$dups_size = 0;
+			$size_t = formatBytes($torrent_size);
+
 			foreach ($hashes as $key => $value) {
 				$hash = &$value['hash'];
 				if (isset($keys[$hash])) {
@@ -392,14 +394,15 @@ $msg = lang();
 				}
 			}
 
-			$dup_hashes = 0;
-			$filed = 0;
 
 			if (!empty($keys)) {
 
 				if ($argc < 4) { // Single torrent
 					torrent_metainfo($argv[2]);
 				}
+
+				$dup_hashes = 0;
+				$filed = 0;
 
 				foreach ($keys as $key => $value) {
 					$count = count($value);
@@ -411,7 +414,6 @@ $msg = lang();
 					}
 				}
 			}
-			$size_t = formatBytes($torrent_size);
 
 			if (empty($dup_hashes)) {
 				echo "\r\n {$msg['no_duplicates']}\r\n\r\n{$msg['total_files']}: $filec ($size_t)\r\n";
@@ -482,7 +484,7 @@ $msg = lang();
 
 			$indices = '&so=' . formatSeq($magnet['indices']); // BEP 0053
 
-			$name = $trackers = $web_seeds = $bt_v1 = '';
+			$name = $trackers = $web_seeds = $info_hash_v1 = '';
 
 			if (isset($torrent['announce']) && !isset($torrent['announce-list'])) {
 				$trackers = '&tr=' . urlencode($torrent['announce']);
@@ -518,11 +520,11 @@ $msg = lang();
 			$bencoded_string = bencode_encode($torrent['info']);
 
 			if (isset($torrent['info']['pieces'])) { // Hybrid torrent
-				$bt_v1 = '&xt=urn:btih:' . hash('sha1', $bencoded_string);
+				$info_hash_v1 = '&xt=urn:btih:' . hash('sha1', $bencoded_string);
 			}
 
-			$bt_v2 = hash('sha256', $bencoded_string);
-			$hash = 'magnet:?xt=urn:btmh:1220' . $bt_v2 . $bt_v1;
+			$info_hash_v2 = hash('sha256', $bencoded_string);
+			$hash = 'magnet:?xt=urn:btmh:1220' . $info_hash_v2 . $info_hash_v1;
 
 			return $hash . $name . $trackers . $web_seeds . $indices;
 		}
