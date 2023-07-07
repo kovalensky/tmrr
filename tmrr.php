@@ -425,7 +425,7 @@ $msg = lang();
 				if ($argc < 4) {
 
 					$percentage = ($dups_size / $torrent_size) * 100;
-					$precision = ($percentage >= 0.01) ? 2 : dec_count($percentage);
+					$precision = ($percentage >= 0.01) ? 2 : abs(floor(log10($percentage)));
 					echo ' | ' . number_format($percentage, $precision) . "%\r\n";
 
 					cli_set_process_title($msg['magnet_proposal']);
@@ -475,18 +475,6 @@ $msg = lang();
 					echo "\r\n";
 				}
 			}
-		}
-		
-		// Detect numbers after decimal
-		function dec_count($number) {
-
-			$decimalCount = 0;
-			while ($number < 1) {
-				$number *= 10;
-				$decimalCount++;
-			}
-
-			return $decimalCount;
 		}
 
 		// Generate a magnet link without duplicates
