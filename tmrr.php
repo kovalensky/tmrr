@@ -227,7 +227,6 @@ $msg = lang();
 				if (strlen($return) != $len) {
 					return null;
 				}
-
 				$pos += $len;
 			}
 
@@ -408,7 +407,7 @@ $msg = lang();
 					$count = count($value);
 					if ($count > 1) {
 						$dups = implode("\r\n", $value);
-						echo "\r\n {$msg['root_hash']} $key {$msg['dup_found']}:\r\n\r\n{$dups}\r\n\r\n";
+						echo "\r\n {$msg['root_hash']} $key {$msg['dup_found']}:\r\n\r\n$dups\r\n\r\n";
 						$filed += $count;
 						++$dup_hashes;
 					}
