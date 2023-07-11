@@ -31,9 +31,8 @@ $msg = lang();
 
 				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
-				$size_t = formatBytes($torrent_size); // Calculated & formatted torrent size
 
-				echo "\r\n{$msg['total_files']}: $filec ($size_t)\r\n\r\n";
+				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n\r\n";
 			}
 
 			error_status();
@@ -213,7 +212,6 @@ $msg = lang();
 				if ($return < 0) {
 					return null;
 				}
-
 				$pos += $digits + 1;
 			} else{
 				$digits = strpos($data, ':', $pos) - $pos;
@@ -221,9 +219,9 @@ $msg = lang();
 				if ($len < 0) {
 					return null;
 				}
-
 				$pos += ($digits + 1);
 				$return = substr($data, $pos, $len);
+
 				if (strlen($return) != $len) {
 					return null;
 				}
@@ -250,7 +248,6 @@ $msg = lang();
 		{
 			if (is_array($data)) {
 				$return = '';
-
 				if (array_is_list($data)) {
 					$return .= 'l';
 					foreach ($data as $value) {
@@ -270,6 +267,7 @@ $msg = lang();
 			} else{
 				$return = strlen($data) . ':' . $data;
 			}
+
 			return $return;
 		}
 
@@ -379,9 +377,10 @@ $msg = lang();
 		function compare()
 		{
 			global $msg, $torrent, $hashes, $torrent_size, $filec, $magnet, $argv, $argc;
-			$dups_size = 0;
-			$size_t = formatBytes($torrent_size);
+			$single_torrent = $argc < 4 ? true : false;
+			$t_size = formatBytes($torrent_size);
 
+			$dups_size = 0;
 			foreach ($hashes as $key => $value) {
 				$hash = &$value['hash'];
 				if (isset($keys[$hash])) {
@@ -396,7 +395,7 @@ $msg = lang();
 
 			if (!empty($keys)) {
 
-				if ($argc < 4) { // Single torrent
+				if ($single_torrent) {
 					torrent_metainfo($argv[2]);
 				}
 
@@ -415,13 +414,13 @@ $msg = lang();
 			}
 
 			if (empty($dup_hashes)) {
-				echo "\r\n {$msg['no_duplicates']}\r\n\r\n{$msg['total_files']}: $filec ($size_t)\r\n";
+				echo "\r\n {$msg['no_duplicates']}\r\n\r\n{$msg['total_files']}: $filec ($t_size)\r\n";
 			} else{
-				$count_d = $filed - $dup_hashes;
-				$size_d = formatBytes($dups_size);
-				echo "{$msg['total_files']}: $filec ($size_t)\r\n{$msg['total_dup_files']}: $count_d ($size_d)";
+				$d_count = $filed - $dup_hashes;
+				$d_sizes = formatBytes($dups_size);
+				echo "{$msg['total_files']}: $filec ($t_size)\r\n{$msg['total_dup_files']}: $d_count ($d_sizes)";
 
-				if ($argc < 4) {
+				if ($single_torrent) {
 
 					$percentage = ($dups_size / $torrent_size) * 100;
 					$precision = ($percentage >= 0.01) ? 2 : abs(floor(log10($percentage)));
