@@ -426,20 +426,21 @@ $msg = lang();
 					$precision = ($percentage >= 0.01) ? 2 : abs(floor(log10($percentage)));
 					echo ' | ' . number_format($percentage, $precision) . "%\r\n";
 
-					cli_set_process_title($msg['magnet_proposal']);
 					ob_end_flush();
 
 
 					// Magnet handler
+					cli_set_process_title($msg['magnet_proposal']);
 
 					$cli_output = stream_isatty(STDOUT);
-					$clear_cli = "\033[2A" . "\033[2K"; // Escape symbols
 
 					if ($cli_output) {
 						echo "\r\n	" . $msg['magnet_proposal'] . "\r\n	";
 					}
 
+					$clear_cli = "\033[2A" . "\033[2K"; // Escape symbols
 					$acceptance_symbol = ['y', 'd'];
+
 					$handle = strtolower(fgets(fopen('php://stdin', 'r')));
 
 					if (in_array(trim($handle), $acceptance_symbol) || $handle == PHP_EOL) {
