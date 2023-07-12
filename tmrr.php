@@ -666,7 +666,7 @@ $msg = lang();
 			$sequenceStart = null;
 			$count = count($numbers);
 
-			for ($index = 0; $index < $count; $index++) {
+			for ($index = 0; $index < $count; ++$index) {
 				$number = $numbers[$index];
 
 				if ($index === 0 || $number - $numbers[$index - 1] !== 1) {
