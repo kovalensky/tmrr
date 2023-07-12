@@ -228,7 +228,7 @@ $msg = lang();
 				$pos += ($digits + 1);
 				$return = substr($data, $pos, $len);
 
-				if (strlen($return) != $len) {
+				if (strlen($return) !== $len) {
 					return null;
 				}
 				$pos += $len;
@@ -583,7 +583,7 @@ $msg = lang();
 					}
 
 					$blocks[] = hash('sha256', $leaf, true);
-					if (count($blocks) != $this->num_blocks) {
+					if (count($blocks) !== $this->num_blocks) {
 						$remaining = $this->num_blocks - count($blocks);
 						if (count($this->layer_hashes) === 0) {
 							$power2 = next_power_2(count($blocks));
