@@ -15,7 +15,7 @@ $msg = lang();
 	}
 
 		// Extract hashes
-		if ($argv[1] == 'e') {
+		if ($argv[1] === 'e') {
 			foreach (array_slice($argv, 2) as $file) {
 
 				$torrent = [];
@@ -39,7 +39,7 @@ $msg = lang();
 		}
 
 		// Find duplicates; be aware that duplicates inside single .torrent file are also shown
-		if ($argv[1] == 'd') {
+		if ($argv[1] === 'd') {
 			foreach (array_slice($argv, 2) as $file) {
 
 				$torrent = [];
@@ -64,13 +64,14 @@ $msg = lang();
 		}
 
 		// Calculate BTMR (BitTorrent Merkle Root) hash
-		if ($argv[1] == 'c') {
+		if ($argv[1] === 'c') {
 			foreach (array_slice($argv, 2) as $file) {
 
 				if (is_file($file) && filesize($file) !== 0) {
 					$hash = new HasherV2($file, 2**14); // 16KiB blocks
 					echo "\r\n $file\r\n{$msg['root_hash']}: {$hash->root}\r\n\r\n";
-				} else{
+				}
+				else{
 					$err_status[$file] = $msg['noraw'];
 				}
 			}
@@ -140,7 +141,7 @@ $msg = lang();
 			// Great and mighty, free and sincere Russian language.
 			// I.S. Turgenev's poem (1882)
 
-			if (($argv[1] ?? null) == 'locale') {
+			if (($argv[1] ?? null) === 'locale') {
 				switch ($argv[2] ?? null) {
 					case 'en':
 						@unlink($ru_file);
@@ -153,10 +154,11 @@ $msg = lang();
 				}
 			}
 
-			if (!file_exists($ru_file)) {
-				return $strings['en'];
-			} else{
+			if (file_exists($ru_file)) {
 				return $strings['ru'];
+			}
+			else{
+				return $strings['en'];
 			}
 		}
 
@@ -166,7 +168,7 @@ $msg = lang();
 			$data_len = strlen($data);
 			$start_decode = ($pos === 0);
 
-			if ($start_decode && (!is_string($data) || $data_len == 0)) {
+			if ($start_decode && (!is_string($data) || $data_len === 0)) {
 				return null;
 			}
 
@@ -186,14 +188,16 @@ $msg = lang();
 					}
 					if (!is_string($key)) {
 						break;
-					} elseif (isset($return[$key])) {
+					}
+					elseif (isset($return[$key])) {
 						break;
 					}
 					$return[$key] = $value;
 				}
 				ksort($return, SORT_STRING);
 				$pos++;
-			} elseif ($currentChar === 'l') {
+			}
+			elseif ($currentChar === 'l') {
 				$pos++;
 				$return = [];
 				while ($currentChar !== 'e') {
@@ -204,7 +208,8 @@ $msg = lang();
 					$return[] = $value;
 				}
 				$pos++;
-			} elseif ($currentChar === 'i') {
+			}
+			elseif ($currentChar === 'i') {
 				$pos++;
 				$digits = strpos($data, 'e', $pos) - $pos;
 				$value = substr($data, $pos, $digits);
@@ -213,7 +218,8 @@ $msg = lang();
 					return null;
 				}
 				$pos += $digits + 1;
-			} else{
+			}
+			else{
 				$digits = strpos($data, ':', $pos) - $pos;
 				$len = checkInteger(substr($data, $pos, $digits));
 				if ($len < 0) {
@@ -253,7 +259,8 @@ $msg = lang();
 					foreach ($data as $value) {
 						$return .= bencode_encode($value);
 					}
-				} else{
+				}
+				else{
 					$return .= 'd';
 					ksort($data, SORT_STRING);
 					foreach ($data as $key => $value) {
@@ -262,9 +269,11 @@ $msg = lang();
 					}
 				}
 				$return .= 'e';
-			} elseif (is_integer($data)) {
+			}
+			elseif (is_integer($data)) {
 				$return = 'i' . $data . 'e';
-			} else{
+			}
+			else{
 				$return = strlen($data) . ':' . $data;
 			}
 
@@ -336,7 +345,8 @@ $msg = lang();
 				$current = $parent . '/' . $key;
 				if (is_array($value) && !empty($key)) {
 					printFiles($value, $current);
-				} else{
+				}
+				else{
 					$length = &$value['length'];
 					$path = substr($current, 1, -1);
 					$size = formatBytes($length);
@@ -358,7 +368,8 @@ $msg = lang();
 				$current_key = $parent_key . '/' . $key;
 				if (is_array($value) && !empty($key)) {
 					combine_keys($value, $hashes, $current_key);
-				} else{
+				}
+				else{
 					$length = &$value['length'];
 					$size = formatBytes($length);
 					$root = bin2hex($value['pieces root'] ?? '');
@@ -386,7 +397,8 @@ $msg = lang();
 				if (isset($keys[$hash])) {
 					$keys[$hash][] = $key;
 					$dups_size += $value['size'];
-				} else{
+				}
+				else{
 					$keys[$hash] = [$key];
 					$magnet['indices'][] = $value['pos'];
 				}
@@ -415,7 +427,8 @@ $msg = lang();
 
 			if (empty($dup_hashes)) {
 				echo "\r\n {$msg['no_duplicates']}\r\n\r\n{$msg['total_files']}: $filec ($t_size)\r\n";
-			} else{
+			}
+			else{
 				$d_count = $filed - $dup_hashes;
 				$d_sizes = formatBytes($dups_size);
 				echo "{$msg['total_files']}: $filec ($t_size)\r\n{$msg['total_dup_files']}: $d_count ($d_sizes)";
@@ -443,7 +456,7 @@ $msg = lang();
 
 					$handle = strtolower(fgets(fopen('php://stdin', 'r')));
 
-					if (in_array(trim($handle), $acceptance_symbol) || $handle == PHP_EOL) {
+					if (in_array(trim($handle), $acceptance_symbol) || $handle === PHP_EOL) {
 						$magnetL = magnet_gen();
 						if ($cli_output) {
 							echo $clear_cli;
@@ -452,15 +465,16 @@ $msg = lang();
 						echo "\r\n" . $magnetL . "\r\n";
 
 						if ($cli_output) {
-							if (PHP_OS_FAMILY == 'Windows') {
+							if (PHP_OS_FAMILY === 'Windows') {
 								$command = 'start "" "' . $magnetL . '"';
 								if (strlen($command) <= 8191) { // Windows command length limit
 									@exec($command);
-								} else{
+								}
+								else{
 									echo "\r\n " . $msg['magnet_copy'] . "\r\n";
 								}
 							}
-							elseif (PHP_OS_FAMILY == 'Linux') {
+							elseif (PHP_OS_FAMILY === 'Linux') {
 								$command = 'xdg-open "" "' . $magnetL . '"';
 								@exec($command);
 							}
@@ -505,7 +519,8 @@ $msg = lang();
 				$url_list = &$torrent['url-list'];
 				if (!is_array($url_list)) {
 					$web_seeds = '&ws=' . urlencode($url_list);
-				} else{
+				}
+				else{
 					foreach ($url_list as $value) {
 						$web_seeds .= '&ws=' . urlencode($value);
 					}
@@ -570,7 +585,7 @@ $msg = lang();
 					$blocks[] = hash('sha256', $leaf, true);
 					if (count($blocks) != $this->num_blocks) {
 						$remaining = $this->num_blocks - count($blocks);
-						if (count($this->layer_hashes) == 0) {
+						if (count($this->layer_hashes) === 0) {
 							$power2 = next_power_2(count($blocks));
 							$remaining = $power2 - count($blocks);
 						}
@@ -661,7 +676,8 @@ $msg = lang();
 				if ($index === $count - 1 || $numbers[$index + 1] - $number !== 1) {
 					if ($sequenceStart !== $number) {
 						$sequences[] = $sequenceStart . '-' . $number;
-					} else{
+					}
+					else{
 						$sequences[] = $number;
 					}
 				}
