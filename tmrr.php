@@ -583,11 +583,12 @@ $msg = lang();
 					}
 
 					$blocks[] = hash('sha256', $leaf, true);
-					if (count($blocks) !== $this->num_blocks) {
-						$remaining = $this->num_blocks - count($blocks);
+					$blocks_count = count($blocks);
+					if ($blocks_count !== $this->num_blocks) {
+						$remaining = $this->num_blocks - $blocks_count;
 						if (count($this->layer_hashes) === 0) {
-							$power2 = next_power_2(count($blocks));
-							$remaining = $power2 - count($blocks);
+							$power2 = next_power_2($blocks_count);
+							$remaining = $power2 - $blocks_count;
 						}
 						$padding = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
 						$blocks = array_merge($blocks, array_slice($padding, 0, $remaining));
