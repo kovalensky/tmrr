@@ -323,12 +323,14 @@ $msg = lang();
 		// Print torrent name, client and creation date
 		function torrent_metainfo($filename)
 		{
-			global $torrent, $msg;
+			global $msg, $torrent;
 
 			echo "\r\n — {$msg['file_location']}: $filename —\r\n";
 
 			if (isset($torrent['info']['name'])) { // BEP 0052
-				echo " — {$msg['torrent_title']}: {$torrent['info']['name']} —\r\n";
+				if (pathinfo($filename, PATHINFO_FILENAME) !== $torrent['info']['name']) {
+					echo " — {$msg['torrent_title']}: {$torrent['info']['name']} —\r\n";
+				}
 			}
 
 			if (isset($torrent['creation date'], $torrent['created by'])) {
@@ -387,7 +389,7 @@ $msg = lang();
 		//Create an array and find duplicates
 		function compare()
 		{
-			global $msg, $torrent, $hashes, $torrent_size, $filec, $magnet, $argv, $argc;
+			global $msg, $hashes, $torrent, $torrent_size, $filec, $magnet, $argv, $argc;
 			$single_torrent = $argc < 4 ? true : false;
 			$t_size = formatBytes($torrent_size);
 
