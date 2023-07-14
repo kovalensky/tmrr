@@ -328,8 +328,9 @@ $msg = lang();
 			echo "\r\n — {$msg['file_location']}: $filename —\r\n";
 
 			if (isset($torrent['info']['name'])) { // BEP 0052
-				if (pathinfo($filename, PATHINFO_FILENAME) !== $torrent['info']['name']) {
-					echo " — {$msg['torrent_title']}: {$torrent['info']['name']} —\r\n";
+				$t_name = &$torrent['info']['name'];
+				if (pathinfo($filename, PATHINFO_FILENAME) !== $t_name) {
+					echo " — {$msg['torrent_title']}: $t_name —\r\n";
 				}
 			}
 
