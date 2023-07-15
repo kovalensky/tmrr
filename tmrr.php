@@ -394,25 +394,27 @@ $msg = lang();
 			$single_torrent = $argc < 4 ? true : false;
 			$t_size = formatBytes($torrent_size);
 
-			$dups_size = 0;
-			foreach ($hashes as $key => $value) {
-				$hash = &$value['hash'];
-				if (isset($keys[$hash])) {
-					$keys[$hash][] = $key;
-					$dups_size += $value['size'];
-				}
-				else{
-					$keys[$hash] = [$key];
-					$magnet['indices'][] = $value['pos'];
+			if (!empty($hashes)) {
+
+				$dups_size = 0;
+				foreach ($hashes as $key => $value) {
+					$hash = &$value['hash'];
+					if (isset($keys[$hash])) {
+						$keys[$hash][] = $key;
+						$dups_size += $value['size'];
+					}
+					else{
+						$keys[$hash] = [$key];
+						$magnet['indices'][] = $value['pos'];
+					}
 				}
 			}
 
+			if ($single_torrent) {
+				torrent_metainfo($argv[2]);
+			}
 
 			if (!empty($keys)) {
-
-				if ($single_torrent) {
-					torrent_metainfo($argv[2]);
-				}
 
 				$dup_hashes = 0;
 				$filed = 0;
