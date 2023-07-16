@@ -391,8 +391,9 @@ $msg = lang();
 		function compare()
 		{
 			global $msg, $hashes, $torrent, $torrent_size, $filec, $magnet, $argv, $argc;
-			$single_torrent = $argc < 4 ? true : false;
 			$t_size = formatBytes($torrent_size);
+			$filec ??= 0;
+			$single_torrent = $argc < 4 ? true : false;
 
 			if (!empty($hashes)) {
 
