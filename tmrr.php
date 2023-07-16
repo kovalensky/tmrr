@@ -283,7 +283,7 @@ $msg = lang();
 		// Torrent validity checks
 		function tvalidity_check($file)
 		{
-			global $torrent, $msg, $err_status;
+			global $torrent, $msg, $torrent_size, $filec, $err_status;
 
 			if (!isset($torrent['info'])) {
 				$err_status[$file] = $msg['invalid_torrent'];
@@ -316,6 +316,7 @@ $msg = lang();
 
 				return false;
 			}
+			$torrent_size = $filec = 0; // Init variables
 
 			return true;
 		}
