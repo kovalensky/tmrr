@@ -32,7 +32,7 @@ $msg = lang();
 				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
 
-				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n\r\n";
+				echo "\r\n{$msg['total_files']}: " . ($filec ?? 0) . ' (' . formatBytes($torrent_size) . ")\r\n\r\n";
 			}
 
 			error_status();
