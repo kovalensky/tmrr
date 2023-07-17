@@ -395,12 +395,13 @@ $msg = lang();
 		function compare()
 		{
 			global $msg, $hashes, $torrent, $torrent_size, $filec, $magnet, $argv, $argc;
+
 			$t_size = formatBytes($torrent_size);
 			$single_torrent = $argc < 4 ? true : false;
+			$dups_size = $dup_hashes = $filed = 0;
 
 			if (!empty($hashes)) {
 
-				$dups_size = 0;
 				foreach ($hashes as $key => $value) {
 					$hash = &$value['hash'];
 					if (isset($keys[$hash])) {
@@ -419,9 +420,6 @@ $msg = lang();
 			}
 
 			if (!empty($keys)) {
-
-				$dup_hashes = 0;
-				$filed = 0;
 
 				foreach ($keys as $key => $value) {
 					$count = count($value);
