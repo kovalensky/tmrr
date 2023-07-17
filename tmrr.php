@@ -30,7 +30,7 @@ $msg = lang();
 				cli_set_process_title($msg['cli_hash_extraction'] . "  —  $file");
 
 				torrent_metainfo($file);
-				printFiles($torrent['info']['file tree']); // Passing the dictionary of all files
+				printFiles($torrent['info']['file tree']); // Recursive array traversal
 
 				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n\r\n";
 			}
@@ -286,6 +286,7 @@ $msg = lang();
 			global $torrent, $msg, $torrent_size, $filec, $err_status;
 
 			if (!isset($torrent['info'])) {
+
 				$err_status[$file] = $msg['invalid_torrent'];
 				return false;
 			}
@@ -316,7 +317,8 @@ $msg = lang();
 
 				return false;
 			}
-			$torrent_size = $filec = 0; // Init variables
+
+			$torrent_size = $filec = 0; // Valid torrent, init count variables
 
 			return true;
 		}
