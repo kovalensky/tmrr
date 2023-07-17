@@ -86,6 +86,7 @@ $msg = lang();
 		function lang()
 		{
 			global $argv;
+
 			$version = '2.3g'; // Code name: Gribovskaya (Mushroom Pumpkin)
 			$strings = [
 				'ru' => [
@@ -348,6 +349,7 @@ $msg = lang();
 		function printFiles($array, $parent = '')
 		{
 			global $msg, $torrent_size, $filec;
+
 			foreach ($array as $key => $value) {
 				$current = $parent . '/' . $key;
 				if (is_array($value) && !empty($key)) {
@@ -371,6 +373,7 @@ $msg = lang();
 		function combine_keys($array, &$hashes, $parent_key = '')
 		{
 			global $torrent_size, $filec;
+
 			foreach ($array as $key => $value) {
 				$current_key = $parent_key . '/' . $key;
 				if (is_array($value) && !empty($key)) {
