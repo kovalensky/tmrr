@@ -288,6 +288,7 @@ $msg = lang();
 			if (!isset($torrent['info'])) {
 
 				$err_status[$file] = $msg['invalid_torrent'];
+
 				return false;
 			}
 
