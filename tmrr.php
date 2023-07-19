@@ -312,7 +312,7 @@ $msg = lang();
 				}
 
 				if (!isset($torrent['info']['meta version'])) {
-					$note_v1 = "\033[0m\r\n{$msg['note']}: {$msg['hint_v1']}";
+					$note_v1 = "\r\n{$msg['note']}: {$msg['hint_v1']}";
 				}
 
 				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $note_v1;
