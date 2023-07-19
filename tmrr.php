@@ -312,7 +312,7 @@ $msg = lang();
 				}
 
 				if (!isset($torrent['info']['meta version'])) {
-					$note_v1 = "\r\n{$msg['note']}: {$msg['hint_v1']}";
+					$note_v1 = "\033[0m\r\n{$msg['note']}: {$msg['hint_v1']}";
 				}
 
 				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $note_v1;
@@ -458,10 +458,10 @@ $msg = lang();
 					$cli_output = stream_isatty(STDOUT);
 
 					if ($cli_output) {
-						echo "\r\n	" . $msg['magnet_proposal'] . "\r\n	";
+						echo "\r\n	" . formatText($msg['magnet_proposal'], 36) . "\r\n	";
 					}
 
-					$clear_cli = "\033[2A" . "\033[2K"; // Escape symbols
+					$clear_cli = "\033[2A" . "\033[2K"; // Escape symbols for cleaning output
 					$acceptance_symbol = ['y', 'd'];
 
 					$handle = strtolower(fgets(fopen('php://stdin', 'r')));
@@ -472,7 +472,7 @@ $msg = lang();
 							echo $clear_cli;
 						}
 
-						echo "\r\n" . $magnetL . "\r\n";
+						echo "\r\n" . formatText($magnetL, 32) . "\r\n";
 
 						if ($cli_output) {
 							if (PHP_OS_FAMILY === 'Windows') {
@@ -481,7 +481,7 @@ $msg = lang();
 									@exec($command);
 								}
 								else{
-									echo "\r\n " . $msg['magnet_copy'] . "\r\n";
+									echo "\r\n " . formatText($msg['magnet_copy'], 36) . "\r\n";
 								}
 							}
 							elseif (PHP_OS_FAMILY === 'Linux') {
@@ -670,6 +670,17 @@ $msg = lang();
 			return round($bytes, $precision) . ' ' . $units[$pow];
 		}
 
+		// Format coloured text
+		function formatText($text, $color) {
+			$cli_output = stream_isatty(STDOUT);
+			if ($cli_output) {
+				return "\033[$color" . "m$text\033[0m";
+			}
+			else{
+				return $text;
+			}
+		}
+
 		// Represent sequences
 		function formatSeq($numbers)
 		{
@@ -704,7 +715,7 @@ $msg = lang();
 
 			if (!empty($err_status)) {
 
-				echo "\r\n\r\n--- {$msg['unfinished_files']}: ---\r\n";
+				echo "\r\n\r\n--- ". formatText($msg['unfinished_files'], "91") . ": ---\r\n";
 
 				foreach ($err_status as $key => $value) {
 					echo "\r\n{$msg['file_location']}: $key\r\n{$msg['error_type']}: $value\r\n\r\n";
