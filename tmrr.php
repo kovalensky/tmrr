@@ -146,11 +146,11 @@ $msg = lang();
 				switch ($argv[2] ?? null) {
 					case 'en':
 						@unlink($ru_file);
-						die('Language changed to English.');
+						die(formatText('Language changed to English.', 32));
 
 					case 'ru':
 						file_put_contents($ru_file, '');
-						die('Язык был изменён на русский.');
+						die(formatText('Язык изменён на русский.', 32));
 
 				}
 			}
@@ -715,9 +715,10 @@ $msg = lang();
 
 			if (!empty($err_status)) {
 
-				echo "\r\n\r\n--- ". formatText($msg['unfinished_files'], 91) . ": ---\r\n";
+				echo "\r\n\r\n--- ". formatText($msg['unfinished_files'], 33) . ": ---\r\n";
 
 				foreach ($err_status as $key => $value) {
+
 					echo "\r\n{$msg['file_location']}: $key\r\n{$msg['error_type']}: $value\r\n\r\n";
 
 				}
