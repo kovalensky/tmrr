@@ -671,9 +671,9 @@ $msg = lang();
 		}
 
 		// Format coloured text
-		function formatText($text, $color) {
-			$cli_output = stream_isatty(STDOUT);
-			if ($cli_output) {
+		function formatText($text, $color)
+		{
+			if (stream_isatty(STDOUT)) {
 				return "\033[$color" . "m$text\033[0m";
 			}
 			else{
