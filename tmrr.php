@@ -458,7 +458,7 @@ $msg = lang();
 					$cli_output = stream_isatty(STDOUT);
 
 					if ($cli_output) {
-						echo "\r\n	" . formatText($msg['magnet_proposal'], 36) . "\r\n	";
+						echo "\r\n	" . formatText($msg['magnet_proposal'], 33) . "\r\n	";
 					}
 
 					$clear_cli = "\033[2A" . "\033[2K"; // Escape symbols for cleaning output
@@ -481,7 +481,7 @@ $msg = lang();
 									@exec($command);
 								}
 								else{
-									echo "\r\n " . formatText($msg['magnet_copy'], 36) . "\r\n";
+									echo "\r\n " . formatText($msg['magnet_copy'], 33) . "\r\n";
 								}
 							}
 							elseif (PHP_OS_FAMILY === 'Linux') {
