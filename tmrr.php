@@ -68,7 +68,7 @@ $msg = lang();
 			foreach (array_slice($argv, 2) as $file) {
 
 				if (is_file($file) && filesize($file) !== 0) {
-					$hash = new HasherV2($file, 2**14); // 16KiB blocks
+					$hash = new HasherV2($file);
 					echo "\r\n $file\r\n{$msg['root_hash']}: {$hash->root}\r\n\r\n";
 				}
 				else{
@@ -562,7 +562,7 @@ $msg = lang();
 			private $layer_hashes;
 			private $num_blocks;
 
-			public function __construct($path, $piece_length)
+			public function __construct($path, $piece_length = 16384) // 16KiB blocks
 			{
 				!ob_get_level() || ob_end_flush();
 				defined('BLOCK_SIZE') || define('BLOCK_SIZE', $piece_length);
