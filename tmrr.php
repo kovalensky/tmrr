@@ -298,7 +298,10 @@ $msg = lang();
 				$title = $client_date = $hash_v1 = $note_v1 = '';
 
 				if (isset($torrent['info']['name'])) {
-					$title = "\r\n{$msg['torrent_title']}: {$torrent['info']['name']}";
+					$t_name = &$torrent['info']['name'];
+					if (pathinfo($file, PATHINFO_FILENAME) !== $t_name) {
+						$title = "\r\n{$msg['torrent_title']}: $t_name";
+					}
 				}
 
 				if (isset($torrent['creation date'], $torrent['created by'])) {
