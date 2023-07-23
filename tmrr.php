@@ -102,7 +102,7 @@ $msg = lang();
 					'unfinished_files' => 'Необработанные файлы',
 					'error_type' => 'Ошибка',
 					'note' => 'Заметка',
-					'no_duplicates' => 'Дубликаты не найдены.',
+					'no_duplicates' => 'Дубликатов не найдено.',
 					'dup_found' => 'найден в',
 					'total_files' => 'Количество файлов',
 					'total_dup_files' => 'Количество дубликатов',
@@ -436,7 +436,7 @@ $msg = lang();
 			}
 
 			if (empty($dup_hashes)) {
-				echo "\r\n {$msg['no_duplicates']}\r\n\r\n{$msg['total_files']}: $filec ($t_size)\r\n";
+				echo "\r\n " . formatText($msg['no_duplicates'], 33) . "\r\n\r\n{$msg['total_files']}: $filec ($t_size)\r\n";
 			}
 			else{
 				$d_count = $filed - $dup_hashes;
