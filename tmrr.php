@@ -715,7 +715,7 @@ $msg = lang();
 
 			if (!empty($err_status)) {
 
-				echo "\r\n\r\n--- ". formatText($msg['unfinished_files'], 33) . ": ---\r\n";
+				echo "\r\n\r\n--- ". formatText($msg['unfinished_files'], 31) . ": ---\r\n";
 
 				foreach ($err_status as $key => $value) {
 
