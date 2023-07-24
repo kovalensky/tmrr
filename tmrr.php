@@ -69,7 +69,7 @@ $msg = lang();
 
 				if (is_file($file) && filesize($file) !== 0) {
 					$hash = new HasherV2($file);
-					echo "\r\n $file\r\n{$msg['root_hash']}: {$hash->root}\r\n\r\n";
+					echo "\r\n  $file\r\n {$msg['root_hash']}: {$hash->root}\r\n\r\n";
 				}
 				else{
 					$err_status[$file] = $msg['noraw'];
