@@ -27,7 +27,7 @@ $msg = lang();
 					continue;
 				}
 
-				cli_set_process_title($msg['cli_hash_extraction'] . "  —  $file");
+				cli_set_process_title("{$msg['cli_hash_extraction']}  —  $file");
 
 				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Recursive array traversal
