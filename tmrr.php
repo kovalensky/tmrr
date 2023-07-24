@@ -585,13 +585,15 @@ $msg = lang();
 			{
 				global $msg;
 
+				$f_size = formatBytes($file_size);
+
 				while (!feof($fd)) {
 					$blocks = [];
 					$leaf = fread($fd, BLOCK_SIZE);
 
 					if (time() > $this->sync) { // Show percentage status
 						$percent = round((ftell($fd) / $file_size) * 100);
-						cli_set_process_title("{$msg['calculation']} $percent%  —  $filename");
+						cli_set_process_title("{$msg['calculation']} $percent%  —  $filename ($f_size)");
 						$this->sync = time();
 					}
 
