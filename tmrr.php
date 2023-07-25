@@ -448,9 +448,12 @@ $msg = lang();
 
 				if ($single_torrent) {
 
-					$percentage = ($dups_size / $torrent_size) * 100;
-					$precision = ($percentage >= 0.01) ? 2 : (!empty($percentage) ? abs(floor(log10($percentage))) : 0);
-					echo ' | ' . number_format($percentage, $precision) . "%\r\n";
+					if (!empty($torrent_size)) {
+
+						$percentage = ($dups_size / $torrent_size) * 100;
+						$precision = ($percentage >= 0.01) ? 2 : (!empty($percentage) ? abs(floor(log10($percentage))) : 0);
+						echo ' | ' . number_format($percentage, $precision) . "%\r\n";
+					}
 
 					ob_end_flush();
 
