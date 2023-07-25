@@ -467,7 +467,7 @@ $msg = lang();
 						echo "\r\n	" . formatText($msg['magnet_proposal'], 33) . "\r\n	";
 					}
 
-					$clear_cli = "\033[2A" . "\033[2K"; // Escape symbols for cleaning output
+					$clean_cli = "\033[2A" . "\033[2K"; // Escape symbols for cleaning output
 					$acceptance_symbol = ['y', 'd'];
 
 					$handle = strtolower(fgets(fopen('php://stdin', 'r')));
@@ -475,7 +475,7 @@ $msg = lang();
 					if (in_array(trim($handle), $acceptance_symbol) || $handle === PHP_EOL) {
 						$magnetL = magnet_gen();
 						if ($cli_output) {
-							echo $clear_cli;
+							echo $clean_cli;
 						}
 
 						echo "\r\n" . formatText($magnetL, 32) . "\r\n";
@@ -497,7 +497,7 @@ $msg = lang();
 						}
 					}
 					elseif ($cli_output) {
-						echo $clear_cli . "\033[1B" . "\033[2K";
+						echo $clean_cli . "\033[1B" . "\033[2K";
 					}
 				}
 				else{
