@@ -65,7 +65,19 @@ $msg = lang();
 
 		// Calculate BTMR (BitTorrent Merkle Root) hash
 		if ($argv[1] === 'c') {
-			foreach (array_slice($argv, 2) as $file) {
+			
+			$files = [];
+			foreach (array_slice($argv, 2) as $location) {
+
+				if (is_dir($location)) {
+					scanAllDir($location);
+				}
+				else{
+					$files[] = $location;
+				}
+			}
+			
+			foreach ($files as $file) {
 
 				if (is_file($file) && !empty($size = filesize($file))) {
 					$hash = new HasherV2($file);
@@ -90,7 +102,7 @@ $msg = lang();
 			$version = '2.3g'; // Code name: Gribovskaya (Mushroom Pumpkin)
 			$strings = [
 				'ru' => [
-					'main' => "\r\nСинтаксис:\r\n\r\n\r\n tmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\n tmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\n tmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Поддерживается пакетная обработка, как <файл1> <файл2>.. <файлN>.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
+					'main' => "\r\nСинтаксис:\r\n\r\n\r\n tmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\n tmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\n tmrr c <ваш-файл>	*Вычисляет хеш существующего файла (поддержка папок)*\r\n\r\n\r\n** Поддерживается пакетная обработка, как <файл1> <файл2>.. <файлN>.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
 					'noraw' => 'Укажите расположение файла, он не должен быть пустым.',
 					'invalid_torrent' => 'Неопознанный .torrent файл.',
 					'no_v2' => 'Торрент файл не содержит признаки v2 / гибрида.',
@@ -113,7 +125,7 @@ $msg = lang();
 					'created_by_client' => 'Создан'
 				],
 				'en' => [
-					'main' => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Batch processing is supported, such as <file1> <file2>.. <fileN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
+					'main' => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files (supports folders)*\r\n\r\n\r\n** Batch processing is supported, such as <file1> <file2>.. <fileN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
 					'noraw' => 'This is not a valid file, is it empty?',
 					'invalid_torrent' => 'Invalid torrent file.',
 					'no_v2' => 'This is an invalid v2 / hybrid torrent.',
@@ -661,6 +673,28 @@ $msg = lang();
 					$start <<= 1;
 				}
 				return $start;
+			}
+		}
+
+		// Get directory listing
+		function scanAllDir($path, $rootParent = '') {
+
+			global $files;
+
+			$rootParent = empty($rootParent) ? basename($path) : $rootParent;
+
+			$dirStructure = array_diff(scandir($path), array('..', '.'));
+
+			foreach ($dirStructure as $item) {
+
+				$itemPath = $path . DIRECTORY_SEPARATOR . $item;
+				$root = empty($rootParent) ? $item : $rootParent . '/' . $item;
+
+				if (is_dir($itemPath)) {
+					scanAllDir($itemPath, $root);
+				} else {
+					$files[] = $root;
+				}
 			}
 		}
 
