@@ -612,10 +612,10 @@ $msg = lang();
 					$layer_hash = $this->merkle_root($blocks);
 					$this->layer_hashes[] = $layer_hash;
 					}
-				$this->_calculate_root();
+				$this->calculate_root();
 			}
 
-			private function _calculate_root()
+			private function calculate_root()
 			{
 				$this->piece_layer = implode('', $this->layer_hashes);
 				$hashes = count($this->layer_hashes);
