@@ -611,7 +611,7 @@ $msg = lang();
 					}
 					$layer_hash = $this->merkle_root($blocks);
 					$this->layer_hashes[] = $layer_hash;
-					}
+				}
 				$this->calculate_root();
 			}
 
