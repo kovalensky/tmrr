@@ -593,7 +593,7 @@ $msg = lang();
 					$leaf = fread($fd, BLOCK_SIZE);
 
 					if (time() > $this->sync) { // Show percentage status
-						$percent = round((ftell($fd) / $file_size) * 100);
+						$percent = number_format((ftell($fd) / $file_size) * 100);
 						cli_set_process_title("{$msg['calculation']} $percent%  —  $filename");
 						$this->sync = time();
 					}
@@ -669,8 +669,7 @@ $msg = lang();
 		{
 			static $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
-			$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-			$pow = min($pow, count($units) - 1);
+			$pow = min(floor(($bytes ? log($bytes) : 0) / log(1024)), count($units) - 1);
 
 			return round($bytes / (1024 ** $pow), $precision) . ' ' . $units[$pow];
 		}
