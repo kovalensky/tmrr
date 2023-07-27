@@ -667,7 +667,7 @@ $msg = lang();
 		// Represent bytes
 		function formatBytes($bytes, $precision = 2)
 		{
-			$units = ['B', 'KB', 'MB', 'GB', 'TB'];
+			static $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
 			$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
 			$pow = min($pow, count($units) - 1);
