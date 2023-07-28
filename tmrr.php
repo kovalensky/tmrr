@@ -478,7 +478,7 @@ $msg = lang();
 							echo $clean_cli;
 						}
 
-						echo "\r\n" . formatText($magnetL, 32) . "\r\n";
+						echo "\r\n" , formatText($magnetL, 32) , "\r\n";
 
 						if ($cli_output) {
 							if (PHP_OS_FAMILY === 'Windows') {
