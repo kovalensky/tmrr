@@ -671,7 +671,7 @@ $msg = lang();
 
 			$pow = min(floor(($bytes ? log($bytes) : 0) / log(1024)), count($units) - 1);
 
-			return round($bytes / (1024 ** $pow), $precision) . ' ' . $units[$pow];
+			return round($bytes / (1024 ** $pow), $precision) . " $units[$pow]";
 		}
 
 		// Format coloured text
