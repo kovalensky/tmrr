@@ -354,7 +354,7 @@ $msg = lang();
 			global $msg, $torrent_size, $filec;
 
 			foreach ($array as $key => $value) {
-				$current = $parent . '/' . $key;
+				$current = "$parent/$key";
 				if (is_array($value) && !empty($key)) {
 					printFiles($value, $current);
 				}
@@ -378,7 +378,7 @@ $msg = lang();
 			global $torrent_size, $filec;
 
 			foreach ($array as $key => $value) {
-				$current_key = $parent_key . '/' . $key;
+				$current_key = "$parent_key/$key";
 				if (is_array($value) && !empty($key)) {
 					combine_keys($value, $hashes, $current_key);
 				}
@@ -701,7 +701,7 @@ $msg = lang();
 
 				if ($index === $count - 1 || $numbers[$index + 1] - $number !== 1) {
 					if ($sequenceStart !== $number) {
-						$sequences[] = $sequenceStart . '-' . $number;
+						$sequences[] = "$sequenceStart-$number";
 					}
 					else{
 						$sequences[] = $number;
