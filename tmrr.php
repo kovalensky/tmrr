@@ -677,13 +677,6 @@ $msg = lang();
 		// Format coloured text
 		function formatText($text, $color)
 		{
-<?php
-
-
-
-		// Format coloured text
-		function formatText($text, $color)
-		{
 			if (stream_isatty(STDOUT)) {
 				return "\033[$color" . "m$text\033[0m";
 			}
@@ -692,7 +685,6 @@ $msg = lang();
 			}
 		}
 
-
 		// Represent sequences
 		function formatSeq($numbers)
 		{
@@ -700,15 +692,12 @@ $msg = lang();
 			$sequenceStart = null;
 			$count = count($numbers);
 
-
 			for ($index = 0; $index < $count; ++$index) {
 				$number = $numbers[$index];
-
 
 				if ($index === 0 || $number - $numbers[$index - 1] !== 1) {
 					$sequenceStart = $number;
 				}
-
 
 				if ($index === $count - 1 || $numbers[$index + 1] - $number !== 1) {
 					if ($sequenceStart !== $number) {
@@ -720,31 +709,24 @@ $msg = lang();
 				}
 			}
 
-
 			return implode(',', $sequences);
 		}
-
 
 		// Error handler
 		function error_status()
 		{
 			global $msg, $err_status;
 
-
 			if (!empty($err_status)) {
 
-
-				echo "\r\n\r\n--- " , formatText($msg['unfinished_files'], 31) , ": ---\r\n";
-
+				echo "\r\n\r\n--- ". formatText($msg['unfinished_files'], 31) . ": ---\r\n";
 
 				foreach ($err_status as $key => $value) {
 
-
 					echo "\r\n{$msg['file_location']}: $key\r\n{$msg['error_type']}: $value\r\n\r\n";
-
 
 				}
 			}
 
-
 			die();
+}
