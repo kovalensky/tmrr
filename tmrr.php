@@ -32,7 +32,7 @@ $msg = lang();
 				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Recursive array traversal
 
-				echo "\r\n{$msg['total_files']}: $filec (" . formatBytes($torrent_size) . ")\r\n\r\n";
+				echo "\r\n{$msg['total_files']}: $filec (" , formatBytes($torrent_size) , ")\r\n\r\n";
 			}
 
 			error_status();
@@ -69,7 +69,7 @@ $msg = lang();
 
 				if (is_file($file) && !empty($size = filesize($file))) {
 					$hash = new HasherV2($file);
-					echo "\r\n  $file (" . formatBytes($size) . ")\r\n {$msg['root_hash']}: {$hash->root}\r\n\r\n";
+					echo "\r\n  $file (" , formatBytes($size) , ")\r\n {$msg['root_hash']}: {$hash->root}\r\n\r\n";
 				}
 				else{
 					$err_status[$file] = $msg['noraw'];
@@ -228,7 +228,6 @@ $msg = lang();
 				}
 				$pos += ($digits + 1);
 				$return = substr($data, $pos, $len);
-
 				if (strlen($return) !== $len) {
 					return null;
 				}
@@ -439,7 +438,7 @@ $msg = lang();
 			}
 
 			if (empty($dup_hashes)) {
-				echo "\r\n " . formatText($msg['no_duplicates'], 33) . "\r\n\r\n{$msg['total_files']}: $filec ($t_size)\r\n";
+				echo "\r\n " , formatText($msg['no_duplicates'], 33) , "\r\n\r\n{$msg['total_files']}: $filec ($t_size)\r\n";
 			}
 			else{
 				$d_count = $filed - $dup_hashes;
@@ -452,7 +451,7 @@ $msg = lang();
 
 						$percentage = ($dups_size / $torrent_size) * 100;
 						$precision = ($percentage >= 0.01) ? 2 : (!empty($percentage) ? abs(floor(log10($percentage))) : 0);
-						echo ' | ' . number_format($percentage, $precision) . "%\r\n";
+						echo ' | ' , number_format($percentage, $precision) , "%\r\n";
 					}
 
 					ob_end_flush();
@@ -464,7 +463,7 @@ $msg = lang();
 					$cli_output = stream_isatty(STDOUT);
 
 					if ($cli_output) {
-						echo "\r\n	" . formatText($msg['magnet_proposal'], 33) . "\r\n	";
+						echo "\r\n	" , formatText($msg['magnet_proposal'], 33) , "\r\n	";
 					}
 
 					$clean_cli = "\033[2A" . "\033[2K"; // Escape symbols for cleaning output
@@ -487,7 +486,7 @@ $msg = lang();
 									@exec($command);
 								}
 								else{
-									echo "\r\n " . formatText($msg['magnet_copy'], 33) . "\r\n";
+									echo "\r\n " , formatText($msg['magnet_copy'], 33) , "\r\n";
 								}
 							}
 							elseif (PHP_OS_FAMILY === 'Linux') {
@@ -497,7 +496,7 @@ $msg = lang();
 						}
 					}
 					elseif ($cli_output) {
-						echo $clean_cli . "\033[1B" . "\033[2K";
+						echo $clean_cli , "\033[1B" , "\033[2K";
 					}
 				}
 				else{
@@ -719,7 +718,7 @@ $msg = lang();
 
 			if (!empty($err_status)) {
 
-				echo "\r\n\r\n--- ". formatText($msg['unfinished_files'], 31) . ": ---\r\n";
+				echo "\r\n\r\n--- " , formatText($msg['unfinished_files'], 31) , ": ---\r\n";
 
 				foreach ($err_status as $key => $value) {
 
@@ -729,4 +728,4 @@ $msg = lang();
 			}
 
 			die();
-}
+		}
