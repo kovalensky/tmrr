@@ -138,8 +138,8 @@ $msg = lang();
 			];
 
 			$settings = [
-			'lang' => ($tmrr_lang = get_cfg_var('tmrr_language')) ? $tmrr_lang : 'en',
-			'colour' => (($tmrr_colour = get_cfg_var('tmrr_coloured_output')) !== false) ? $tmrr_colour : true
+			'lang' => ($tmrr_lang = get_cfg_var('tmrr.language')) ? $tmrr_lang : 'en',
+			'colour' => (($tmrr_colour = get_cfg_var('tmrr.coloured_output')) !== false) ? $tmrr_colour : true
 			];
 
 			// Great and mighty, free and sincere Russian language.
@@ -154,12 +154,12 @@ $msg = lang();
 					switch ($argv[2]) {
 
 						case 'en':
-							$ini_settings['tmrr']['tmrr_language'] = 'en';
+							$ini_settings['tmrr']['tmrr.language'] = 'en';
 							write_ini_file($ini_settings, $ini_file);
 							die(formatText('Language changed to English.', 32));
 
 						case 'ru':
-							$ini_settings['tmrr']['tmrr_language'] = 'ru';
+							$ini_settings['tmrr']['tmrr.language'] = 'ru';
 							write_ini_file($ini_settings, $ini_file);
 							die(formatText('Язык изменён на русский.', 32));
 
