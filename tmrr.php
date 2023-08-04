@@ -139,7 +139,7 @@ $msg = lang();
 
 			$settings = [
 			'lang' => ($tmrr_lang = get_cfg_var('tmrr.language')) ? $tmrr_lang : 'en',
-			'colour' => (($tmrr_colour = get_cfg_var('tmrr.coloured_output')) !== false) ? $tmrr_colour : true
+			'colour' => (($tmrr_colour = get_cfg_var('tmrr.coloured_mode')) !== false) ? $tmrr_colour : true
 			];
 
 			// Great and mighty, free and sincere Russian language.
