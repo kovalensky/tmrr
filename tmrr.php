@@ -82,7 +82,7 @@ $msg = lang();
 
 //Functions
 
-		// Language option (Activated by 'locale [code]' arguments. [code] = en | ru), currently works in Windows builds
+		// Language option (Activated by 'locale [code]' arguments. [code] = en | ru), works in Windows builds
 		function lang()
 		{
 			global $argv, $settings;
@@ -191,7 +191,7 @@ $msg = lang();
 						$ini_string[] = "$key = 0";
 					}
 					else {
-						$ini_string[] = "$key = " . (is_numeric($val) ? $val : "'$val'");
+						$ini_string[] = "$key = " . (is_numeric($val) ? $val : "$val");
 					}
 				}
 			};
