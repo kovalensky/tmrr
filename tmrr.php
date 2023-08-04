@@ -85,7 +85,7 @@ $msg = lang();
 		// Language option (Activated by 'locale [code]' arguments. [code] = en | ru)
 		function lang()
 		{
-			global $argv;
+			global $argv, $settings;
 
 			$version = '2.3g'; // Code name: Gribovskaya (Mushroom Pumpkin)
 			$strings = [
@@ -137,30 +137,68 @@ $msg = lang();
 				]
 			];
 
-			$ru_file = __DIR__  . '/ru';
+			$settings = [
+			'lang' => ($tmrr_lang = get_cfg_var('tmrr_language')) ? $tmrr_lang : 'en',
+			'colour' => (($tmrr_colour = get_cfg_var('tmrr_coloured_output')) !== false) ? $tmrr_colour : true
+			];
 
 			// Great and mighty, free and sincere Russian language.
 			// I.S. Turgenev's poem (1882)
 
-			if (($argv[1] ?? null) === 'locale') {
-				switch ($argv[2] ?? null) {
-					case 'en':
-						@unlink($ru_file);
-						die(formatText('Language changed to English.', 32));
+			if (($argv[1] ?? null) === 'locale' && isset($argv[2])) {
+				$ini_file = __DIR__ . '/php.ini';
 
-					case 'ru':
-						file_put_contents($ru_file, '');
-						die(formatText('Язык изменён на русский.', 32));
+				if (is_file($ini_file)) {
+					$ini_settings = parse_ini_file($ini_file, true);
 
+					switch ($argv[2]) {
+
+						case 'en':
+							$ini_settings['tmrr']['tmrr_language'] = 'en';
+							write_ini_file($ini_settings);
+							die(formatText('Language changed to English.', 32));
+
+						case 'ru':
+							$ini_settings['tmrr']['tmrr_language'] = 'ru';
+							write_ini_file($ini_settings);
+							die(formatText('Язык изменён на русский.', 32));
+
+					}
 				}
+		}
+
+			return $strings[$settings['lang']];
+		}
+
+		// Save a new ini configuration file
+		function write_ini_file($ini_data) {
+
+			if (!is_array($ini_data) || empty($ini_data)) {
+				return false;
 			}
 
-			if (file_exists($ru_file)) {
-				return $strings['ru'];
-			}
-			else{
-				return $strings['en'];
-			}
+			$ini_string = [];
+
+			$process_data = function ($data, $prefix = '') use (&$ini_string, &$process_data) {
+				foreach ($data as $key => $val) {
+					$current_key = $prefix ? "$prefix.$key" : $key;
+
+					if (is_array($val)) {
+						$ini_string[] = "[$current_key]";
+						$process_data($val, $current_key);
+					}
+					elseif ($val === null || $val === false || $val === '') {
+						$ini_string[] = "$key = 0";
+					}
+					else {
+						$ini_string[] = "$key = " . (is_numeric($val) ? $val : "'$val'");
+					}
+				}
+			};
+
+			$process_data($ini_data);
+
+			file_put_contents(__DIR__ . '/php.ini', implode(PHP_EOL, $ini_string));
 		}
 
 		// @Rhilip's bencode library (modified)
@@ -676,7 +714,9 @@ $msg = lang();
 		// Format coloured text
 		function formatText($text, $color)
 		{
-			if (stream_isatty(STDOUT)) {
+			global $settings;
+
+			if (stream_isatty(STDOUT) && $settings['colour']) {
 				return "\033[$color" . "m$text\033[0m";
 			}
 			else{
