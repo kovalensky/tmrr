@@ -82,7 +82,7 @@ $msg = lang();
 
 //Functions
 
-		// Language option (Activated by 'locale [code]' arguments. [code] = en | ru)
+		// Language option (Activated by 'locale [code]' arguments. [code] = en | ru), currently works in Windows builds
 		function lang()
 		{
 			global $argv, $settings;
@@ -155,12 +155,12 @@ $msg = lang();
 
 						case 'en':
 							$ini_settings['tmrr']['tmrr_language'] = 'en';
-							write_ini_file($ini_settings);
+							write_ini_file($ini_settings, $ini_file);
 							die(formatText('Language changed to English.', 32));
 
 						case 'ru':
 							$ini_settings['tmrr']['tmrr_language'] = 'ru';
-							write_ini_file($ini_settings);
+							write_ini_file($ini_settings, $ini_file);
 							die(formatText('Язык изменён на русский.', 32));
 
 					}
@@ -171,7 +171,7 @@ $msg = lang();
 		}
 
 		// Save a new ini configuration file
-		function write_ini_file($ini_data) {
+		function write_ini_file($ini_data, $file) {
 
 			if (!is_array($ini_data) || empty($ini_data)) {
 				return false;
@@ -198,7 +198,7 @@ $msg = lang();
 
 			$process_data($ini_data);
 
-			file_put_contents(__DIR__ . '/php.ini', implode(PHP_EOL, $ini_string));
+			file_put_contents($file, implode(PHP_EOL, $ini_string));
 		}
 
 		// @Rhilip's bencode library (modified)
