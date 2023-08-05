@@ -138,7 +138,7 @@ $msg = lang();
 					'lang_change' => 'Language changed to English.'
 				],
 				'zh' => [
-					'main' => "\r\n请使用正确的格式, 例如:\r\n\r\n\r\n tmrr e <torrent 文件>  *计算 .torrent 文件的哈希值*\r\n\r\n tmrr d <torrent 文件>  *查找 .torrent 文件中的重复项*\r\n\r\n tmrr c <你的文件>	*计算文件的哈希值*\r\n\r\n\r\n** 支持同时处理多个文件, 使用空格分隔 <文件1> <文件2>.. <文件N>.\r\n\r\n---\r\n\r\n版本号: $version\r\n作者: Constantine Kovalensky\r\n\r\n",
+					'main' => "\r\n请使用正确的格式, 例如:\r\n\r\n\r\n tmrr e <torrent 文件>  *提取 .torrent 文件的哈希值*\r\n\r\n tmrr d <torrent 文件>  *查找 .torrent 文件中的重复项*\r\n\r\n tmrr c <你的文件>	*计算文件的哈希值*\r\n\r\n\r\n** 支持同时处理多个文件, 使用空格分隔 <文件1> <文件2>.. <文件N>.\r\n\r\n---\r\n\r\n版本号: $version\r\n作者: Constantine Kovalensky\r\n\r\n",
 					'noraw' => '文件无效或不存在',
 					'invalid_torrent' => '无效的 torrent 文件',
 					'no_v2' => 'torrent 文件不是受支持的 v2 / hybrid 协议',
