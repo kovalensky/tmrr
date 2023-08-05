@@ -184,7 +184,7 @@ $msg = lang();
 
 					}
 					else{
-						die('Undefined language code "' . formatText($code, 31) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(range(32, 36)), count($strings)))));
+						die('Undefined language code "' . formatText($code, 31) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(array_merge(range(31, 36), range(90, 96))), count($strings)))));
 					}
 				}
 			}
