@@ -110,7 +110,8 @@ $msg = lang();
 					'cli_hash_extraction' => 'Извлечение хешей',
 					'magnet_proposal' => 'Создать магнит ссылку для загрузки раздачи без дубликатов? Да (d) | Нет (n) : ',
 					'magnet_copy' => 'Скопируйте магнит ссылку в торрент клиент.',
-					'created_by_client' => 'Создан'
+					'created_by_client' => 'Создан',
+					'lang_change' => 'Язык изменён на русский.'
 				],
 				'en' => [
 					'main' => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Batch processing is supported, such as <file1> <file2>.. <fileN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
@@ -133,12 +134,37 @@ $msg = lang();
 					'cli_hash_extraction' => 'Extracting file hashes',
 					'magnet_proposal' => 'Create a magnet download link without duplicates? Yes (y) | No (n) : ',
 					'magnet_copy' => 'Paste this magnet link into your torrent client.',
-					'created_by_client' => 'Created by'
+					'created_by_client' => 'Created by',
+					'lang_change' => 'Language changed to English.'
+				],
+				'zh' => [
+					'main' => "\r\n请使用正确的格式, 例如:\r\n\r\n\r\n tmrr e <torrent 文件>  *计算 .torrent 文件的哈希值*\r\n\r\n tmrr d <torrent 文件>  *查找 .torrent 文件中的重复项*\r\n\r\n tmrr c <你的文件>	*计算文件的哈希值*\r\n\r\n\r\n** 支持同时处理多个文件, 使用空格分隔 <文件1> <文件2>.. <文件N>.\r\n\r\n---\r\n\r\n版本号: $version\r\n作者: Constantine Kovalensky\r\n\r\n",
+					'noraw' => '文件无效或不存在',
+					'invalid_torrent' => '无效的 torrent 文件',
+					'no_v2' => 'torrent 文件不是受支持的 v2 / hybrid 协议',
+					'hint_v1' => 'torrent v1 协议不支持内嵌文件哈希值',
+					'root_hash' => '哈希值',
+					'calculation' => '处理中',
+					'torrent_title' => '文件标题',
+					'file_location' => '文件名',
+					'unfinished_files' => '未能处理的文件',
+					'error_type' => '错误',
+					'note' => '注释',
+					'no_duplicates' => '文件中不包含重复项',
+					'dup_found' => '存在于以下文件中',
+					'total_files' => '总文件数量',
+					'total_dup_files' => '重复文件数量',
+					'cli_dup_search' => '正在查找重复项',
+					'cli_hash_extraction' => '正在计算文件哈希值',
+					'magnet_proposal' => '是否创建一个已去重的磁力链? 是 (y) | 否 (n) : ',
+					'magnet_copy' => '请将磁力链粘贴至您的任意客户端中',
+					'created_by_client' => '来源',
+					'lang_change' => '当前语言已被修改为: 中文'
 				]
 			];
 
 			$settings = [
-			'lang' => (($tmrr_lang = get_cfg_var('tmrr.language')) && in_array($tmrr_lang, ['en', 'ru'])) ? $tmrr_lang : 'en',
+			'lang' => (($tmrr_lang = get_cfg_var('tmrr.language')) && array_key_exists($tmrr_lang, $strings)) ? $tmrr_lang : 'en',
 			'colour' => (($tmrr_colour = get_cfg_var('tmrr.coloured_mode')) !== false) ? $tmrr_colour : true
 			];
 
@@ -150,19 +176,15 @@ $msg = lang();
 
 				if (is_file($ini_file)) {
 					$ini_settings = parse_ini_file($ini_file, true);
+					if (array_key_exists($argv[2], $strings)) {
 
-					switch ($argv[2]) {
+						$ini_settings['tmrr']['tmrr.language'] = $argv[2];
+						write_ini_file($ini_settings, $ini_file);
+						die(formatText($strings[$argv[2]]['lang_change'], 32));
 
-						case 'en':
-							$ini_settings['tmrr']['tmrr.language'] = 'en';
-							write_ini_file($ini_settings, $ini_file);
-							die(formatText('Language changed to English.', 32));
-
-						case 'ru':
-							$ini_settings['tmrr']['tmrr.language'] = 'ru';
-							write_ini_file($ini_settings, $ini_file);
-							die(formatText('Язык изменён на русский.', 32));
-
+					}
+					else{
+						die(formatText('Invalid language code', 31));
 					}
 				}
 		}
