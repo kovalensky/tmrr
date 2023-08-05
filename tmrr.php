@@ -159,12 +159,12 @@ $msg = lang();
 					'magnet_proposal' => '是否创建一个已去重的磁力链? 是 (y) | 否 (n) : ',
 					'magnet_copy' => '请将磁力链粘贴至您的任意客户端中',
 					'created_by_client' => '来源',
-					'lang_change' => '当前语言已被修改为: 中文'
+					'lang_change' => '当前语言已被修改为中文'
 				]
 			];
 
 			$settings = [
-			'lang' => (($tmrr_lang = get_cfg_var('tmrr.language')) && array_key_exists($tmrr_lang, $strings)) ? $tmrr_lang : 'en',
+			'lang' => (($tmrr_lang = get_cfg_var('tmrr.language')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
 			'colour' => (($tmrr_colour = get_cfg_var('tmrr.coloured_mode')) !== false) ? $tmrr_colour : true
 			];
 
@@ -176,7 +176,7 @@ $msg = lang();
 
 				if (is_file($ini_file)) {
 					$ini_settings = parse_ini_file($ini_file, true);
-					if (array_key_exists($argv[2], $strings)) {
+					if (isset($strings[$argv[2]])) {
 
 						$ini_settings['tmrr']['tmrr.language'] = $argv[2];
 						write_ini_file($ini_settings, $ini_file);
