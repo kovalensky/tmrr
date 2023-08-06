@@ -177,15 +177,15 @@ $msg = lang();
 
 				if (is_file($ini_file)) {
 					$ini_settings = parse_ini_file($ini_file, true);
-					if (isset($strings[$code = $argv[2]])) {
+					if (isset($strings[$code = &$argv[2]])) {
 
 						$ini_settings['tmrr']['tmrr.language'] = $code;
 						write_ini_file($ini_settings, $ini_file);
-						die(formatText($strings[$code]['lang_change'], 32));
+						die(formatText($strings[$code]['lang_change'], 2));
 
 					}
 					else{
-						die('Undefined language code "' . formatText($code, 31) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip([...range(31, 36), ...range(90, 96)]), count($strings))))); // :>
+						die('Undefined language code "' . formatText($code, 196) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(range(1, 229)), count($strings))))); // :>
 					}
 				}
 			}
@@ -499,7 +499,7 @@ $msg = lang();
 			}
 
 			if (empty($dup_hashes)) {
-				echo "\r\n " , formatText($msg['no_duplicates'], 33) , "\r\n\r\n{$msg['total_files']}: $filec ($t_size)\r\n";
+				echo "\r\n " , formatText($msg['no_duplicates'], 178) , "\r\n\r\n{$msg['total_files']}: $filec ($t_size)\r\n";
 			}
 			else{
 				$d_count = $filed - $dup_hashes;
@@ -524,7 +524,7 @@ $msg = lang();
 					$cli_output = stream_isatty(STDOUT);
 
 					if ($cli_output) {
-						echo "\r\n	" , formatText($msg['magnet_proposal'], 33) , "\r\n	";
+						echo "\r\n	" , formatText($msg['magnet_proposal'], 178) , "\r\n	";
 					}
 
 					$clean_cli = "\033[2A" . "\033[2K"; // Escape symbols for cleaning output
@@ -538,7 +538,7 @@ $msg = lang();
 							echo $clean_cli;
 						}
 
-						echo "\r\n" , formatText($magnetL, 32) , "\r\n";
+						echo "\r\n" , formatText($magnetL, 70) , "\r\n";
 
 						if ($cli_output) {
 							if (PHP_OS_FAMILY === 'Windows') {
@@ -547,7 +547,7 @@ $msg = lang();
 									@exec($command);
 								}
 								else{
-									echo "\r\n " , formatText($msg['magnet_copy'], 33) , "\r\n";
+									echo "\r\n " , formatText($msg['magnet_copy'], 178) , "\r\n";
 								}
 							}
 							elseif (PHP_OS_FAMILY === 'Linux') {
@@ -742,7 +742,7 @@ $msg = lang();
 			global $settings;
 
 			if (stream_isatty(STDOUT) && $settings['colour']) {
-				return "\033[$color" . "m$text\033[0m";
+				return "\033[38;5;$color" . "m$text\033[0m";	
 			}
 			else{
 				return $text;
@@ -783,7 +783,7 @@ $msg = lang();
 
 			if (!empty($err_status)) {
 
-				echo "\r\n\r\n--- " , formatText($msg['unfinished_files'], 31) , ": ---\r\n";
+				echo "\r\n\r\n--- " , formatText($msg['unfinished_files'], 196) , ": ---\r\n";
 
 				foreach ($err_status as $key => $value) {
 
