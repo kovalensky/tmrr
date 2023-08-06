@@ -171,6 +171,7 @@ $msg = lang();
 			// Great and mighty, free and sincere Russian language.
 			// I.S. Turgenev's poem (1882)
 
+
 			if (($argv[1] ?? null) === 'locale' && isset($argv[2])) {
 				$ini_file = __DIR__ . '/php.ini';
 
@@ -184,7 +185,7 @@ $msg = lang();
 
 					}
 					else{
-						die('Undefined language code "' . formatText($code, 31) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(array_merge(range(31, 36), range(90, 96))), count($strings)))));
+						die('Undefined language code "' . formatText($code, 31) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip([...range(31, 36), ...range(90, 96)]), count($strings))))); // :>
 					}
 				}
 			}
@@ -659,6 +660,7 @@ $msg = lang();
 
 					$blocks[] = hash('sha256', $leaf, true);
 					$blocks_count = count($blocks);
+
 					if ($blocks_count !== $this->num_blocks) {
 						$remaining = $this->num_blocks - $blocks_count;
 						if (count($this->layer_hashes) === 0) {
@@ -666,11 +668,12 @@ $msg = lang();
 							$remaining = $power2 - $blocks_count;
 						}
 						$padding = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
-						$blocks = array_merge($blocks, array_slice($padding, 0, $remaining));
+						$blocks = [...$blocks, ...array_slice($padding, 0, $remaining)];
 					}
 					$layer_hash = $this->merkle_root($blocks);
 					$this->layer_hashes[] = $layer_hash;
 				}
+
 				$this->calculate_root();
 			}
 
@@ -687,12 +690,12 @@ $msg = lang();
 						$remainder--;
 					}
 				}
+
 				$this->root = bin2hex($this->merkle_root($this->layer_hashes));
 			}
 
 			private function merkle_root($blocks)
 			{
-				if (count($blocks) > 0) {
 					while (count($blocks) > 1) {
 						$blocks_count = count($blocks);
 						$next_level_blocks = [];
@@ -705,9 +708,8 @@ $msg = lang();
 						}
 						$blocks = $next_level_blocks;
 					}
+
 					return $blocks[0];
-				}
-				return $blocks;
 			}
 
 			private function next_power_2($value)
@@ -719,6 +721,7 @@ $msg = lang();
 				while ($start < $value) {
 					$start <<= 1;
 				}
+
 				return $start;
 			}
 		}
