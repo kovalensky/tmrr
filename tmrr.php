@@ -189,7 +189,7 @@ $msg = lang();
 						tmrr_set_preferences('tmrr.colours', false);
 						die("$pref => $value");
 					}
-					elseif ($value === 'enable'){
+					elseif ($value === 'enable') {
 						tmrr_set_preferences('tmrr.colours', true);
 						$settings['colours'] = true;
 						die(formatText("$pref => $value", 70));
@@ -220,7 +220,8 @@ $msg = lang();
 
 			$ini_string = [];
 
-			$process_data = function ($data, $prefix = '') use (&$ini_string, &$process_data) {
+			$process_data = function ($data, $prefix = '') use (&$ini_string, &$process_data)
+			{
 				foreach ($data as $key => $val) {
 					$current_key = $prefix ? "$prefix.$key" : $key;
 
@@ -552,6 +553,7 @@ $msg = lang();
 					$handle = strtolower(fgets(fopen('php://stdin', 'r')));
 
 					if (in_array(trim($handle), $acceptance_symbol) || $handle === PHP_EOL) {
+
 						$magnetL = magnet_gen();
 
 						if ($cli_output) {
