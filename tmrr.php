@@ -160,6 +160,30 @@ $msg = lang();
 					'magnet_copy' => '请将磁力链粘贴至您的任意客户端中',
 					'created_by_client' => '来源',
 					'lang_change' => '当前语言已被修改为: 中文'
+				],
+				'de' => [
+                    'main' => "\r\nBitte benutzen sie das richtige syntax, as:\r\n\r\n\r\n tmrr e <Torrent-Datei>	*Extrahieren sie die Datei hashes von .torrent Dateien*\r\n\r\n tmrr d <Torrent-Datei>	*Finden sie Dublikate Dateien in .torrent Dateie(n)*\r\n\r\n tmrr c <deine-Datei>	*Berechnet die hash der existierenden Datei*\r\n\r\n\r\n** Beitung vorgehen wird unterstützt, so wie <Datei1> <Datei2>.. <DateiN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAutor: Constantine Kovalensky\r\n\r\n",
+                    'noraw' => 'Dies ist keine zulässige Datei, ist sie leer?',
+                    'invalid_torrent' => 'Unzulässige torrent Datei.',
+                    'no_v2' => 'Dies ist eine unzulässige v2 / hybrid torrent.',
+                    'hint_v1' => 'v1 protokoll torrents unterstützen keine eingebettenen Datei hashes.',
+                    'root_hash' => 'Hash',
+                    'calculation' => 'Prozessvorgang',
+                    'torrent_title' => 'Name',
+                    'file_location' => 'Datei',
+                    'unfinished_files' => 'Unprozessierte Dateien',
+                    'error_type' => 'Fehler Typ',
+                    'note' => 'Notiz',
+                    'no_duplicates' => 'Keine Dublikate wurden gefunden.',
+                    'dup_found' => 'gefunden',
+                    'total_files' => 'Gesamte Dateien',
+                    'total_dup_files' => 'Doppelter Inhalt',
+                    'cli_dup_search' => 'Suche nach Dublikaten',
+                    'cli_hash_extraction' => 'Extrahiere Datei hashes',
+                    'magnet_proposal' => 'Erstelle einen Magneten download link ohne Dublikate? Ja (j) | Nein (n) : ',
+                    'magnet_copy' => 'Kopieren sie diesen magneten link in ihr torrent Programm.',
+                    'created_by_client' => 'Ertellt von',
+                    'lang_change' => 'Sprache geändert zu Deutsch.'
 				]
 			];
 
@@ -180,7 +204,7 @@ $msg = lang();
 						die(formatText($strings[$value]['lang_change'], 70));
 					}
 					else{
-						die('Undefined language code "' . formatText($lang_code, 196) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(range(1, 229)), count($strings))))); // :>
+						die('Undefined language code "' . formatText($value, 196) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(range(1, 229)), count($strings))))); // :>
 					}
 				}
 
