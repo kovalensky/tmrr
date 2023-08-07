@@ -183,7 +183,7 @@ $msg = lang();
                     'magnet_proposal' => 'Erstelle einen Magneten download link ohne Dublikate? Ja (j) | Nein (n) : ',
                     'magnet_copy' => 'Kopieren sie diesen magneten link in ihr torrent Programm.',
                     'created_by_client' => 'Ertellt von',
-                    'lang_change' => 'Sprache geändert zu Deutsch.'
+                    'lang_change' => 'Sprache geändert zu: Deutsch.'
 				]
 			];
 
