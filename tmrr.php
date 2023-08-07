@@ -32,7 +32,7 @@ $msg = lang();
 				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Recursive array traversal
 
-				echo "\r\n{$msg['total_files']}: $filec (" , formatBytes($torrent_size) , ")\r\n\r\n";
+				echo "\r\n", formatText($msg['total_files'], 250), ": $filec (" , formatBytes($torrent_size) , ")\r\n\r\n";
 			}
 
 			error_status();
@@ -69,7 +69,7 @@ $msg = lang();
 
 				if (is_file($file) && !empty($size = filesize($file))) {
 					$hash = new HasherV2($file);
-					echo "\r\n  $file (" , formatBytes($size) , ")\r\n {$msg['root_hash']}: {$hash->root}\r\n\r\n";
+					echo "\r\n  $file (" , formatBytes($size) , ")\r\n ", formatText($msg['root_hash'], 250), ": {$hash->root}\r\n\r\n";
 				}
 				else{
 					$err_status[$file] = $msg['noraw'];
@@ -85,7 +85,7 @@ $msg = lang();
 		// Language option (Activated by 'locale [code]' arguments. [code] = en | ru), works in Windows builds
 		function lang()
 		{
-			global $argv, $settings;
+			global $settings, $argv;
 
 			$version = '2.3g'; // Code name: Gribovskaya (Mushroom Pumpkin)
 			$strings = [
@@ -111,7 +111,7 @@ $msg = lang();
 					'magnet_proposal' => 'Создать магнит ссылку для загрузки раздачи без дубликатов? Да (d) | Нет (n) : ',
 					'magnet_copy' => 'Скопируйте магнит ссылку в торрент клиент.',
 					'created_by_client' => 'Создан',
-					'lang_change' => 'Язык изменён на русский.'
+					'lang_change' => 'Язык изменён на: Русский.'
 				],
 				'en' => [
 					'main' => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Batch processing is supported, such as <file1> <file2>.. <fileN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
@@ -135,7 +135,7 @@ $msg = lang();
 					'magnet_proposal' => 'Create a magnet download link without duplicates? Yes (y) | No (n) : ',
 					'magnet_copy' => 'Paste this magnet link into your torrent client.',
 					'created_by_client' => 'Created by',
-					'lang_change' => 'Language changed to English.'
+					'lang_change' => 'Language changed to: English.'
 				],
 				'zh' => [
 					'main' => "\r\n请使用正确的格式, 例如:\r\n\r\n\r\n tmrr e <torrent 文件>	*提取 .torrent 文件的哈希值*\r\n\r\n tmrr d <torrent 文件>	*查找 .torrent 文件中的重复项*\r\n\r\n tmrr c <你的文件>	*计算文件的哈希值*\r\n\r\n\r\n** 支持同时处理多个文件, 使用空格分隔 <文件1> <文件2>.. <文件N>.\r\n\r\n---\r\n\r\n版本号: $version\r\n作者: Constantine Kovalensky\r\n\r\n",
@@ -159,42 +159,60 @@ $msg = lang();
 					'magnet_proposal' => '是否创建一个已去重的磁力链? 是 (y) | 否 (n) : ',
 					'magnet_copy' => '请将磁力链粘贴至您的任意客户端中',
 					'created_by_client' => '来源',
-					'lang_change' => '当前语言已被修改为中文'
+					'lang_change' => '当前语言已被修改为: 中文'
 				]
 			];
 
 			$settings = [
-			'lang' => (($tmrr_lang = get_cfg_var('tmrr.language')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
-			'colour' => (($tmrr_colour = get_cfg_var('tmrr.coloured_mode')) !== false) ? $tmrr_colour : true
+			'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
+			'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true
 			];
 
-			// Great and mighty, free and sincere Russian language.
-			// I.S. Turgenev's poem (1882)
 
+			if (isset($settings[$argv[1]]) && isset($argv[2])) {
 
-			if (($argv[1] ?? null) === 'locale' && isset($argv[2])) {
-				$ini_file = __DIR__ . '/php.ini';
+				$pref = &$argv[1];
+				$value = &$argv[2];
 
-				if (is_file($ini_file)) {
-					$ini_settings = parse_ini_file($ini_file, true);
-					if (isset($strings[$code = &$argv[2]])) {
-
-						$ini_settings['tmrr']['tmrr.language'] = $code;
-						write_ini_file($ini_settings, $ini_file);
-						die(formatText($strings[$code]['lang_change'], 2));
-
+				if ($pref === 'locale') {
+					if (isset($strings[$value])) {
+						tmrr_set_preferences('tmrr.locale', $value);
+						die(formatText($strings[$value]['lang_change'], 70));
 					}
 					else{
-						die('Undefined language code "' . formatText($code, 196) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(range(1, 229)), count($strings))))); // :>
+						die('Undefined language code "' . formatText($lang_code, 196) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(range(1, 229)), count($strings))))); // :>
+					}
+				}
+
+				if ($pref === 'colours') {
+					if ($value === 'disable') {
+						tmrr_set_preferences('tmrr.colours', false);
+						die("$pref => $value");
+					}
+					elseif ($value === 'enable'){
+						tmrr_set_preferences('tmrr.colours', true);
+						$settings['colours'] = true;
+						die(formatText("$pref => $value", 70));
 					}
 				}
 			}
 
-			return $strings[$settings['lang']];
+			return $strings[$settings['locale']];
+		}
+
+		// Set preferences via php.ini configuration
+		function tmrr_set_preferences($preference, $value)
+		{
+			if (is_file($ini_file = __DIR__ . '/php.ini')) {
+				$ini_settings = parse_ini_file($ini_file, true);
+				$ini_settings['tmrr'][$preference] = $value;
+				write_ini_file($ini_settings, $ini_file);
+			}
 		}
 
 		// Save a new ini configuration file
-		function write_ini_file($ini_data, $file) {
+		function write_ini_file($ini_data, $file)
+		{
 
 			if (!is_array($ini_data) || empty($ini_data)) {
 				return false;
@@ -213,7 +231,7 @@ $msg = lang();
 					elseif ($val === null || $val === false || $val === '') {
 						$ini_string[] = "$key = 0";
 					}
-					else {
+					else{
 						$ini_string[] = "$key = " . (is_numeric($val) ? $val : "$val");
 					}
 				}
@@ -499,12 +517,13 @@ $msg = lang();
 			}
 
 			if (empty($dup_hashes)) {
-				echo "\r\n " , formatText($msg['no_duplicates'], 178) , "\r\n\r\n{$msg['total_files']}: $filec ($t_size)\r\n";
+				echo "\r\n " , formatText($msg['no_duplicates'], 178) , "\r\n\r\n", formatText($msg['total_files'], 250), ": $filec ($t_size)\r\n";
 			}
 			else{
 				$d_count = $filed - $dup_hashes;
 				$d_sizes = formatBytes($dups_size);
-				echo "{$msg['total_files']}: $filec ($t_size)\r\n{$msg['total_dup_files']}: $d_count ($d_sizes)";
+
+				echo formatText($msg['total_files'], 250), ": $filec ($t_size)\r\n" , formatText($msg['total_dup_files'], 250), ": $d_count ($d_sizes)";
 
 				if ($single_torrent) {
 
@@ -534,6 +553,7 @@ $msg = lang();
 
 					if (in_array(trim($handle), $acceptance_symbol) || $handle === PHP_EOL) {
 						$magnetL = magnet_gen();
+
 						if ($cli_output) {
 							echo $clean_cli;
 						}
@@ -741,8 +761,8 @@ $msg = lang();
 		{
 			global $settings;
 
-			if (stream_isatty(STDOUT) && $settings['colour']) {
-				return "\033[38;5;$color" . "m$text\033[0m";	
+			if (stream_isatty(STDOUT) && $settings['colours']) {
+				return "\033[38;5;$color" . "m$text\033[0m";
 			}
 			else{
 				return $text;
