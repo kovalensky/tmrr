@@ -159,7 +159,7 @@ $msg = lang();
 					'magnet_proposal' => '是否创建一个已去重的磁力链? 是 (y) | 否 (n) : ',
 					'magnet_copy' => '请将磁力链粘贴至您的任意客户端中',
 					'created_by_client' => '来源',
-					'lang_change' => '当前语言已被修改为: 中文'
+					'lang_change' => '当前语言已被修改为: 中文。'
 				],
 				'de' => [
                     'main' => "\r\nBitte benutzen sie das richtige syntax, as:\r\n\r\n\r\n tmrr e <Torrent-Datei>	*Extrahieren sie die Datei hashes von .torrent Dateien*\r\n\r\n tmrr d <Torrent-Datei>	*Finden sie Dublikate Dateien in .torrent Dateie(n)*\r\n\r\n tmrr c <deine-Datei>	*Berechnet die hash der existierenden Datei*\r\n\r\n\r\n** Beitung vorgehen wird unterstützt, so wie <Datei1> <Datei2>.. <DateiN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAutor: Constantine Kovalensky\r\n\r\n",
