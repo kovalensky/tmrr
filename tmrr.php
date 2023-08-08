@@ -108,7 +108,7 @@ $msg = lang();
 					'total_dup_files' => 'Количество дубликатов',
 					'cli_dup_search' => 'Поиск дубликатов',
 					'cli_hash_extraction' => 'Извлечение хешей',
-					'magnet_proposal' => 'Создать магнит ссылку для загрузки раздачи без дубликатов? Да (d) | Нет (n) : ',
+					'magnet_proposal' => 'Создать магнит ссылку для загрузки раздачи без дубликатов? Да ([Enter]) | Нет (n) : ',
 					'magnet_copy' => 'Скопируйте магнит ссылку в торрент клиент.',
 					'created_by_client' => 'Создан',
 					'lang_change' => 'Язык изменён на: Русский.'
@@ -132,7 +132,7 @@ $msg = lang();
 					'total_dup_files' => 'Duplicate count',
 					'cli_dup_search' => 'Searching for duplicates',
 					'cli_hash_extraction' => 'Extracting file hashes',
-					'magnet_proposal' => 'Create a magnet download link without duplicates? Yes (y) | No (n) : ',
+					'magnet_proposal' => 'Create a magnet download link without duplicates? Yes ([Enter]) | No (n) : ',
 					'magnet_copy' => 'Paste this magnet link into your torrent client.',
 					'created_by_client' => 'Created by',
 					'lang_change' => 'Language changed to: English.'
@@ -156,7 +156,7 @@ $msg = lang();
 					'total_dup_files' => '重复文件数量',
 					'cli_dup_search' => '正在查找重复项',
 					'cli_hash_extraction' => '正在计算文件哈希值',
-					'magnet_proposal' => '是否创建一个已去重的磁力链? 是 (y) | 否 (n) : ',
+					'magnet_proposal' => '是否创建一个已去重的磁力链? 是 ([Enter]) | 否 (n) : ',
 					'magnet_copy' => '请将磁力链粘贴至您的任意客户端中',
 					'created_by_client' => '来源',
 					'lang_change' => '当前语言已被修改为: 中文。'
@@ -180,7 +180,7 @@ $msg = lang();
 					'total_dup_files' => 'Doppelter Inhalt',
 					'cli_dup_search' => 'Suche nach Dublikaten',
 					'cli_hash_extraction' => 'Extrahiere Datei hashes',
-					'magnet_proposal' => 'Erstelle einen Magneten download link ohne Dublikate? Ja (j) | Nein (n) : ',
+					'magnet_proposal' => 'Erstelle einen Magneten download link ohne Dublikate? Ja ([Enter]) | Nein (n) : ',
 					'magnet_copy' => 'Kopieren sie diesen magneten link in ihr torrent Programm.',
 					'created_by_client' => 'Ertellt von',
 					'lang_change' => 'Sprache geändert zu: Deutsch.'
@@ -503,7 +503,7 @@ $msg = lang();
 		//Create an array and find duplicates
 		function compare()
 		{
-			global $msg, $hashes, $torrent, $torrent_size, $filec, $magnet, $argv, $argc;
+			global $msg, $hashes, $torrent, $torrent_size, $filec, $magnet, $settings, $argv, $argc;
 
 			$t_size = formatBytes($torrent_size);
 			$single_torrent = $argc < 4 ? true : false;
@@ -565,18 +565,17 @@ $msg = lang();
 					// Magnet handler
 					cli_set_process_title($msg['magnet_proposal']);
 
-					$cli_output = stream_isatty(STDOUT);
+					$cli_output = (stream_isatty(STDOUT) && $settings['colours']) ? true : false;
 
 					if ($cli_output) {
 						echo "\r\n	" , formatText($msg['magnet_proposal'], 178) , "\r\n	";
 					}
 
 					$clean_cli = "\033[2A" . "\033[2K"; // Escape symbols for cleaning output
-					$acceptance_symbol = ['y', 'd'];
 
 					$handle = strtolower(fgets(fopen('php://stdin', 'r')));
 
-					if (in_array(trim($handle), $acceptance_symbol) || $handle === PHP_EOL) {
+					if ($handle === PHP_EOL) {
 
 						$magnetL = magnet_gen();
 
