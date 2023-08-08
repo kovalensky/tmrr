@@ -585,7 +585,7 @@ $msg = lang();
 
 						echo "\r\n" , formatText($magnetL, 70) , "\r\n";
 
-						if ($cli_output) {
+						if (stream_isatty(STDOUT)) {
 							if (PHP_OS_FAMILY === 'Windows') {
 								$command = 'start "" "' . $magnetL . '"';
 								if (strlen($command) <= 8191) { // Windows command length limit
