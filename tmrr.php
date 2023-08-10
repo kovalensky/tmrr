@@ -776,7 +776,7 @@ $msg = lang();
 		{
 			static $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
-			$pow = min(floor(($bytes ? log($bytes) : 0) / log(1024)), count($units) - 1);
+			$pow = min(floor(($bytes ? log($bytes) : 0) / log(1024)), 4);
 
 			return round($bytes / (1024 ** $pow), $precision) . " $units[$pow]";
 		}
