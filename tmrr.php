@@ -189,7 +189,8 @@ $msg = lang();
 
 			$settings = [
 			'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
-			'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true
+			'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
+			'output' => stream_isatty(STDOUT)
 			];
 
 
@@ -399,26 +400,27 @@ $msg = lang();
 			if (($torrent['info']['meta version'] ?? null) !== 2 || !isset($torrent['info']['file tree'])) { // BEP 0052
 
 				$title = $client_date = $hash_v1 = $note_v1 = '';
+				$text_colour = 250;
 
 				if (isset($torrent['info']['name'])) {
 					$t_name = &$torrent['info']['name'];
 					if (pathinfo($file, PATHINFO_FILENAME) !== $t_name) {
-						$title = "\r\n{$msg['torrent_title']}: $t_name";
+						$title = "\r\n" . formatText($msg['torrent_title'], $text_colour) . ": $t_name";
 					}
 				}
 
 				if (isset($torrent['creation date'], $torrent['created by'])) {
 					$date = date("d M Y | G:i:s T", $torrent['creation date']);
-					$client_date =  "\r\n{$msg['created_by_client']}: {$torrent['created by']} ($date)";
+					$client_date =  "\r\n" . formatText($msg['created_by_client'], $text_colour) . ": {$torrent['created by']} ($date)";
 				}
 
 				if (isset($torrent['info']['pieces'])) {
 					$info_hash_v1 = hash('sha1', bencode_encode($torrent['info']));
-					$hash_v1 = "\r\n{$msg['root_hash']}: $info_hash_v1";
+					$hash_v1 = "\r\n" . formatText($msg['root_hash'], $text_colour) . ": $info_hash_v1";
 				}
 
 				if (!isset($torrent['info']['meta version'])) {
-					$note_v1 = "\r\n{$msg['note']}: {$msg['hint_v1']}";
+					$note_v1 = "\r\n" . formatText($msg['note'], $text_colour) . ": {$msg['hint_v1']}";
 				}
 
 				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $note_v1;
@@ -436,18 +438,19 @@ $msg = lang();
 		{
 			global $msg, $torrent;
 
-			echo "\r\n — {$msg['file_location']}: $filename —\r\n";
+			$text_colour = 250;
+			echo "\r\n — ", formatText($msg['file_location'], $text_colour), ": $filename —\r\n";
 
 			if (isset($torrent['info']['name'])) { // BEP 0052
 				$t_name = &$torrent['info']['name'];
 				if (pathinfo($filename, PATHINFO_FILENAME) !== $t_name) {
-					echo " — {$msg['torrent_title']}: $t_name —\r\n";
+					echo ' — ', formatText($msg['torrent_title'], $text_colour), ": $t_name —\r\n";
 				}
 			}
 
 			if (isset($torrent['creation date'], $torrent['created by'])) {
 				$creation_date = date("d M Y | G:i:s T", $torrent['creation date']);
-				echo " — {$msg['created_by_client']}: {$torrent['created by']} ($creation_date) —\r\n";
+				echo ' — ', formatText($msg['created_by_client'], $text_colour), ": {$torrent['created by']} ($creation_date) —\r\n";
 			}
 		}
 
@@ -565,7 +568,7 @@ $msg = lang();
 					// Magnet handler
 					cli_set_process_title($msg['magnet_proposal']);
 
-					$cli_output = (stream_isatty(STDOUT) && $settings['colours']) ? true : false;
+					$cli_output = ($settings['output'] && $settings['colours']) ? true : false;
 
 					if ($cli_output) {
 						echo "\r\n	" , formatText($msg['magnet_proposal'], 178) , "\r\n	";
@@ -585,7 +588,7 @@ $msg = lang();
 
 						echo "\r\n" , formatText($magnetL, 70) , "\r\n";
 
-						if (stream_isatty(STDOUT)) {
+						if ($settings['output']) {
 							if (PHP_OS_FAMILY === 'Windows') {
 								$command = 'start "" "' . $magnetL . '"';
 								if (strlen($command) <= 8191) { // Windows command length limit
@@ -786,7 +789,7 @@ $msg = lang();
 		{
 			global $settings;
 
-			if (stream_isatty(STDOUT) && $settings['colours']) {
+			if ($settings['output'] && $settings['colours']) {
 				return "\033[38;5;$color" . "m$text\033[0m";
 			}
 			else{
@@ -832,7 +835,7 @@ $msg = lang();
 
 				foreach ($err_status as $key => $value) {
 
-					echo "\r\n{$msg['file_location']}: $key\r\n{$msg['error_type']}: $value\r\n\r\n";
+					echo "\r\n", formatText($msg['file_location'], 250), ": $key\r\n", formatText($msg['error_type'], 250), ": $value\r\n\r\n";
 
 				}
 			}
