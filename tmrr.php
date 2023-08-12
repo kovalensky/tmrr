@@ -210,11 +210,11 @@ $msg = lang();
 				}
 
 				if ($pref === 'colours') {
-					if ($value === 'disable') {
+					if ($value === 'off') {
 						tmrr_set_preferences('tmrr.colours', false);
 						die("$pref => $value");
 					}
-					elseif ($value === 'enable') {
+					elseif ($value === 'on') {
 						tmrr_set_preferences('tmrr.colours', true);
 						$settings['colours'] = true;
 						die(formatText("$pref => $value", 70));
