@@ -254,7 +254,10 @@ $msg = lang();
 						$ini_string[] = "[$current_key]";
 						$process_data($val, $current_key);
 					}
-					elseif ($val === null || $val === false) {
+					elseif ($val === null || $val === '') {
+						$ini_string[] = "$key = ";
+					}
+					elseif ($val === false) {
 						$ini_string[] = "$key = 0";
 					}
 					else{
