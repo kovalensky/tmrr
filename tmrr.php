@@ -400,7 +400,7 @@ $msg = lang();
 				return false;
 			}
 
-			if (($torrent['info']['meta version'] ?? null) !== 2 || empty($torrent['info']['file tree'])) { // BEP 0052
+			if (($torrent['info']['meta version'] ?? null) !== 2 || !is_array($torrent['info']['file tree'])) { // BEP 0052
 
 				$text_clr = 250;
 				$title = $client_date = $hash_v1 = $note_v1 = '';
