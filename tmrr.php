@@ -68,12 +68,8 @@ $msg = lang();
 			foreach (array_slice($argv, 2) as $file) {
 
 				if (is_file($file) && !empty($size = filesize($file))) {
-
 					$hash = new HasherV2($file);
-					$file = formatText($file, 250);
-					$size = formatBytes($size);
-
-					echo "\r\n  $file ($size)\r\n {$msg['root_hash']}: {$hash->root}\r\n\r\n";
+					echo "\r\n  ", formatText($file, 250) , ' (' , formatBytes($size) , ")\r\n {$msg['root_hash']}: {$hash->root}\r\n\r\n";
 				}
 				else{
 					$err_status[$file] = $msg['noraw'];
