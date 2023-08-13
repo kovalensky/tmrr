@@ -254,11 +254,11 @@ $msg = lang();
 						$ini_string[] = "[$current_key]";
 						$process_data($val, $current_key);
 					}
-					elseif ($val === null || $val === false || $val === '') {
+					elseif ($val === null || $val === false) {
 						$ini_string[] = "$key = 0";
 					}
 					else{
-						$ini_string[] = "$key = " . (is_numeric($val) ? $val : "\"$val\"");
+						$ini_string[] = "$key = " . ((is_numeric($val) || $val === true) ? $val : "\"$val\"");
 					}
 				}
 			};
@@ -399,28 +399,28 @@ $msg = lang();
 
 			if (($torrent['info']['meta version'] ?? null) !== 2 || !isset($torrent['info']['file tree'])) { // BEP 0052
 
+				$text_clr = 250;
 				$title = $client_date = $hash_v1 = $note_v1 = '';
-				$text_colour = 250;
 
 				if (isset($torrent['info']['name'])) {
 					$t_name = &$torrent['info']['name'];
 					if (pathinfo($file, PATHINFO_FILENAME) !== $t_name) {
-						$title = "\r\n" . formatText($msg['torrent_title'], $text_colour) . ": $t_name";
+						$title = "\r\n" . formatText($msg['torrent_title'], $text_clr) . ": $t_name";
 					}
 				}
 
 				if (isset($torrent['creation date'], $torrent['created by'])) {
 					$date = date("d M Y | G:i:s T", $torrent['creation date']);
-					$client_date =  "\r\n" . formatText($msg['created_by_client'], $text_colour) . ": {$torrent['created by']} ($date)";
+					$client_date =  "\r\n" . formatText($msg['created_by_client'], $text_clr) . ": {$torrent['created by']} ($date)";
 				}
 
 				if (isset($torrent['info']['pieces'])) {
 					$info_hash_v1 = hash('sha1', bencode_encode($torrent['info']));
-					$hash_v1 = "\r\n" . formatText($msg['root_hash'], $text_colour) . ": $info_hash_v1";
+					$hash_v1 = "\r\n" . formatText($msg['root_hash'], $text_clr) . ": $info_hash_v1";
 				}
 
 				if (!isset($torrent['info']['meta version'])) {
-					$note_v1 = "\r\n" . formatText($msg['note'], $text_colour) . ": {$msg['hint_v1']}";
+					$note_v1 = "\r\n" . formatText($msg['note'], $text_clr) . ": {$msg['hint_v1']}";
 				}
 
 				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $note_v1;
@@ -438,19 +438,19 @@ $msg = lang();
 		{
 			global $msg, $torrent;
 
-			$text_colour = 250;
-			echo "\r\n — ", formatText($msg['file_location'], $text_colour), ": $filename —\r\n";
+			$text_clr = 250;
+			echo "\r\n — ", formatText($msg['file_location'], $text_clr), ": $filename —\r\n";
 
 			if (isset($torrent['info']['name'])) { // BEP 0052
 				$t_name = &$torrent['info']['name'];
 				if (pathinfo($filename, PATHINFO_FILENAME) !== $t_name) {
-					echo ' — ', formatText($msg['torrent_title'], $text_colour), ": $t_name —\r\n";
+					echo ' — ', formatText($msg['torrent_title'], $text_clr), ": $t_name —\r\n";
 				}
 			}
 
 			if (isset($torrent['creation date'], $torrent['created by'])) {
 				$creation_date = date("d M Y | G:i:s T", $torrent['creation date']);
-				echo ' — ', formatText($msg['created_by_client'], $text_colour), ": {$torrent['created by']} ($creation_date) —\r\n";
+				echo ' — ', formatText($msg['created_by_client'], $text_clr), ": {$torrent['created by']} ($creation_date) —\r\n";
 			}
 		}
 
