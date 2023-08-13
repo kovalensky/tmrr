@@ -441,7 +441,7 @@ $msg = lang();
 		{
 			global $msg, $torrent;
 
-			$text_clr = 250;
+			$text_clr = 106;
 			echo "\r\n — ", formatText($msg['file_location'], $text_clr), ": $filename —\r\n";
 
 			if (isset($torrent['info']['name'])) { // BEP 0052
