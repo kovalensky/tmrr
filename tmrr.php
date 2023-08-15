@@ -162,7 +162,7 @@ $msg = lang();
 					'lang_change' => '当前语言已被修改为: 中文。'
 				],
 				'de' => [
-					'main' => "\r\nBitte benutzen sie das richtige syntax, as:\r\n\r\n\r\n tmrr e <Torrent-Datei>	*Extrahieren sie die Datei hashes von .torrent Dateien*\r\n\r\n tmrr d <Torrent-Datei>	*Finden sie Dublikate Dateien in .torrent Dateie(n)*\r\n\r\n tmrr c <deine-Datei>	*Berechnet die hash der existierenden Datei*\r\n\r\n\r\n** Beitung vorgehen wird unterstützt, so wie <Datei1> <Datei2>.. <DateiN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAutor: Constantine Kovalensky\r\n\r\n",
+					'main' => "\r\nBitte benutzen sie das richtige syntax, wie:\r\n\r\n\r\n tmrr e <Torrent-Datei>	*Extrahieren sie die Datei hashes von .torrent Dateien*\r\n\r\n tmrr d <Torrent-Datei>	*Finden sie Dublikate Dateien in .torrent Dateie(n)*\r\n\r\n tmrr c <deine-Datei>	*Berechnet die hash der existierenden Datei*\r\n\r\n\r\n** Beitung vorgehen wird unterstützt, so wie <Datei1> <Datei2>.. <DateiN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAutor: Constantine Kovalensky\r\n\r\n",
 					'noraw' => 'Dies ist keine zulässige Datei, ist sie leer?',
 					'invalid_torrent' => 'Unzulässige torrent Datei.',
 					'no_v2' => 'Dies ist eine unzulässige v2 / hybrid torrent.',
@@ -194,7 +194,7 @@ $msg = lang();
 			];
 
 
-			if (isset(($settings[$argv[1] ?? null]), $argv[2])) {
+			if (isset($settings[$argv[1] ?? null], $argv[2])) {
 
 				$pref = &$argv[1];
 				$value = &$argv[2];
