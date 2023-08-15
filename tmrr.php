@@ -194,7 +194,7 @@ $msg = lang();
 			];
 
 
-			if (isset($settings[$argv[1] ?? null]) && isset($argv[2])) {
+			if (isset(($settings[$argv[1] ?? null]), $argv[2])) {
 
 				$pref = &$argv[1];
 				$value = &$argv[2];
