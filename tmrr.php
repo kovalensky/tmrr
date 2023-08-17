@@ -190,7 +190,8 @@ $msg = lang();
 			$settings = [
 			'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
 			'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
-			'output' => stream_isatty(STDOUT)
+			'output' => stream_isatty(STDOUT),
+			'debug' => error_reporting()
 			];
 
 
@@ -220,17 +221,28 @@ $msg = lang();
 						die("$pref => $value");
 					}
 				}
+
+				if ($pref === 'debug') {
+					if ($value === 'on') {
+						tmrr_set_preferences('display_errors', true, 'PHP');
+						die(formatText("$pref => $value", 196));
+					}
+					elseif ($value === 'off') {
+						tmrr_set_preferences('display_errors', false, 'PHP');
+						die(formatText("$pref => $value", 70));
+					}
+				}
 			}
 
 			return $strings[$settings['locale']];
 		}
 
 		// Set preferences via php.ini configuration
-		function tmrr_set_preferences($preference, $value)
+		function tmrr_set_preferences($preference, $value, $section = 'tmrr')
 		{
 			if (is_file($ini_file = __DIR__ . '/php.ini')) {
 				$ini_settings = parse_ini_file($ini_file, true);
-				$ini_settings['tmrr'][$preference] = $value;
+				$ini_settings[$section][$preference] = $value;
 				write_ini_file($ini_settings, $ini_file);
 			}
 		}
