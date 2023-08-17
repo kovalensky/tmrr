@@ -498,7 +498,7 @@ $msg = lang();
 					$hashes[substr($current_key, 1, -1)] = [
 						'hash' => "$root ($size)",
 						'size' => $length,
-						'pos' => $filec ?? 0
+						'pos' => $filec
 					];
 					$torrent_size += $length;
 					++$filec;
