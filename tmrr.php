@@ -210,14 +210,14 @@ $msg = lang();
 				}
 
 				if ($pref === 'colours') {
-					if ($value === 'off') {
-						tmrr_set_preferences('tmrr.colours', false);
-						die("$pref => $value");
-					}
-					elseif ($value === 'on') {
+					if ($value === 'on') {
 						tmrr_set_preferences('tmrr.colours', true);
 						$settings['colours'] = true;
 						die(formatText("$pref => $value", 70));
+					}
+					elseif ($value === 'off') {
+						tmrr_set_preferences('tmrr.colours', false);
+						die("$pref => $value");
 					}
 				}
 			}
@@ -400,7 +400,7 @@ $msg = lang();
 				return false;
 			}
 
-			if (($torrent['info']['meta version'] ?? null) !== 2 || !is_array($torrent['info']['file tree'])) { // BEP 0052
+			if (($torrent['info']['meta version'] ?? null) !== 2 || !is_array($torrent['info']['file tree'] ?? null)) { // BEP 0052
 
 				$text_clr = 250;
 				$title = $client_date = $hash_v1 = $note_v1 = '';
