@@ -4,8 +4,8 @@
 
 // Output buffer
 ob_start();
-// Language
-$msg = lang();
+// Language & Settings
+$msg = init();
 
 //Main
 
@@ -83,7 +83,7 @@ $msg = lang();
 //Functions
 
 		// Language option (Activated by 'locale [code]' arguments. [code] = en | ru), works in Windows builds
-		function lang()
+		function init()
 		{
 			global $settings, $argv;
 
