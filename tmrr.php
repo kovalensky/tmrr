@@ -82,7 +82,12 @@ $msg = init();
 
 //Functions
 
-		// Language option (Activated by 'locale [code]' arguments. [code] = en | ru), works in Windows builds
+		//Parameters:
+
+		// Language changed by — 'tmrr locale [code]' arguments | [code] = ru, en, zh, de)
+		// Colour — 'colour [switch]' | [switch] = on / off | This disables ANSI escape sequences if your console does not support their correct display
+		// Debugging — 'debug [switch]'
+
 		function init()
 		{
 			global $settings, $argv;
@@ -800,12 +805,12 @@ $msg = init();
 		}
 
 		// Format coloured text
-		function formatText($text, $color)
+		function formatText($text, $colour)
 		{
 			global $settings;
 
 			if ($settings['output'] && $settings['colours']) {
-				return "\033[38;5;$color" . "m$text\033[0m";
+				return "\033[38;5;$colour" . "m$text\033[0m";
 			}
 			else{
 				return $text;
