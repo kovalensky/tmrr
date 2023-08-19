@@ -529,7 +529,7 @@ $msg = init();
 			global $msg, $hashes, $torrent, $torrent_size, $filec, $magnet, $settings, $argv, $argc;
 
 			$t_size = formatBytes($torrent_size);
-			$single_torrent = $argc < 4 ? true : false;
+			$single_torrent = ($argc < 4) ? true : false;
 			$dups_size = $dup_hashes = $filed = 0;
 
 			if (!empty($hashes)) {
