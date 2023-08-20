@@ -612,7 +612,7 @@ $msg = init();
 							if (PHP_OS_FAMILY === 'Windows') {
 								$command = 'start "" "' . $magnetL . '"';
 								if (strlen($command) <= 8191) { // Windows command length limit
-									@exec($command);
+									exec($command);
 								}
 								else{
 									echo "\r\n " , formatText($msg['magnet_copy'], 178) , "\r\n";
@@ -620,7 +620,7 @@ $msg = init();
 							}
 							elseif (PHP_OS_FAMILY === 'Linux') {
 								$command = 'xdg-open "" "' . $magnetL . '"';
-								@exec($command);
+								exec($command);
 							}
 						}
 					}
