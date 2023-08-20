@@ -82,7 +82,7 @@ $msg = init();
 
 //Functions
 
-		//Parameters:
+		//Parameters (works only in Windows builds):
 
 		// Language changed by — 'tmrr locale [code]' arguments | [code] = ru, en, zh, de)
 		// Colour — 'colour [switch]' | [switch] = on / off | This disables ANSI escape sequences if your console does not support their correct display
