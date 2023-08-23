@@ -867,8 +867,11 @@ $msg = init();
 				}
 			}
 
-			if ($settings['debug']['stats']) {
+			if ($settings['debug']['stats'] && $settings['output']) {
+
 				echo 'Time: ', number_format(($t = microtime(true) - $settings['debug']['init_time']), abs(floor(log10($t)))), 's | Memory: ', formatBytes(memory_get_peak_usage()), PHP_EOL;
+
 			}
+
 			die();
 		}
