@@ -199,7 +199,7 @@ $msg = init();
 				'output' => stream_isatty(STDOUT),
 
 				'debug' => [
-				'stats' => (($tmrr_debug = get_cfg_var('tmrr.debug')) !== false) ? $tmrr_debug : false,
+				'enabled' => (($tmrr_debug = get_cfg_var('tmrr.debug')) !== false) ? $tmrr_debug : false,
 				'init_time' => microtime(true)
 				]
 			];
@@ -867,7 +867,7 @@ $msg = init();
 				}
 			}
 
-			if ($settings['debug']['stats'] && $settings['output']) {
+			if ($settings['debug']['enabled'] && $settings['output']) {
 
 				echo formatText('Time', 130), ': ', number_format(($t = microtime(true) - $settings['debug']['init_time']), abs(floor(log10($t)))), 's | ', formatText('Memory', 130), ': ' , formatBytes(memory_get_peak_usage()), PHP_EOL;
 
