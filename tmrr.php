@@ -193,10 +193,15 @@ $msg = init();
 			];
 
 			$settings = [
-			'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
-			'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
-			'output' => stream_isatty(STDOUT),
-			'debug' => error_reporting()
+
+				'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
+				'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
+				'output' => stream_isatty(STDOUT),
+
+				'debug' => [
+				'stats' => (($tmrr_debug = get_cfg_var('tmrr.debug')) !== false) ? $tmrr_debug : false,
+				'init_time' => microtime(true)
+				]
 			];
 
 
@@ -229,10 +234,12 @@ $msg = init();
 
 				if ($pref === 'debug') {
 					if ($value === 'on') {
+						tmrr_set_preferences('tmrr.debug', true);
 						tmrr_set_preferences('display_errors', true, 'PHP');
 						die(formatText("$pref => $value", 196));
 					}
 					elseif ($value === 'off') {
+						tmrr_set_preferences('tmrr.debug', false);
 						tmrr_set_preferences('display_errors', false, 'PHP');
 						die(formatText("$pref => $value", 70));
 					}
@@ -847,9 +854,9 @@ $msg = init();
 		// Error handler
 		function error_status()
 		{
-			global $msg, $err_status;
+			global $msg, $err_status, $settings;
 
-			if (!empty($err_status)) {
+			if (!empty($err_status) && $settings['output']) {
 
 				echo "\r\n\r\n--- " , formatText($msg['unfinished_files'], 196) , ": ---\r\n";
 
@@ -860,5 +867,8 @@ $msg = init();
 				}
 			}
 
+			if ($settings['debug']['stats']) {
+				echo 'Time: ', number_format(($t = microtime(true) - $settings['debug']['init_time']), abs(floor(log10($t)))), 's | Memory: ', formatBytes(memory_get_peak_usage()), PHP_EOL;
+			}
 			die();
 		}
