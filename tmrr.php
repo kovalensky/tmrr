@@ -259,7 +259,7 @@ $msg = init();
 			if (is_file($ini_file = __DIR__ . '/php.ini')) {
 				$ini_settings = parse_ini_file($ini_file, true);
 				if (is_array($preference)) {
-					foreach ($preference as $value){
+					foreach ($preference as $value) {
 						$ini_settings[$value[2]][$value[0]] = $value[1];
 					}
 				}
