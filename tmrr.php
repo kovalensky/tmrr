@@ -234,11 +234,17 @@ $msg = init();
 
 				if ($pref === 'debug') {
 					if ($value === 'on') {
-						tmrr_set_preferences([ ['tmrr.debug', 'tmrr', true], ['display_errors', 'PHP', true] ]);
+						tmrr_set_preferences([
+						['tmrr.debug', 'tmrr', true],
+						['display_errors', 'PHP', true]
+						]);
 						die(formatText("$pref => $value", 196));
 					}
 					elseif ($value === 'off') {
-						tmrr_set_preferences([ ['tmrr.debug', 'tmrr', false], ['display_errors', 'PHP', false] ]);
+						tmrr_set_preferences([
+						['tmrr.debug', 'tmrr', false],
+						['display_errors', 'PHP', false]
+						]);
 						die(formatText("$pref => $value", 70));
 					}
 				}
