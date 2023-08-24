@@ -235,15 +235,15 @@ $msg = init();
 				if ($pref === 'debug') {
 					if ($value === 'on') {
 						tmrr_set_preferences([
-						['tmrr.debug', 'tmrr', true],
-						['display_errors', 'PHP', true]
+						['tmrr.debug', true, 'tmrr'],
+						['display_errors', true, 'PHP']
 						]);
 						die(formatText("$pref => $value", 196));
 					}
 					elseif ($value === 'off') {
 						tmrr_set_preferences([
-						['tmrr.debug', 'tmrr', false],
-						['display_errors', 'PHP', false]
+						['tmrr.debug', false, 'tmrr'],
+						['display_errors', false, 'PHP']
 						]);
 						die(formatText("$pref => $value", 70));
 					}
@@ -260,7 +260,7 @@ $msg = init();
 				$ini_settings = parse_ini_file($ini_file, true);
 				if (is_array($preference)) {
 					foreach ($preference as $value){
-						$ini_settings[$value[1]][$value[0]] = $value[2];
+						$ini_settings[$value[2]][$value[0]] = $value[1];
 					}
 				}
 				else{
