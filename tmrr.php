@@ -234,13 +234,11 @@ $msg = init();
 
 				if ($pref === 'debug') {
 					if ($value === 'on') {
-						tmrr_set_preferences('tmrr.debug', true);
-						tmrr_set_preferences('display_errors', true, 'PHP');
+						tmrr_set_preferences([ ['tmrr.debug', 'tmrr', true], ['display_errors', 'PHP', true] ]);
 						die(formatText("$pref => $value", 196));
 					}
 					elseif ($value === 'off') {
-						tmrr_set_preferences('tmrr.debug', false);
-						tmrr_set_preferences('display_errors', false, 'PHP');
+						tmrr_set_preferences([ ['tmrr.debug', 'tmrr', false], ['display_errors', 'PHP', false] ]);
 						die(formatText("$pref => $value", 70));
 					}
 				}
@@ -250,11 +248,18 @@ $msg = init();
 		}
 
 		// Set preferences via php.ini configuration
-		function tmrr_set_preferences($preference, $value, $section = 'tmrr')
+		function tmrr_set_preferences($preference, $value = false, $section = 'tmrr')
 		{
 			if (is_file($ini_file = __DIR__ . '/php.ini')) {
 				$ini_settings = parse_ini_file($ini_file, true);
-				$ini_settings[$section][$preference] = $value;
+				if (is_array($preference)) {
+					foreach ($preference as $value){
+						$ini_settings[$value[1]][$value[0]] = $value[2];
+					}
+				}
+				else{
+					$ini_settings[$section][$preference] = $value;
+				}
 				write_ini_file($ini_settings, $ini_file);
 			}
 		}
