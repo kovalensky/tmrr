@@ -499,14 +499,14 @@ $msg = init();
 
 			foreach ($array as $key => $value) {
 				$current = "$parent/$key";
-				if (is_array($value) && !empty($key)) {
+				if (is_array($value) && !isset($value[''])) {
 					printFiles($value, $current);
 				}
 				else{
-					$length = &$value['length'];
-					$path = substr($current, 1, -1);
+					$length = &$value['']['length'];
+					$path = substr($current, 1);
 					$size = formatBytes($length);
-					$root = bin2hex($value['pieces root'] ?? '');
+					$root = bin2hex($value['']['pieces root'] ?? '');
 					echo "\r\n  $path ($size)\r\n {$msg['root_hash']}: $root\r\n";
 					$torrent_size += $length;
 					++$filec;
@@ -523,14 +523,14 @@ $msg = init();
 
 			foreach ($array as $key => $value) {
 				$current_key = "$parent_key/$key";
-				if (is_array($value) && !empty($key)) {
+				if (is_array($value) && !isset($value[''])) {
 					combine_keys($value, $hashes, $current_key);
 				}
 				else{
-					$length = &$value['length'];
+					$length = &$value['']['length'];
 					$size = formatBytes($length);
-					$root = bin2hex($value['pieces root'] ?? '');
-					$hashes[substr($current_key, 1, -1)] = [
+					$root = bin2hex($value['']['pieces root'] ?? '');
+					$hashes[substr($current_key, 1)] = [
 						'hash' => "$root ($size)",
 						'size' => $length,
 						'pos' => $filec
