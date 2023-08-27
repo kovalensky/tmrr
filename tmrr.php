@@ -499,7 +499,7 @@ $msg = init();
 
 			foreach ($array as $key => $value) {
 				$current = "$parent/$key";
-				if (is_array($value) && !isset($value[''])) {
+				if (!isset($value[''])) {
 					printFiles($value, $current);
 				}
 				else{
@@ -523,7 +523,7 @@ $msg = init();
 
 			foreach ($array as $key => $value) {
 				$current_key = "$parent_key/$key";
-				if (is_array($value) && !isset($value[''])) {
+				if (!isset($value[''])) {
 					combine_keys($value, $hashes, $current_key);
 				}
 				else{
