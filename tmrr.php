@@ -880,7 +880,7 @@ $msg = init();
 
 			if ($settings['debug']['enabled'] && $settings['output']) {
 
-				echo PHP_EOL , formatText('Time', 130), ': ', number_format(($t = microtime(true) - $settings['debug']['init_time']), abs(floor(log10($t)))), 's | ', formatText('Memory', 130), ': ' , formatBytes(memory_get_peak_usage()), PHP_EOL;
+				echo PHP_EOL , formatText('Time', 130), ': ', number_format(($t = microtime(true) - $settings['debug']['init_time']), ($t < 0.01 ? abs(floor(log10($t))) : 1)), 's | ', formatText('Memory', 130), ': ' , formatBytes(memory_get_peak_usage()), PHP_EOL;
 
 			}
 
