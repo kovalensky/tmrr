@@ -32,7 +32,7 @@ $msg = init();
 				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Recursive array traversal
 
-				echo "\r\n", formatText($msg['total_files'], 250), ": $filec (" , formatBytes($torrent_size) , ")\r\n\r\n";
+				echo "\r\n", formatText($msg['total_files']), ": $filec (" , formatBytes($torrent_size) , ")\r\n\r\n";
 			}
 
 			error_status();
@@ -69,7 +69,7 @@ $msg = init();
 
 				if (is_file($file) && !empty($size = filesize($file))) {
 					$hash = new HasherV2($file);
-					echo "\r\n  ", formatText($file, 250) , ' (' , formatBytes($size) , ")\r\n {$msg['root_hash']}: {$hash->root}\r\n\r\n";
+					echo "\r\n  ", formatText($file) , ' (' , formatBytes($size) , ")\r\n {$msg['root_hash']}: {$hash->root}\r\n\r\n";
 				}
 				else{
 					$err_status[$file] = $msg['noraw'];
@@ -283,6 +283,7 @@ $msg = init();
 			$process_data = function ($data, $prefix = '') use (&$ini_string, &$process_data)
 			{
 				foreach ($data as $key => $val) {
+
 					$current_key = $prefix ? "$prefix.$key" : $key;
 
 					if (is_array($val)) {
@@ -390,6 +391,7 @@ $msg = init();
 			if ((string)$int !== $value) {
 				return -1;
 			}
+
 			return $int;
 		}
 
@@ -437,28 +439,27 @@ $msg = init();
 
 			if (($torrent['info']['meta version'] ?? null) !== 2 || !is_array($torrent['info']['file tree'] ?? null)) { // BEP 0052
 
-				$text_clr = 250;
 				$title = $client_date = $hash_v1 = $note_v1 = '';
 
 				if (isset($torrent['info']['name'])) {
 					$t_name = &$torrent['info']['name'];
 					if (pathinfo($file, PATHINFO_FILENAME) !== $t_name) {
-						$title = "\r\n" . formatText($msg['torrent_title'], $text_clr) . ": $t_name";
+						$title = "\r\n" . formatText($msg['torrent_title']) . ": $t_name";
 					}
 				}
 
 				if (isset($torrent['creation date'], $torrent['created by'])) {
 					$date = date("d M Y | G:i:s T", $torrent['creation date']);
-					$client_date =  "\r\n" . formatText($msg['created_by_client'], $text_clr) . ": {$torrent['created by']} ($date)";
+					$client_date =  "\r\n" . formatText($msg['created_by_client']) . ": {$torrent['created by']} ($date)";
 				}
 
 				if (isset($torrent['info']['pieces'])) {
 					$info_hash_v1 = hash('sha1', bencode_encode($torrent['info']));
-					$hash_v1 = "\r\n" . formatText($msg['root_hash'], $text_clr) . ": $info_hash_v1";
+					$hash_v1 = "\r\n" . formatText($msg['root_hash']) . ": $info_hash_v1";
 				}
 
 				if (!isset($torrent['info']['meta version'])) {
-					$note_v1 = "\r\n" . formatText($msg['note'], $text_clr) . ": {$msg['hint_v1']}";
+					$note_v1 = "\r\n" . formatText($msg['note']) . ": {$msg['hint_v1']}";
 				}
 
 				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $note_v1;
@@ -476,19 +477,18 @@ $msg = init();
 		{
 			global $msg, $torrent;
 
-			$text_clr = 250;
-			echo "\r\n — ", formatText($msg['file_location'], $text_clr), ": $filename —\r\n";
+			echo "\r\n — ", formatText($msg['file_location']), ": $filename —\r\n";
 
 			if (isset($torrent['info']['name'])) { // BEP 0052
 				$t_name = &$torrent['info']['name'];
 				if (pathinfo($filename, PATHINFO_FILENAME) !== $t_name) {
-					echo ' — ', formatText($msg['torrent_title'], $text_clr), ": $t_name —\r\n";
+					echo ' — ', formatText($msg['torrent_title']), ": $t_name —\r\n";
 				}
 			}
 
 			if (isset($torrent['creation date'], $torrent['created by'])) {
 				$creation_date = date("d M Y | G:i:s T", $torrent['creation date']);
-				echo ' — ', formatText($msg['created_by_client'], $text_clr), ": {$torrent['created by']} ($creation_date) —\r\n";
+				echo ' — ', formatText($msg['created_by_client']), ": {$torrent['created by']} ($creation_date) —\r\n";
 			}
 		}
 
@@ -583,13 +583,13 @@ $msg = init();
 			}
 
 			if (empty($dup_hashes)) {
-				echo "\r\n " , formatText($msg['no_duplicates'], 178) , "\r\n\r\n", formatText($msg['total_files'], 250), ": $filec ($t_size)\r\n";
+				echo "\r\n " , formatText($msg['no_duplicates'], 178) , "\r\n\r\n", formatText($msg['total_files']), ": $filec ($t_size)\r\n";
 			}
 			else{
 				$d_count = $filed - $dup_hashes;
 				$d_sizes = formatBytes($dups_size);
 
-				echo formatText($msg['total_files'], 250), ": $filec ($t_size)\r\n" , formatText($msg['total_dup_files'], 250), ": $d_count ($d_sizes)";
+				echo formatText($msg['total_files']), ": $filec ($t_size)\r\n" , formatText($msg['total_dup_files']), ": $d_count ($d_sizes)";
 
 				if ($single_torrent) {
 
@@ -823,7 +823,7 @@ $msg = init();
 		}
 
 		// Format coloured text
-		function formatText($text, $colour)
+		function formatText($text, $colour = 250)
 		{
 			global $settings;
 
@@ -873,7 +873,7 @@ $msg = init();
 
 				foreach ($err_status as $key => $value) {
 
-					echo "\r\n", formatText($msg['file_location'], 250), ": $key\r\n", formatText($msg['error_type'], 250), ": $value\r\n\r\n";
+					echo "\r\n", formatText($msg['file_location']), ": $key\r\n", formatText($msg['error_type']), ": $value\r\n\r\n";
 
 				}
 			}
