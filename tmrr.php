@@ -672,7 +672,7 @@ $msg = init();
 				}
 				else{
 					foreach ($tracker_list as $value) {
-						$trackers .= '&tr=' . urlencode($value[0]); // For tracker lists created with additional space separations
+						$trackers .= '&tr=' . urlencode($value[0]); // For tracker lists created with tiers (priorities)
 					}
 				}
 			}
