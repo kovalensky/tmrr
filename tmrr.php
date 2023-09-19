@@ -194,6 +194,7 @@ $msg = init();
 
 			$settings = [
 
+				'settings_file' => __DIR__ . DIRECTORY_SEPARATOR . 'php.ini',
 				'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
 				'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
 				'output' => stream_isatty(STDOUT),
@@ -204,6 +205,9 @@ $msg = init();
 				]
 			];
 
+			$time_zone = (($tmrr_time_zone = get_cfg_var('tmrr.time_zone')) !== false) ? $tmrr_time_zone : (!($tmrr_time_zone = set_timezone()) ? 'UTC' : $tmrr_time_zone);
+
+			date_default_timezone_set($time_zone);
 
 			if (isset($settings[$argv[1] ?? null], $argv[2])) {
 
@@ -256,8 +260,9 @@ $msg = init();
 		// Set preferences via php.ini configuration
 		function tmrr_set_preferences($preference, $value = false, $section = 'tmrr')
 		{
-			if (is_file($ini_file = __DIR__ . '/php.ini')) {
-				$ini_settings = parse_ini_file($ini_file, true);
+			global $settings;
+			if (is_file($settings['settings_file'])) {
+				$ini_settings = parse_ini_file($settings['settings_file'], true);
 				if (is_array($preference)) {
 					foreach ($preference as $value) {
 						$ini_settings[$value[2] ?? $section][$value[0]] = $value[1];
@@ -266,7 +271,10 @@ $msg = init();
 				else{
 					$ini_settings[$section][$preference] = $value;
 				}
-				write_ini_file($ini_settings, $ini_file);
+				write_ini_file($ini_settings, $settings['settings_file']);
+			}
+			else{
+				die(formatText('Changing the settings only works for Windows builds.', 178));
 			}
 		}
 
@@ -305,6 +313,38 @@ $msg = init();
 			$process_data($ini_data);
 
 			file_put_contents($file, implode(PHP_EOL, $ini_string));
+		}
+
+		// Get && Set system's timezone
+		function set_timezone()
+		{
+			global $settings;
+			static $timezones;
+
+			if (PHP_OS_FAMILY !== 'Windows' || !is_file($settings['settings_file'])) {
+				return false;
+			}
+
+			$system_time = exec('time /T');
+
+			if (is_null($timezones)) {
+				$timezones = DateTimeZone::listIdentifiers();
+			}
+
+			$system_time = DateTimeImmutable::createFromFormat('H:i', $system_time);
+
+			foreach ($timezones as $timezone) {
+				$dt = new DateTimeImmutable('now', new DateTimeZone($timezone));
+				if ($dt->format('H:i') === $system_time->format('H:i')) {
+					tmrr_set_preferences('tmrr.time_zone', $timezone);
+
+					return $timezone;
+				}
+			}
+
+			tmrr_set_preferences('tmrr.time_zone', 'UTC');
+
+			return false;
 		}
 
 		// @Rhilip's bencode library (modified)
@@ -449,7 +489,7 @@ $msg = init();
 				}
 
 				if (isset($torrent['creation date'], $torrent['created by'])) {
-					$date = date("d M Y | G:i:s T", $torrent['creation date']);
+					$date = date("d M Y | G:i:s e", $torrent['creation date']);
 					$client_date =  "\r\n" . formatText($msg['created_by_client']) . ": {$torrent['created by']} ($date)";
 				}
 
@@ -487,7 +527,7 @@ $msg = init();
 			}
 
 			if (isset($torrent['creation date'], $torrent['created by'])) {
-				$creation_date = date("d M Y | G:i:s T", $torrent['creation date']);
+				$creation_date = date("d M Y | G:i:s e", $torrent['creation date']);
 				echo ' — ', formatText($msg['created_by_client']), ": {$torrent['created by']} ($creation_date) —\r\n";
 			}
 		}
