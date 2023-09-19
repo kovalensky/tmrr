@@ -197,6 +197,8 @@ $msg = init();
 				'settings_file' => __DIR__ . DIRECTORY_SEPARATOR . 'php.ini',
 				'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
 				'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
+				'OS' => PHP_OS_FAMILY,
+				'time_zone' => 'UTC',
 				'output' => stream_isatty(STDOUT),
 
 				'debug' => [
@@ -206,8 +208,8 @@ $msg = init();
 			];
 
 			$time_zone = (($tmrr_time_zone = get_cfg_var('tmrr.time_zone')) !== false) ? $tmrr_time_zone : (!($tmrr_time_zone = set_timezone()) ? 'UTC' : $tmrr_time_zone);
-
 			date_default_timezone_set($time_zone);
+			$settings['time_zone'] = $time_zone;
 
 			if (isset($settings[$argv[1] ?? null], $argv[2])) {
 
@@ -321,7 +323,7 @@ $msg = init();
 			global $settings;
 			static $timezones;
 
-			if (PHP_OS_FAMILY !== 'Windows' || !is_file($settings['settings_file'])) {
+			if ($settings['OS'] !== 'Windows' || !is_file($settings['settings_file'])) {
 				return false;
 			}
 
@@ -468,7 +470,7 @@ $msg = init();
 		// Torrent validity checks
 		function tvalidity_check($file)
 		{
-			global $torrent, $msg, $torrent_size, $filec, $err_status;
+			global $torrent, $msg, $settings, $torrent_size, $filec, $err_status;
 
 			if (!isset($torrent['info'])) {
 
@@ -489,7 +491,7 @@ $msg = init();
 				}
 
 				if (isset($torrent['creation date'], $torrent['created by'])) {
-					$date = date("d M Y | G:i:s e", $torrent['creation date']);
+					$date = date("d M Y | G:i:s" . (($settings['time_zone'] === 'UTC') ? ' e' : ''), $torrent['creation date']);
 					$client_date =  "\r\n" . formatText($msg['created_by_client']) . ": {$torrent['created by']} ($date)";
 				}
 
@@ -515,7 +517,7 @@ $msg = init();
 		// Print torrent name, client and creation date
 		function torrent_metainfo($filename)
 		{
-			global $msg, $torrent;
+			global $msg, $settings, $torrent;
 
 			echo "\r\n — ", formatText($msg['file_location']), ": $filename —\r\n";
 
@@ -527,7 +529,7 @@ $msg = init();
 			}
 
 			if (isset($torrent['creation date'], $torrent['created by'])) {
-				$creation_date = date("d M Y | G:i:s e", $torrent['creation date']);
+				$creation_date = date("d M Y | G:i:s" . (($settings['time_zone'] === 'UTC') ? ' e' : ''), $torrent['creation date']);
 				echo ' — ', formatText($msg['created_by_client']), ": {$torrent['created by']} ($creation_date) —\r\n";
 			}
 		}
@@ -667,7 +669,7 @@ $msg = init();
 						echo "\r\n" , formatText($magnetL, 70) , "\r\n";
 
 						if ($settings['output']) {
-							if (PHP_OS_FAMILY === 'Windows') {
+							if ($settings['OS'] === 'Windows') {
 								$command = 'start "" "' . $magnetL . '"';
 								if (strlen($command) <= 8191) { // Windows command length limit
 									exec($command);
@@ -676,7 +678,7 @@ $msg = init();
 									echo "\r\n " , formatText($msg['magnet_copy'], 178) , "\r\n";
 								}
 							}
-							elseif (PHP_OS_FAMILY === 'Linux') {
+							elseif ($settings['OS'] === 'Linux') {
 								$command = 'xdg-open "" "' . $magnetL . '"';
 								exec($command);
 							}
