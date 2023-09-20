@@ -140,7 +140,6 @@ $msg = init();
 
 				'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
 				'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
-				'OS' => PHP_OS_FAMILY,
 				'time_zone' => (($tmrr_time_zone = get_cfg_var('tmrr.time_zone')) !== false && !empty($tmrr_time_zone)) ? $tmrr_time_zone : set_timezone(),
 				'output' => stream_isatty(STDOUT),
 
@@ -607,7 +606,7 @@ $msg = init();
 						echo "\r\n" , formatText($magnetL, 70) , "\r\n";
 
 						if ($settings['output']) {
-							if ($settings['OS'] === 'Windows') {
+							if (PHP_OS_FAMILY === 'Windows') {
 								$command = 'start "" "' . $magnetL . '"';
 								if (strlen($command) <= 8191) { // Windows command length limit
 									exec($command);
@@ -616,7 +615,7 @@ $msg = init();
 									echo "\r\n " , formatText($msg['magnet_copy'], 178) , "\r\n";
 								}
 							}
-							elseif ($settings['OS'] === 'Linux') {
+							elseif (PHP_OS_FAMILY === 'Linux') {
 								$command = 'xdg-open "" "' . $magnetL . '"';
 								exec($command);
 							}
