@@ -10,7 +10,7 @@ $msg = init();
 //Main
 
 	// Check for arguments
-	if ($argc <= 2 || !in_array($argv[1], ['e', 'd', 'c'])) {
+	if ($argc <= 2 || !in_array(($argv[1] = strtolower($argv[1])), ['e', 'd', 'c'])) {
 		die($msg['main']);
 	}
 
@@ -96,120 +96,62 @@ $msg = init();
 			$strings = [
 				'ru' => [
 					'main' => "\r\nСинтаксис:\r\n\r\n\r\n tmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\n tmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\n tmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Поддерживается пакетная обработка, как <файл1> <файл2>.. <файлN>.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
-					'noraw' => 'Укажите расположение файла, он не должен быть пустым.',
-					'invalid_torrent' => 'Неопознанный .torrent файл.',
-					'no_v2' => 'Торрент файл не содержит признаки v2 / гибрида.',
-					'hint_v1' => 'Торренты v1 протокола не поддерживают привязку хешей файлов.',
-					'root_hash' => 'Хеш',
-					'calculation' => 'Вычисление',
-					'torrent_title' => 'Название раздачи',
-					'file_location' => 'Файл',
-					'unfinished_files' => 'Необработанные файлы',
-					'error_type' => 'Ошибка',
-					'note' => 'Заметка',
-					'no_duplicates' => 'Дубликатов не найдено.',
-					'dup_found' => 'найден в',
-					'total_files' => 'Количество файлов',
-					'total_dup_files' => 'Количество дубликатов',
-					'cli_dup_search' => 'Поиск дубликатов',
-					'cli_hash_extraction' => 'Извлечение хешей',
-					'magnet_proposal' => 'Создать магнит ссылку для загрузки раздачи без дубликатов? Да ([Enter]) | Нет (n) : ',
-					'magnet_copy' => 'Скопируйте магнит ссылку в торрент клиент.',
-					'created_by_client' => 'Создан',
-					'lang_change' => 'Язык изменён на: Русский.'
+					'noraw' => 'Укажите расположение файла, он не должен быть пустым.', 'invalid_torrent' => 'Неопознанный .torrent файл.', 'no_v2' => 'Торрент файл не содержит признаки v2 / гибрида.',
+					'hint_v1' => 'Торренты v1 протокола не поддерживают привязку хешей файлов.', 'root_hash' => 'Хеш', 'calculation' => 'Вычисление',
+					'torrent_title' => 'Название раздачи', 'file_location' => 'Файл', 'unfinished_files' => 'Необработанные файлы',
+					'error_type' => 'Ошибка', 'note' => 'Заметка', 'no_duplicates' => 'Дубликатов не найдено.',
+					'dup_found' => 'найден в', 'total_files' => 'Количество файлов', 'total_dup_files' => 'Количество дубликатов', 'cli_dup_search' => 'Поиск дубликатов', 'cli_hash_extraction' => 'Извлечение хешей', 'magnet_proposal' => 'Создать магнит ссылку для загрузки раздачи без дубликатов? Да ([Enter]) | Нет (n) : ',
+					'magnet_copy' => 'Скопируйте магнит ссылку в торрент клиент.', 'created_by_client' => 'Создан', 'lang_change' => 'Язык изменён на: Русский.'
 				],
 				'en' => [
 					'main' => "\r\nPlease use the correct syntax, as:\r\n\r\n\r\n tmrr e <torrent-file>	*Extracts file hashes from .torrent files*\r\n\r\n tmrr d <torrent-file>	*Finds duplicate files within .torrent file(s)*\r\n\r\n tmrr c <your-file>	*Calculates the hash of existing files*\r\n\r\n\r\n** Batch processing is supported, such as <file1> <file2>.. <fileN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAuthor: Constantine Kovalensky\r\n\r\n",
-					'noraw' => 'This is not a valid file, is it empty?',
-					'invalid_torrent' => 'Invalid torrent file.',
-					'no_v2' => 'This is an invalid v2 / hybrid torrent.',
-					'hint_v1' => 'v1 protocol torrents do not support embedding file hashes.',
-					'root_hash' => 'Hash',
-					'calculation' => 'Processing',
-					'torrent_title' => 'Name',
-					'file_location' => 'File',
-					'unfinished_files' => 'Unprocessed files',
-					'error_type' => 'Error type',
-					'note' => 'Note',
-					'no_duplicates' => 'No duplicates were found.',
-					'dup_found' => 'found in',
-					'total_files' => 'Total files',
-					'total_dup_files' => 'Duplicate count',
-					'cli_dup_search' => 'Searching for duplicates',
-					'cli_hash_extraction' => 'Extracting file hashes',
-					'magnet_proposal' => 'Create a magnet download link without duplicates? Yes ([Enter]) | No (n) : ',
-					'magnet_copy' => 'Paste this magnet link into your torrent client.',
-					'created_by_client' => 'Created by',
-					'lang_change' => 'Language changed to: English.'
+					'noraw' => 'This is not a valid file, is it empty?', 'invalid_torrent' => 'Invalid torrent file.', 'no_v2' => 'This is an invalid v2 / hybrid torrent.',
+					'hint_v1' => 'v1 protocol torrents do not support embedding file hashes.', 'root_hash' => 'Hash', 'calculation' => 'Processing',
+					'torrent_title' => 'Name', 'file_location' => 'File', 'unfinished_files' => 'Unprocessed files',
+					'error_type' => 'Error type', 'note' => 'Note', 'no_duplicates' => 'No duplicates were found.',
+					'dup_found' => 'found in', 'total_files' => 'Total files', 'total_dup_files' => 'Duplicate count',
+					'cli_dup_search' => 'Searching for duplicates', 'cli_hash_extraction' => 'Extracting file hashes', 'magnet_proposal' => 'Create a magnet download link without duplicates? Yes ([Enter]) | No (n) : ',
+					'magnet_copy' => 'Paste this magnet link into your torrent client.', 'created_by_client' => 'Created by', 'lang_change' => 'Language changed to: English.'
 				],
 				'zh' => [
 					'main' => "\r\n请使用正确的格式, 例如:\r\n\r\n\r\n tmrr e <torrent 文件>	*提取 .torrent 文件的哈希值*\r\n\r\n tmrr d <torrent 文件>	*查找 .torrent 文件中的重复项*\r\n\r\n tmrr c <你的文件>	*计算文件的哈希值*\r\n\r\n\r\n** 支持同时处理多个文件, 使用空格分隔 <文件1> <文件2>.. <文件N>.\r\n\r\n---\r\n\r\n版本号: $version\r\n作者: Constantine Kovalensky\r\n\r\n",
-					'noraw' => '文件无效或不存在',
-					'invalid_torrent' => '无效的 torrent 文件',
-					'no_v2' => 'torrent 文件不是受支持的 v2 / hybrid 协议',
-					'hint_v1' => 'torrent v1 协议不支持内嵌文件哈希值',
-					'root_hash' => '哈希值',
-					'calculation' => '处理中',
-					'torrent_title' => '文件标题',
-					'file_location' => '文件名',
-					'unfinished_files' => '未能处理的文件',
-					'error_type' => '错误',
-					'note' => '注释',
-					'no_duplicates' => '文件中不包含重复项',
-					'dup_found' => '存在于以下文件中',
-					'total_files' => '总文件数量',
-					'total_dup_files' => '重复文件数量',
-					'cli_dup_search' => '正在查找重复项',
-					'cli_hash_extraction' => '正在计算文件哈希值',
-					'magnet_proposal' => '是否创建一个已去重的磁力链? 是 ([Enter]) | 否 (n) : ',
-					'magnet_copy' => '请将磁力链粘贴至您的任意客户端中',
-					'created_by_client' => '来源',
-					'lang_change' => '当前语言已被修改为: 中文。'
+					'noraw' => '文件无效或不存在', 'invalid_torrent' => '无效的 torrent 文件', 'no_v2' => 'torrent 文件不是受支持的 v2 / hybrid 协议',
+					'hint_v1' => 'torrent v1 协议不支持内嵌文件哈希值', 'root_hash' => '哈希值', 'calculation' => '处理中',
+					'torrent_title' => '文件标题', 'file_location' => '文件名', 'unfinished_files' => '未能处理的文件',
+					'error_type' => '错误', 'note' => '注释', 'no_duplicates' => '文件中不包含重复项',
+					'dup_found' => '存在于以下文件中', 'total_files' => '总文件数量', 'total_dup_files' => '重复文件数量',
+					'cli_dup_search' => '正在查找重复项', 'cli_hash_extraction' => '正在计算文件哈希值', 'magnet_proposal' => '是否创建一个已去重的磁力链? 是 ([Enter]) | 否 (n) : ',
+					'magnet_copy' => '请将磁力链粘贴至您的任意客户端中', 'created_by_client' => '来源', 'lang_change' => '当前语言已被修改为: 中文。'
 				],
 				'de' => [
 					'main' => "\r\nBitte benutzen sie das richtige syntax, wie:\r\n\r\n\r\n tmrr e <Torrent-Datei>	*Extrahieren sie die Datei hashes von .torrent Dateien*\r\n\r\n tmrr d <Torrent-Datei>	*Finden sie Dublikate Dateien in .torrent Dateie(n)*\r\n\r\n tmrr c <deine-Datei>	*Berechnet die hash der existierenden Datei*\r\n\r\n\r\n** Beitung vorgehen wird unterstützt, so wie <Datei1> <Datei2>.. <DateiN>.\r\n\r\n---\r\n\r\nVersion: $version\r\nAutor: Constantine Kovalensky\r\n\r\n",
-					'noraw' => 'Dies ist keine zulässige Datei, ist sie leer?',
-					'invalid_torrent' => 'Unzulässige torrent Datei.',
-					'no_v2' => 'Dies ist eine unzulässige v2 / hybrid torrent.',
-					'hint_v1' => 'v1 protokoll torrents unterstützen keine eingebettenen Datei hashes.',
-					'root_hash' => 'Hash',
-					'calculation' => 'Prozessvorgang',
-					'torrent_title' => 'Name',
-					'file_location' => 'Datei',
-					'unfinished_files' => 'Unprozessierte Dateien',
-					'error_type' => 'Fehler Typ',
-					'note' => 'Notiz',
-					'no_duplicates' => 'Keine Dublikate wurden gefunden.',
-					'dup_found' => 'gefunden',
-					'total_files' => 'Gesamte Dateien',
-					'total_dup_files' => 'Doppelter Inhalt',
-					'cli_dup_search' => 'Suche nach Dublikaten',
-					'cli_hash_extraction' => 'Extrahiere Datei hashes',
-					'magnet_proposal' => 'Erstelle einen Magneten download link ohne Dublikate? Ja ([Enter]) | Nein (n) : ',
-					'magnet_copy' => 'Kopieren sie diesen magneten link in ihr torrent Programm.',
-					'created_by_client' => 'Ertellt von',
-					'lang_change' => 'Sprache geändert zu: Deutsch.'
+					'noraw' => 'Dies ist keine zulässige Datei, ist sie leer?', 'invalid_torrent' => 'Unzulässige torrent Datei.', 'no_v2' => 'Dies ist eine unzulässige v2 / hybrid torrent.',
+					'hint_v1' => 'v1 protokoll torrents unterstützen keine eingebettenen Datei hashes.', 'root_hash' => 'Hash', 'calculation' => 'Prozessvorgang',
+					'torrent_title' => 'Name', 'file_location' => 'Datei', 'unfinished_files' => 'Unprozessierte Dateien',
+					'error_type' => 'Fehler Typ', 'note' => 'Notiz', 'no_duplicates' => 'Keine Dublikate wurden gefunden.',
+					'dup_found' => 'gefunden', 'total_files' => 'Gesamte Dateien', 'total_dup_files' => 'Doppelter Inhalt',
+					'cli_dup_search' => 'Suche nach Dublikaten', 'cli_hash_extraction' => 'Extrahiere Datei hashes', 'magnet_proposal' => 'Erstelle einen Magneten download link ohne Dublikate? Ja ([Enter]) | Nein (n) : ',
+					'magnet_copy' => 'Kopieren sie diesen magneten link in ihr torrent Programm.', 'created_by_client' => 'Ertellt von', 'lang_change' => 'Sprache geändert zu: Deutsch.'
 				]
 			];
 
+			// Settings && Constants
 			$settings = [
 
-				'settings_file' => __DIR__ . DIRECTORY_SEPARATOR . 'php.ini',
 				'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
 				'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
 				'OS' => PHP_OS_FAMILY,
-				'time_zone' => 'UTC',
+				'time_zone' => (($tmrr_time_zone = get_cfg_var('tmrr.time_zone')) !== false && !empty($tmrr_time_zone)) ? $tmrr_time_zone : (!($tmrr_time_zone = set_timezone()) ? 'UTC' : $tmrr_time_zone),
 				'output' => stream_isatty(STDOUT),
 
 				'debug' => [
 				'enabled' => (($tmrr_debug = get_cfg_var('tmrr.debug')) !== false) ? $tmrr_debug : false,
 				'init_time' => microtime(true)
+
 				]
 			];
 
-			$time_zone = (($tmrr_time_zone = get_cfg_var('tmrr.time_zone')) !== false) ? $tmrr_time_zone : (!($tmrr_time_zone = set_timezone()) ? 'UTC' : $tmrr_time_zone);
-			date_default_timezone_set($time_zone);
-			$settings['time_zone'] = $time_zone;
+			date_default_timezone_set($settings['time_zone']);
 
 			if (isset($settings[$argv[1] ?? null], $argv[2])) {
 
@@ -262,9 +204,8 @@ $msg = init();
 		// Set preferences via php.ini configuration
 		function tmrr_set_preferences($preference, $value = false, $section = 'tmrr')
 		{
-			global $settings;
-			if (is_file($settings['settings_file'])) {
-				$ini_settings = parse_ini_file($settings['settings_file'], true);
+			if (is_file($ini_file = __DIR__ . DIRECTORY_SEPARATOR . 'php.ini')) {
+				$ini_settings = parse_ini_file($ini_file, true);
 				if (is_array($preference)) {
 					foreach ($preference as $value) {
 						$ini_settings[$value[2] ?? $section][$value[0]] = $value[1];
@@ -273,7 +214,7 @@ $msg = init();
 				else{
 					$ini_settings[$section][$preference] = $value;
 				}
-				write_ini_file($ini_settings, $settings['settings_file']);
+				write_ini_file($ini_settings, $ini_file);
 			}
 			else{
 				die(formatText('Changing the settings only works for Windows builds.', 178));
@@ -320,10 +261,9 @@ $msg = init();
 		// Get && Set system's timezone
 		function set_timezone()
 		{
-			global $settings;
 			static $timezones;
 
-			if ($settings['OS'] !== 'Windows' || !is_file($settings['settings_file'])) {
+			if (PHP_OS_FAMILY !== 'Windows' || !is_file(__DIR__ . DIRECTORY_SEPARATOR . 'php.ini')) {
 				return false;
 			}
 
