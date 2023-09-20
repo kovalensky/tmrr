@@ -141,7 +141,7 @@ $msg = init();
 				'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
 				'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
 				'OS' => PHP_OS_FAMILY,
-				'time_zone' => (($tmrr_time_zone = get_cfg_var('tmrr.time_zone')) !== false && !empty($tmrr_time_zone)) ? $tmrr_time_zone : (!($tmrr_time_zone = set_timezone()) ? 'UTC' : $tmrr_time_zone),
+				'time_zone' => (($tmrr_time_zone = get_cfg_var('tmrr.time_zone')) !== false && !empty($tmrr_time_zone)) ? $tmrr_time_zone : set_timezone(),
 				'output' => stream_isatty(STDOUT),
 
 				'debug' => [
@@ -264,7 +264,7 @@ $msg = init();
 			static $timezones;
 
 			if (PHP_OS_FAMILY !== 'Windows' || !is_file(__DIR__ . DIRECTORY_SEPARATOR . 'php.ini')) {
-				return false;
+				return 'UTC';
 			}
 
 			$system_time = exec('time /T');
@@ -286,7 +286,7 @@ $msg = init();
 
 			tmrr_set_preferences('tmrr.time_zone', 'UTC');
 
-			return false;
+			return 'UTC';
 		}
 
 		// @Rhilip's bencode library (modified)
