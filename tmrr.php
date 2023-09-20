@@ -204,6 +204,7 @@ $msg = init();
 		// Set preferences via php.ini configuration
 		function tmrr_set_preferences($preference, $value = false, $section = 'tmrr')
 		{
+
 			if (is_file($ini_file = __DIR__ . DIRECTORY_SEPARATOR . 'php.ini')) {
 				$ini_settings = parse_ini_file($ini_file, true);
 				if (is_array($preference)) {
@@ -261,7 +262,6 @@ $msg = init();
 		// Get && Set system's timezone
 		function set_timezone()
 		{
-			static $timezones;
 
 			if (PHP_OS_FAMILY !== 'Windows' || !is_file(__DIR__ . DIRECTORY_SEPARATOR . 'php.ini')) {
 				return 'UTC';
@@ -269,9 +269,7 @@ $msg = init();
 
 			$system_time = exec('time /T');
 
-			if (is_null($timezones)) {
-				$timezones = DateTimeZone::listIdentifiers();
-			}
+			$timezones = DateTimeZone::listIdentifiers();
 
 			$system_time = DateTimeImmutable::createFromFormat('H:i', $system_time);
 
