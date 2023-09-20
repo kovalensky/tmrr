@@ -217,7 +217,7 @@ $msg = init();
 				write_ini_file($ini_settings, $ini_file);
 			}
 			else{
-				die(formatText('Changing the settings only works for Windows builds.', 178));
+				die(formatText('Changing the settings only works for Windows standalone builds.', 178));
 			}
 		}
 
