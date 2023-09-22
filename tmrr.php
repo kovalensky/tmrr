@@ -82,7 +82,7 @@ $msg = init();
 
 //Functions
 
-		//Parameters (works only in Windows builds):
+		//Parameters:
 
 		// Language changed by — 'tmrr locale [code]' arguments | [code] = ru, en, zh, de)
 		// Colour — 'colour [switch]' | [switch] = on / off | This disables ANSI escape sequences if your console does not support their correct display
@@ -100,7 +100,8 @@ $msg = init();
 					'hint_v1' => 'Торренты v1 протокола не поддерживают привязку хешей файлов.', 'root_hash' => 'Хеш', 'calculation' => 'Вычисление',
 					'torrent_title' => 'Название раздачи', 'file_location' => 'Файл', 'unfinished_files' => 'Необработанные файлы',
 					'error_type' => 'Ошибка', 'note' => 'Заметка', 'no_duplicates' => 'Дубликатов не найдено.',
-					'dup_found' => 'найден в', 'total_files' => 'Количество файлов', 'total_dup_files' => 'Количество дубликатов', 'cli_dup_search' => 'Поиск дубликатов', 'cli_hash_extraction' => 'Извлечение хешей', 'magnet_proposal' => 'Создать магнит ссылку для загрузки раздачи без дубликатов? Да ([Enter]) | Нет (n) : ',
+					'dup_found' => 'найден в', 'total_files' => 'Количество файлов', 'total_dup_files' => 'Количество дубликатов',
+					'cli_dup_search' => 'Поиск дубликатов', 'cli_hash_extraction' => 'Извлечение хешей', 'magnet_proposal' => 'Создать магнит ссылку для загрузки раздачи без дубликатов? Да ([Enter]) | Нет (n) : ',
 					'magnet_copy' => 'Скопируйте магнит ссылку в торрент клиент.', 'created_by_client' => 'Создан', 'lang_change' => 'Язык изменён на: Русский.'
 				],
 				'en' => [
@@ -201,7 +202,7 @@ $msg = init();
 		}
 
 		// Set preferences via php.ini configuration
-		function tmrr_set_preferences($preference, $value = false, $section = 'tmrr')
+		function tmrr_set_preferences($preference, $value = true, $section = 'tmrr')
 		{
 
 			if (is_file($ini_file = __DIR__ . DIRECTORY_SEPARATOR . 'php.ini')) {
