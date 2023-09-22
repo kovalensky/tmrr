@@ -141,11 +141,11 @@ $msg = init();
 
 				'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
 				'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
-				'time_zone' => (($tmrr_time_zone = get_cfg_var('tmrr.time_zone')) !== false && !empty($tmrr_time_zone)) ? $tmrr_time_zone : set_timezone(),
+				'time_zone' => (($tmrr_timezone = get_cfg_var('tmrr.time_zone')) !== false && !empty($tmrr_timezone)) ? $tmrr_timezone : set_timezone(),
 				'output' => stream_isatty(STDOUT),
 
 				'debug' => [
-				'enabled' => (($tmrr_debug = get_cfg_var('tmrr.debug')) !== false) ? $tmrr_debug : false,
+				'enabled' => (($tmrr_debugging = get_cfg_var('tmrr.debug')) !== false) ? $tmrr_debugging : false,
 				'init_time' => microtime(true)
 
 				]
