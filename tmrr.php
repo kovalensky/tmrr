@@ -153,6 +153,10 @@ $msg = init();
 
 			date_default_timezone_set($settings['time_zone']);
 
+			if (PHP_MAJOR_VERSION < 8) {
+				die(formatText('PHP >= 8 is required.', 176));
+			}
+
 			if (isset($settings[$argv[1] ?? null], $argv[2])) {
 
 				$pref = &$argv[1];
