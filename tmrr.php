@@ -614,7 +614,7 @@ $msg = init();
 						if ($settings['output']) {
 							if (PHP_OS_FAMILY === 'Windows') {
 								$command = 'start "" "' . $magnetL . '"';
-								if (strlen($command) <= 8191) { // Windows command length limit
+								if (strlen($command) <= 8192) { // Windows command length limit
 									exec($command);
 								}
 								else{
