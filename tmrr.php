@@ -140,7 +140,7 @@ $msg = init();
 			$settings = [
 
 				'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
-				'colours' => (($tmrr_colour = get_cfg_var('tmrr.colours')) !== false) ? $tmrr_colour : true,
+				'ansi' => (($tmrr_ansi_output = get_cfg_var('tmrr.ansi')) !== false) ? $tmrr_ansi_output : true,
 				'time_zone' => (($tmrr_timezone = get_cfg_var('tmrr.time_zone')) !== false && !empty($tmrr_timezone)) ? $tmrr_timezone : set_timezone(),
 				'output' => stream_isatty(STDOUT),
 
@@ -151,11 +151,11 @@ $msg = init();
 				]
 			];
 
-			date_default_timezone_set($settings['time_zone']);
-
 			if (PHP_MAJOR_VERSION < 8) {
 				die(formatText('PHP >= 8 is required.', 176));
 			}
+
+			date_default_timezone_set($settings['time_zone']);
 
 			if (isset($settings[$argv[1] ?? null], $argv[2])) {
 
@@ -172,14 +172,14 @@ $msg = init();
 					}
 				}
 
-				if ($pref === 'colours') {
+				if ($pref === 'ansi') {
 					if ($value === 'on') {
-						tmrr_set_preferences('tmrr.colours', true);
-						$settings['colours'] = true;
+						tmrr_set_preferences('tmrr.ansi', true);
+						$settings['ansi'] = true;
 						die(formatText("$pref => $value", 70));
 					}
 					elseif ($value === 'off') {
-						tmrr_set_preferences('tmrr.colours', false);
+						tmrr_set_preferences('tmrr.ansi', false);
 						die("$pref => $value");
 					}
 				}
@@ -280,6 +280,7 @@ $msg = init();
 			foreach ($timezones as $timezone) {
 				$dt = new DateTimeImmutable('now', new DateTimeZone($timezone));
 				if ($dt->format('H:i') === $system_time->format('H:i')) {
+
 					tmrr_set_preferences('tmrr.time_zone', $timezone);
 
 					return $timezone;
@@ -590,7 +591,7 @@ $msg = init();
 					// Magnet handler
 					cli_set_process_title($msg['magnet_proposal']);
 
-					$cli_output = ($settings['output'] && $settings['colours']) ? true : false;
+					$cli_output = ($settings['output'] && $settings['ansi']) ? true : false;
 
 					if ($cli_output) {
 						echo "\r\n	" , formatText($msg['magnet_proposal'], 178) , "\r\n	";
@@ -811,7 +812,7 @@ $msg = init();
 		{
 			global $settings;
 
-			if ($settings['output'] && $settings['colours']) {
+			if ($settings['output'] && $settings['ansi']) {
 				return "\033[38;5;$colour" . "m$text\033[0m";
 			}
 			else{
@@ -846,7 +847,7 @@ $msg = init();
 			return implode(',', $sequences);
 		}
 
-		// Error handler
+		// Error & Debug handler
 		function error_status()
 		{
 			global $msg, $err_status, $settings;
