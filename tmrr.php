@@ -532,7 +532,7 @@ $msg = init();
 			global $msg, $hashes, $torrent, $torrent_size, $filec, $magnet, $settings, $argv, $argc;
 
 			$t_size = formatBytes($torrent_size);
-			$single_torrent = ($argc < 4) ? true : false;
+			$single_torrent = ($argc < 4);
 			$dups_size = $dup_hashes = $filed = 0;
 
 			if (!empty($hashes)) {
@@ -591,7 +591,7 @@ $msg = init();
 					// Magnet handler
 					cli_set_process_title($msg['magnet_proposal']);
 
-					$cli_output = ($settings['output'] && $settings['ansi']) ? true : false;
+					$cli_output = ($settings['output'] && $settings['ansi']);
 
 					if ($cli_output) {
 						echo "\r\n	" , formatText($msg['magnet_proposal'], 178) , "\r\n	";
