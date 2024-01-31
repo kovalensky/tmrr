@@ -5,12 +5,12 @@
 // Output buffer
 ob_start();
 // Language & Settings
-$msg = init();
+tmrr_init();
 
 //Main
 
 	// Check for arguments
-	if ($argc <= 2 || !in_array(($argv[1] = strtolower($argv[1])), ['e', 'd', 'c'])) {
+	if ($argc <= 2 || !in_array($argv[1], ['e', 'd', 'c'])) {
 		die($msg['main']);
 	}
 
@@ -18,12 +18,7 @@ $msg = init();
 		if ($argv[1] === 'e') {
 			foreach (array_slice($argv, 2) as $file) {
 
-				$torrent = [];
-				if (is_file($file)) {
-					$torrent = bencode_decode(file_get_contents($file));
-				}
-
-				if (!tvalidity_check($file)) {
+				if (!torrent_validity($file)) {
 					continue;
 				}
 
@@ -32,7 +27,7 @@ $msg = init();
 				torrent_metainfo($file);
 				printFiles($torrent['info']['file tree']); // Recursive array traversal
 
-				echo "\r\n", formatText($msg['total_files']), ": $filec (" , formatBytes($torrent_size) , ")\r\n\r\n";
+				echo PHP_EOL, formatText($msg['total_files']), ": $filec (" , formatBytes($torrent_size) , ")\r\n\r\n";
 			}
 
 			error_status();
@@ -42,12 +37,7 @@ $msg = init();
 		if ($argv[1] === 'd') {
 			foreach (array_slice($argv, 2) as $file) {
 
-				$torrent = [];
-				if (is_file($file)) {
-					$torrent = bencode_decode(file_get_contents($file));
-				}
-
-				if (!tvalidity_check($file)) {
+				if (!torrent_validity($file)) {
 					continue;
 				}
 
@@ -69,9 +59,8 @@ $msg = init();
 
 				if (is_file($file) && !empty($size = filesize($file))) {
 					$hash = new HasherV2($file);
-					echo "\r\n  ", formatText($file) , ' (' , formatBytes($size) , ")\r\n {$msg['root_hash']}: {$hash->root}\r\n\r\n";
-				}
-				else{
+					echo "\r\n  ", formatText($file) , ' (' , formatBytes($size) , ")\r\n BTMR: {$hash->root}\r\n\r\n";
+				} else {
 					$err_status[$file] = $msg['noraw'];
 				}
 			}
@@ -85,12 +74,13 @@ $msg = init();
 		//Parameters:
 
 		// Language changed by — 'tmrr locale [code]' arguments | [code] = ru, en, zh, de)
-		// Colour — 'colour [switch]' | [switch] = on / off | This disables ANSI escape sequences if your console does not support their correct display
+		// Ansi — 'ansi [switch]' | [switch] = on / off | This disables ANSI escape sequences if your console does not support their correct display
 		// Debugging — 'debug [switch]'
 
-		function init()
+		function tmrr_init()
 		{
-			global $settings, $argv;
+
+			global $settings, $argv, $msg;
 
 			$version = '2.3g'; // Code name: Gribovskaya (Mushroom Pumpkin)
 			$strings = [
@@ -139,15 +129,19 @@ $msg = init();
 			// Settings && Constants
 			$settings = [
 
+				// User command line settings & variables
 				'locale' => (($tmrr_lang = get_cfg_var('tmrr.locale')) && isset($strings[$tmrr_lang])) ? $tmrr_lang : 'en',
 				'ansi' => (($tmrr_ansi_output = get_cfg_var('tmrr.ansi')) !== false) ? $tmrr_ansi_output : true,
+				'log' => __DIR__ . '/incident.log',
+
+				// Dev variables
 				'time_zone' => (($tmrr_timezone = get_cfg_var('tmrr.time_zone')) !== false && !empty($tmrr_timezone)) ? $tmrr_timezone : set_timezone(),
+				'api' => tmrr_api(),
 				'output' => stream_isatty(STDOUT),
 
 				'debug' => [
 				'enabled' => (($tmrr_debugging = get_cfg_var('tmrr.debug')) !== false) ? $tmrr_debugging : false,
 				'init_time' => microtime(true)
-
 				]
 			];
 
@@ -157,79 +151,106 @@ $msg = init();
 
 			date_default_timezone_set($settings['time_zone']);
 
-			if (isset($settings[$argv[1] ?? null], $argv[2])) {
+			if ($settings['api']) {
+				$log_dir = &$settings['log'];
+				ini_set('log_errors', 1);
+				ini_set('error_log', $log_dir);
 
-				$pref = &$argv[1];
-				$value = &$argv[2];
-
-				if ($pref === 'locale') {
-					if (isset($strings[$value])) {
-						tmrr_set_preferences('tmrr.locale', $value);
-						die(formatText($strings[$value]['lang_change'], 70));
-					}
-					else{
-						die('Undefined language code "' . formatText($value, 196) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(range(1, 229)), count($strings))))); // :>
-					}
-				}
-
-				if ($pref === 'ansi') {
-					if ($value === 'on') {
-						tmrr_set_preferences('tmrr.ansi', true);
-						$settings['ansi'] = true;
-						die(formatText("$pref => $value", 70));
-					}
-					elseif ($value === 'off') {
-						tmrr_set_preferences('tmrr.ansi', false);
-						die("$pref => $value");
-					}
-				}
-
-				if ($pref === 'debug') {
-					if ($value === 'on') {
-						tmrr_set_preferences([
-						['tmrr.debug', true],
-						['display_errors', true, 'PHP']
-						]);
-						die(formatText("$pref => $value", 196));
-					}
-					elseif ($value === 'off') {
-						tmrr_set_preferences([
-						['tmrr.debug', false],
-						['display_errors', false, 'PHP']
-						]);
-						die(formatText("$pref => $value", 70));
+				if (filemtime($log_dir) + 2e6 < $settings['debug']['init_time']) {
+					$log_size = filesize($log_dir);
+					if ($log_size > 5e4) {
+						file_put_contents($log_dir, 'Last log reset: ' . date('d M Y | G:i:s e'));
+					} elseif ($log_size !== 0) {
+						touch($log_dir);
 					}
 				}
 			}
 
-			return $strings[$settings['locale']];
+			if (isset($settings[$argv[1] ?? null], $argv[2])) {
+
+				if (!$settings['api']) {
+					die(formatText('Changing the settings currently works for standalone builds.', 178));
+				}
+
+				$pref = &$argv[1];
+				$opt = &$argv[2];
+
+				if ($pref === 'locale') {
+					if (isset($strings[$opt])) {
+						tmrr_set_preferences('tmrr.locale', $opt);
+						die(formatText($strings[$opt]['lang_change'], 70));
+					} else {
+						die('Undefined language code "' . formatText($opt, 196) . '", supporting: '  . implode(', ', array_map('formatText', array_keys($strings), array_rand(array_flip(range(1, 229)), count($strings))))); // :>
+					}
+				}
+
+				if ($pref === 'ansi') {
+					if ($opt === 'on') {
+						tmrr_set_preferences('tmrr.ansi', true);
+						$settings['ansi'] = true;
+						die(formatText("$pref => $opt", 70));
+					} elseif ($opt === 'off') {
+						tmrr_set_preferences('tmrr.ansi', false);
+						die("$pref => $opt");
+					}
+				}
+
+				if ($pref === 'log' && $opt === 'export') {
+					if (filesize($settings['log']) === 0) {
+						die(formatText('The log is empty, nothing to report', 178));
+					}
+					copy($settings['log'], 'tmrr_incident.log');
+					die(formatText('The log has been exported to the current directory'));
+				}
+
+				if ($pref === 'debug') {
+					if ($opt === 'on') {
+						tmrr_set_preferences([
+						['tmrr.debug', true],
+						['display_errors', true, 'PHP']
+						]);
+						die(formatText("$pref => $opt", 196));
+					} elseif ($opt === 'off') {
+						tmrr_set_preferences([
+						['tmrr.debug', false],
+						['display_errors', false, 'PHP']
+						]);
+						die(formatText("$pref => $opt", 70));
+					}
+				}
+			}
+
+			$msg = $strings[$settings['locale']];
 		}
 
 		// Set preferences via php.ini configuration
 		function tmrr_set_preferences($preference, $value = true, $section = 'tmrr')
 		{
-
-			if (is_file($ini_file = __DIR__ . DIRECTORY_SEPARATOR . 'php.ini')) {
+				$ini_file = __DIR__ . '/php.ini';
 				$ini_settings = parse_ini_file($ini_file, true);
 				if (is_array($preference)) {
 					foreach ($preference as $value) {
 						$ini_settings[$value[2] ?? $section][$value[0]] = $value[1];
 					}
-				}
-				else{
+				} else {
 					$ini_settings[$section][$preference] = $value;
 				}
 				write_ini_file($ini_settings, $ini_file);
+		}
+
+		// Detect standalone installation
+		function tmrr_api()
+		{
+			if (get_cfg_var('tmrr.debug') !== false) {
+				return true;
 			}
-			else{
-				die(formatText('Changing the settings currently works for standalone builds.', 178));
-			}
+
+			return false;
 		}
 
 		// Save a new ini configuration file
 		function write_ini_file($ini_data, $file)
 		{
-
 			if (!is_array($ini_data) || empty($ini_data)) {
 				return false;
 			}
@@ -245,14 +266,11 @@ $msg = init();
 					if (is_array($val)) {
 						$ini_string[] = "[$current_key]";
 						$process_data($val, $current_key);
-					}
-					elseif ($val === null || $val === '') {
+					} elseif ($val === null || $val === '') {
 						$ini_string[] = "$key = ";
-					}
-					elseif ($val === false) {
+					} elseif ($val === false) {
 						$ini_string[] = "$key = 0";
-					}
-					else{
+					} else {
 						$ini_string[] = "$key = " . ((is_numeric($val) || $val === true) ? $val : "\"$val\"");
 					}
 				}
@@ -266,8 +284,7 @@ $msg = init();
 		// Get && Set system's timezone
 		function set_timezone()
 		{
-
-			if (PHP_OS_FAMILY !== 'Windows' || !is_file(__DIR__ . DIRECTORY_SEPARATOR . 'php.ini')) {
+			if (!tmrr_api()) {
 				return 'UTC';
 			}
 
@@ -318,16 +335,14 @@ $msg = init();
 					}
 					if (!is_string($key)) {
 						break;
-					}
-					elseif (isset($return[$key])) {
+					} elseif (isset($return[$key])) {
 						break;
 					}
 					$return[$key] = $value;
 				}
 				ksort($return, SORT_STRING);
 				$pos++;
-			}
-			elseif ($currentChar === 'l') {
+			} elseif ($currentChar === 'l') {
 				$pos++;
 				$return = [];
 				while ($currentChar !== 'e') {
@@ -338,23 +353,23 @@ $msg = init();
 					$return[] = $value;
 				}
 				$pos++;
-			}
-			elseif ($currentChar === 'i') {
+			} elseif ($currentChar === 'i') {
 				$pos++;
 				$digits = strpos($data, 'e', $pos) - $pos;
 				$value = substr($data, $pos, $digits);
-				$return = checkInteger($value);
-				if ($return < 0) {
+				$return = $value;
+				if ((string)(int)$return !== $return) {
 					return null;
 				}
+				$return = (int)$return;
 				$pos += $digits + 1;
-			}
-			else{
+			} else {
 				$digits = strpos($data, ':', $pos) - $pos;
-				$len = checkInteger(substr($data, $pos, $digits));
-				if ($len < 0) {
+				$len = substr($data, $pos, $digits);
+				if ((string)(int)$len !== $len) {
 					return null;
 				}
+				$len = (int)$len;
 				$pos += ($digits + 1);
 				$return = substr($data, $pos, $len);
 				if (strlen($return) !== $len) {
@@ -370,16 +385,6 @@ $msg = init();
 			return $return;
 		}
 
-		function checkInteger($value)
-		{
-			$int = (int)$value;
-			if ((string)$int !== $value) {
-				return -1;
-			}
-
-			return $int;
-		}
-
 		function bencode_encode($data)
 		{
 			if (is_array($data)) {
@@ -389,8 +394,7 @@ $msg = init();
 					foreach ($data as $value) {
 						$return .= bencode_encode($value);
 					}
-				}
-				else{
+				} else {
 					$return .= 'd';
 					ksort($data, SORT_STRING);
 					foreach ($data as $key => $value) {
@@ -399,11 +403,9 @@ $msg = init();
 					}
 				}
 				$return .= 'e';
-			}
-			elseif (is_integer($data)) {
+			} elseif (is_integer($data)) {
 				$return = 'i' . $data . 'e';
-			}
-			else{
+			} else {
 				$return = strlen($data) . ':' . $data;
 			}
 
@@ -411,40 +413,43 @@ $msg = init();
 		}
 
 		// Torrent validity checks
-		function tvalidity_check($file)
+		function torrent_validity($file)
 		{
 			global $torrent, $msg, $settings, $torrent_size, $filec, $err_status;
 
-			if (!isset($torrent['info'])) {
+			$torrent = [];
+			if (is_file($file)) {
+				$torrent = bencode_decode(file_get_contents($file));
+			}
 
+			if (!isset($torrent['info'])) {
 				$err_status[$file] = $msg['invalid_torrent'];
 
 				return false;
 			}
 
-			if (($torrent['info']['meta version'] ?? null) !== 2 || !is_array($torrent['info']['file tree'] ?? null)) { // BEP 0052
-
+			if (($torrent['info']['meta version'] ?? 1) !== 2 || !is_array($torrent['info']['file tree'] ?? null)) { // BEP 0052
 				$title = $client_date = $hash_v1 = $note_v1 = '';
 
 				if (isset($torrent['info']['name'])) {
 					$t_name = &$torrent['info']['name'];
 					if (pathinfo($file, PATHINFO_FILENAME) !== $t_name) {
-						$title = "\r\n" . formatText($msg['torrent_title']) . ": $t_name";
+						$title = PHP_EOL . formatText($msg['torrent_title']) . ": $t_name";
 					}
 				}
 
 				if (isset($torrent['creation date'], $torrent['created by'])) {
-					$date = date("d M Y | G:i:s" . (($settings['time_zone'] === 'UTC') ? ' e' : ''), $torrent['creation date']);
-					$client_date =  "\r\n" . formatText($msg['created_by_client']) . ": {$torrent['created by']} ($date)";
+					$date = date('d M Y | G:i:s' . (($settings['time_zone'] === 'UTC') ? ' e' : ''), $torrent['creation date']);
+					$client_date =  PHP_EOL . formatText($msg['created_by_client']) . ": {$torrent['created by']} ($date)";
 				}
 
 				if (isset($torrent['info']['pieces'])) {
 					$info_hash_v1 = hash('sha1', bencode_encode($torrent['info']));
-					$hash_v1 = "\r\n" . formatText($msg['root_hash']) . ": $info_hash_v1";
+					$hash_v1 = PHP_EOL . formatText($msg['root_hash']) . ": $info_hash_v1";
 				}
 
 				if (!isset($torrent['info']['meta version'])) {
-					$note_v1 = "\r\n" . formatText($msg['note']) . ": {$msg['hint_v1']}";
+					$note_v1 = PHP_EOL . formatText($msg['note']) . ": {$msg['hint_v1']}";
 				}
 
 				$err_status[$file . $title . $hash_v1 . $client_date] = $msg['no_v2'] . $note_v1;
@@ -472,24 +477,23 @@ $msg = init();
 			}
 
 			if (isset($torrent['creation date'], $torrent['created by'])) {
-				$creation_date = date("d M Y | G:i:s" . (($settings['time_zone'] === 'UTC') ? ' e' : ''), $torrent['creation date']);
+				$creation_date = date('d M Y | G:i:s' . (($settings['time_zone'] === 'UTC') ? ' e' : ''), $torrent['creation date']);
 				echo ' — ', formatText($msg['created_by_client']), ": {$torrent['created by']} ($creation_date) —\r\n";
 			}
 		}
 
-		// Loop through all arrays saving locations and showing result
+		// Loop through nested array till the main file-info
 		function printFiles($array, $parent = '')
 		{
 			global $msg, $torrent_size, $filec;
 
 			foreach ($array as $key => $value) {
-				$current = "$parent/$key";
+				$path = "$parent/$key";
 				if (!isset($value[''])) {
-					printFiles($value, $current);
-				}
-				else{
+					printFiles($value, $path);
+				} else {
 					$length = &$value['']['length'];
-					$path = substr($current, 1);
+					$path = substr($path, 1);
 					$size = formatBytes($length);
 					$root = bin2hex($value['']['pieces root'] ?? '');
 					echo "\r\n  $path ($size)\r\n {$msg['root_hash']}: $root\r\n";
@@ -507,15 +511,14 @@ $msg = init();
 			global $torrent_size, $filec;
 
 			foreach ($array as $key => $value) {
-				$current_key = "$parent_key/$key";
+				$current_path = "$parent_key/$key";
 				if (!isset($value[''])) {
-					combine_keys($value, $hashes, $current_key);
-				}
-				else{
+					combine_keys($value, $hashes, $current_path);
+				} else {
 					$length = &$value['']['length'];
 					$size = formatBytes($length);
 					$root = bin2hex($value['']['pieces root'] ?? '');
-					$hashes[substr($current_key, 1)] = [
+					$hashes[substr($current_path, 1)] = [
 						'hash' => "$root ($size)",
 						'size' => $length,
 						'pos' => $filec
@@ -542,8 +545,7 @@ $msg = init();
 					if (isset($keys[$hash])) {
 						$keys[$hash][] = $key;
 						$dups_size += $value['size'];
-					}
-					else{
+					} else {
 						$keys[$hash] = [$key];
 						$magnet['indices'][] = $value['pos'];
 					}
@@ -559,7 +561,7 @@ $msg = init();
 				foreach ($keys as $key => $value) {
 					$count = count($value);
 					if ($count > 1) {
-						$dups = implode("\r\n", $value);
+						$dups = implode(PHP_EOL, $value);
 						echo "\r\n {$msg['root_hash']} $key {$msg['dup_found']}:\r\n\r\n$dups\r\n\r\n";
 						$filed += $count;
 						++$dup_hashes;
@@ -569,8 +571,7 @@ $msg = init();
 
 			if (empty($dup_hashes)) {
 				echo "\r\n " , formatText($msg['no_duplicates'], 178) , "\r\n\r\n", formatText($msg['total_files']), ": $filec ($t_size)\r\n";
-			}
-			else{
+			} else {
 				$d_count = $filed - $dup_hashes;
 				$d_sizes = formatBytes($dups_size);
 
@@ -579,7 +580,6 @@ $msg = init();
 				if ($single_torrent) {
 
 					if (!empty($torrent_size)) {
-
 						$percentage = ($dups_size / $torrent_size) * 100;
 						$precision = ($percentage >= 0.01) ? 2 : (!empty($percentage) ? abs(floor(log10($percentage))) : 0);
 						echo ' | ' , number_format($percentage, $precision) , "%\r\n";
@@ -599,7 +599,7 @@ $msg = init();
 
 					$clean_cli = "\033[2A" . "\033[2K"; // Escape symbols for cleaning output
 
-					$handle = strtolower(fgets(fopen('php://stdin', 'r')));
+					$handle = fgets(fopen('php://stdin', 'r'));
 
 					if ($handle === PHP_EOL) {
 
@@ -609,30 +609,26 @@ $msg = init();
 							echo $clean_cli;
 						}
 
-						echo "\r\n" , formatText($magnetL, 70) , "\r\n";
+						echo PHP_EOL , formatText($magnetL, 70) , PHP_EOL;
 
 						if ($settings['output']) {
 							if (PHP_OS_FAMILY === 'Windows') {
 								$command = 'start "" "' . $magnetL . '"';
-								if (strlen($command) <= 8192) { // Windows command length limit
+								if (strlen($command) <= 8191) { // Windows command length limit
 									exec($command);
+								} else {
+									echo "\r\n " , formatText($msg['magnet_copy'], 178) , PHP_EOL;
 								}
-								else{
-									echo "\r\n " , formatText($msg['magnet_copy'], 178) , "\r\n";
-								}
-							}
-							elseif (PHP_OS_FAMILY === 'Linux') {
+							} elseif (PHP_OS_FAMILY === 'Linux') {
 								$command = 'xdg-open "" "' . $magnetL . '"';
 								exec($command);
 							}
 						}
-					}
-					elseif ($cli_output) {
+					} elseif ($cli_output) {
 						echo $clean_cli , "\033[1B" , "\033[2K";
 					}
-				}
-				else{
-					echo "\r\n";
+				} else {
+					echo PHP_EOL;
 				}
 			}
 		}
@@ -642,9 +638,9 @@ $msg = init();
 		{
 			global $magnet, $torrent;
 
-			$indices = '&so=' . formatSeq($magnet['indices']); // BEP 0053
-
 			$name = $trackers = $web_seeds = $info_hash_v1 = '';
+
+			$indices = '&so=' . formatSeq($magnet['indices']); // BEP 0053
 
 			if (isset($torrent['announce']) && !isset($torrent['announce-list'])) {
 				$trackers = '&tr=' . urlencode($torrent['announce']);
@@ -654,8 +650,7 @@ $msg = init();
 				$tracker_list = &$torrent['announce-list'];
 				if (count($tracker_list[0]) > 1) {
 					$trackers .= '&tr=' . implode('&tr=', array_map('urlencode', $tracker_list[0]));
-				}
-				else{
+				} else {
 					foreach ($tracker_list as $value) {
 						$trackers .= '&tr=' . urlencode($value[0]); // For tracker lists created with tiers (priorities)
 					}
@@ -666,8 +661,7 @@ $msg = init();
 				$url_list = &$torrent['url-list'];
 				if (!is_array($url_list)) {
 					$web_seeds = '&ws=' . urlencode($url_list);
-				}
-				else{
+				} else {
 					foreach ($url_list as $value) {
 						$web_seeds .= '&ws=' . urlencode($value);
 					}
@@ -699,7 +693,7 @@ $msg = init();
 			private $layer_hashes;
 			private $num_blocks;
 
-			public function __construct($path, $piece_length = 16384) // 16KiB blocks
+			public function __construct($path, $piece_length = 2**14) // 16KiB blocks
 			{
 				!ob_get_level() || ob_end_flush();
 				defined('BLOCK_SIZE') || define('BLOCK_SIZE', $piece_length);
@@ -815,9 +809,8 @@ $msg = init();
 			if ($settings['output'] && $settings['ansi']) {
 				return "\033[38;5;$colour" . "m$text\033[0m";
 			}
-			else{
-				return $text;
-			}
+
+			return $text;
 		}
 
 		// Represent sequences
@@ -837,8 +830,7 @@ $msg = init();
 				if ($index === $count - 1 || $numbers[$index + 1] - $number !== 1) {
 					if ($sequenceStart !== $number) {
 						$sequences[] = "$sequenceStart-$number";
-					}
-					else{
+					} else {
 						$sequences[] = $number;
 					}
 				}
@@ -858,15 +850,13 @@ $msg = init();
 
 				foreach ($err_status as $key => $value) {
 
-					echo "\r\n", formatText($msg['file_location']), ": $key\r\n", formatText($msg['error_type']), ": $value\r\n\r\n";
+					echo PHP_EOL, formatText($msg['file_location']), ": $key\r\n", formatText($msg['error_type']), ": $value\r\n\r\n";
 
 				}
 			}
 
 			if ($settings['debug']['enabled'] && $settings['output']) {
-
 				echo PHP_EOL , formatText('Time', 130), ': ', number_format(($t = microtime(true) - $settings['debug']['init_time']), ($t < 0.01 ? abs(floor(log10($t))) : 1)), 's | ', formatText('Memory', 130), ': ' , formatBytes(memory_get_peak_usage()), PHP_EOL;
-
 			}
 
 			die();
