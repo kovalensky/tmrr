@@ -82,7 +82,7 @@ tmrr_init();
 
 			global $settings, $argv, $msg;
 
-			$version = '2.3g'; // Code name: Gribovskaya (Mushroom Pumpkin)
+			$version = '2.4g'; // Code name: Gribovskaya (Mushroom Pumpkin)
 			$strings = [
 				'ru' => [
 					'main' => "\r\nСинтаксис:\r\n\r\n\r\n tmrr e <торрент-файл>	*Извлекает хеши файлов из торрентов*\r\n\r\n tmrr d <торрент-файл>	*Находит дубликаты файлов в торрент(ах)*\r\n\r\n tmrr c <ваш-файл>	*Вычисляет хеш существующего файла*\r\n\r\n\r\n** Поддерживается пакетная обработка, как <файл1> <файл2>.. <файлN>.\r\n\r\n---\r\n\r\nВерсия: $version Грибовская\r\nАвтор: Коваленский Константин\r\n\r\n",
