@@ -57,9 +57,10 @@ tmrr_init();
 		if ($argv[1] === 'c') {
 			foreach (array_slice($argv, 2) as $file) {
 
-				if (is_file($file) && !empty($size = filesize($file))) {
+				if (is_file($file) && !empty($file_size = filesize($file))) {
 					$hash = new HasherV2($file);
-					echo "\r\n  ", formatText($file) , ' (' , formatBytes($size) , ")\r\n BTMR: {$hash->root}\r\n\r\n";
+					$size = formatBytes($file_size);
+					echo "\r\n  $file " , formatText("($size)") , "\r\n ", $h_text_string ??= formatText('BTMR'), ": {$hash->root}\r\n\r\n";
 				} else {
 					$err_status[$file] = $msg['noraw'];
 				}
@@ -496,7 +497,7 @@ tmrr_init();
 					$path = substr($path, 1);
 					$size = formatBytes($length);
 					$root = bin2hex($value['']['pieces root'] ?? '');
-					echo "\r\n  $path ($size)\r\n {$msg['root_hash']}: $root\r\n";
+					echo "\r\n  $path ",  formatText("($size)"), "\r\n ", $h_text_string ??= formatText($msg['root_hash']), ": $root\r\n";
 					$torrent_size += $length;
 					++$filec;
 				}
@@ -702,6 +703,7 @@ tmrr_init();
 				$this->root = null;
 				$this->piece_layer = null;
 				$this->layer_hashes = [];
+				$this->padding = str_repeat("\x00", HASH_SIZE);
 				$this->num_blocks = 1;
 				$this->sync = time();
 				$fd = fopen($this->path, 'rb');
@@ -732,7 +734,7 @@ tmrr_init();
 							$power2 = next_power_2($blocks_count);
 							$remaining = $power2 - $blocks_count;
 						}
-						$padding = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
+						$padding = array_fill(0, $this->num_blocks, $this->padding);
 						$blocks = [...$blocks, ...array_slice($padding, 0, $remaining)];
 					}
 					$layer_hash = $this->merkle_root($blocks);
@@ -749,7 +751,7 @@ tmrr_init();
 				if ($hashes > 1) {
 					$pow2 = $this->next_power_2($hashes);
 					$remainder = $pow2 - $hashes;
-					$pad_piece = array_fill(0, $this->num_blocks, str_repeat("\x00", HASH_SIZE));
+					$pad_piece = array_fill(0, $this->num_blocks, $this->padding);
 					while ($remainder > 0) {
 						$this->layer_hashes[] = $this->merkle_root($pad_piece);
 						$remainder--;
