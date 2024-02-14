@@ -14,9 +14,13 @@ tmrr_init();
 		die($msg['main']);
 	}
 
+		// Get arguments
+		$method = &$argv[1];
+		$files = array_unique(array_slice($argv, 2));
+
 		// Extract hashes
-		if ($argv[1] === 'e') {
-			foreach (array_slice($argv, 2) as $file) {
+		if ($method === 'e') {
+			foreach ($files as $file) {
 
 				if (!torrent_validity($file)) {
 					continue;
@@ -34,14 +38,14 @@ tmrr_init();
 		}
 
 		// Find duplicates; be aware that duplicates inside single .torrent file are also shown
-		if ($argv[1] === 'd') {
-			foreach (array_slice($argv, 2) as $file) {
+		if ($method === 'd') {
+			foreach ($files as $file) {
 
 				if (!torrent_validity($file)) {
 					continue;
 				}
 
-				$file_tree_array["  $file:  "] = $torrent['info']['file tree'];
+				$file_tree_array[formatText("  $file:  ")] = $torrent['info']['file tree']; // ﾂ
 			}
 
 			if (!empty($file_tree_array)) {
@@ -54,8 +58,8 @@ tmrr_init();
 		}
 
 		// Calculate BTMR (BitTorrent Merkle Root) hash
-		if ($argv[1] === 'c') {
-			foreach (array_slice($argv, 2) as $file) {
+		if ($method === 'c') {
+			foreach ($files as $file) {
 
 				if (is_file($file) && !empty($file_size = filesize($file))) {
 					$hash = new HasherV2($file);
@@ -688,23 +692,16 @@ tmrr_init();
 		// Individual files Merkle computations
 		class HasherV2
 		{
-			private $path;
-			public $root;
-			private $piece_layer;
-			private $layer_hashes;
-			private $num_blocks;
 
-			public function __construct($path, $piece_length = 2**14) // 16KiB blocks
+			public function __construct($path) // 16KiB blocks
 			{
 				!ob_get_level() || ob_end_flush();
-				defined('BLOCK_SIZE') || define('BLOCK_SIZE', $piece_length);
-				defined('HASH_SIZE') || define('HASH_SIZE', 32);
+				$this->BLOCK_SIZE = 2**14; // 16KiB
+				$this->HASH_LENGTH = 32;
 				$this->path = $path;
 				$this->root = null;
-				$this->piece_layer = null;
 				$this->layer_hashes = [];
-				$this->padding = str_repeat("\x00", HASH_SIZE);
-				$this->num_blocks = 1;
+				$this->padding = str_repeat("\x00", $this->HASH_LENGTH);
 				$this->sync = time();
 				$fd = fopen($this->path, 'rb');
 				$this->process_file($fd, fstat($fd)['size'], $this->path);
@@ -717,7 +714,7 @@ tmrr_init();
 
 				while (!feof($fd)) {
 					$blocks = [];
-					$leaf = fread($fd, BLOCK_SIZE);
+					$leaf = fread($fd, $this->BLOCK_SIZE);
 
 					if (time() > $this->sync) { // Show percentage status
 						$percent = number_format((ftell($fd) / $file_size) * 100);
@@ -728,13 +725,13 @@ tmrr_init();
 					$blocks[] = hash('sha256', $leaf, true);
 					$blocks_count = count($blocks);
 
-					if ($blocks_count !== $this->num_blocks) {
-						$remaining = $this->num_blocks - $blocks_count;
+					if ($blocks_count !== 1) {
+						$remaining = 1 - $blocks_count;
 						if (count($this->layer_hashes) === 0) {
 							$power2 = next_power_2($blocks_count);
 							$remaining = $power2 - $blocks_count;
 						}
-						$padding = array_fill(0, $this->num_blocks, $this->padding);
+						$padding = array_fill(0, 1, $this->padding);
 						$blocks = [...$blocks, ...array_slice($padding, 0, $remaining)];
 					}
 					$layer_hash = $this->merkle_root($blocks);
@@ -746,12 +743,11 @@ tmrr_init();
 
 			private function calculate_root()
 			{
-				$this->piece_layer = implode('', $this->layer_hashes);
 				$hashes = count($this->layer_hashes);
 				if ($hashes > 1) {
 					$pow2 = $this->next_power_2($hashes);
 					$remainder = $pow2 - $hashes;
-					$pad_piece = array_fill(0, $this->num_blocks, $this->padding);
+					$pad_piece = array_fill(0, 1, $this->padding);
 					while ($remainder > 0) {
 						$this->layer_hashes[] = $this->merkle_root($pad_piece);
 						$remainder--;
