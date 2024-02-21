@@ -32,7 +32,3 @@ php tmrr.php your_command
 ```
 
 If this tool has somehow helped you in finding important files, you can express your gratitude by starring this repository 🍀.
-
-## Donations
-### XMR
-837ooBb4LrdGKd2qbzEsjt4SgdG9oCLJgjozRCyszB474pNrEzAftYdPL8EA75h7NqP4Zxmp2ikR3eggLeWcViCMVJxYpQ8
