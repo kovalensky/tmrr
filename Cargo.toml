@@ -1,0 +1,11 @@
+# Cargo.toml
+[package]
+name = "tmrr"
+version = "2.4.7"
+edition = "2024"
+
+[dependencies]
+sha1 = "0.10"
+sha2 = "0.10"
+hex = "0.4"
+chrono = "0.4"

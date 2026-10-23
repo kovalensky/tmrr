@@ -8,7 +8,10 @@
 Useful for finding the sources of the same copies of files on different trackers & DHT indexers that support BitTorrent v2 protocol, thus reviving dead torrents, valuable Internet artifacts.
 
 > [!NOTE]  
-> Generating magnet download links without duplicates is currently not available due to the [ongoing](https://github.com/arvidn/libtorrent/issues/7439) issue with piece alignment files, hopefully it will be resolved soon.
+> Generating magnet download links without duplicates is currently not usable due to client features, the [ongoing](https://github.com/arvidn/libtorrent/issues/7439) issue with piece alignment files, hopefully it will be resolved soon.
+
+Navigate to the Releases, and download your OS build.
+
 
 Extract file hashes from .torrent files:
 ```
@@ -26,9 +29,10 @@ To save a large output:
 ```
 tmrr your_command > output.txt
 ```
-For the Linux environment on which PHP is installed:
-```
-php tmrr.php your_command
-```
 
-If this tool has somehow helped you in finding important files, you can express your gratitude by starring this repository 🍀.
+Change the language (supported codes ```ru, de, en, zh```):
+```
+tmrr locale de
+``` 
+
+Reviews are welcome.
